@@ -1,6 +1,7 @@
 package app.lslibrary.androidHelper;
 
 import android.util.Log;
+import com.amitshekhar.DebugDB;
 
 //按android的组件和模块来分。activity,broadcast,content,services,animation,customview,log.
 public class LSLog
@@ -49,5 +50,10 @@ public class LSLog
             infos[2] = " Line:" +elements[4].getLineNumber() + "";
             return infos[0]+infos[1]+infos[2];
         }
+    }
+
+    public static void Log_DBinfo()
+    {
+        LSLog.Log_INFO("address:"+DebugDB.getAddressLog());
     }
 }
