@@ -7,10 +7,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class Music extends SQLiteOpenHelper
 {
     public static int defaultVersion=1;
+    public static String dbName="music.db";
 
     public static Music getInstance(Context context)
     {
-        return new Music(context, "music.db", null, defaultVersion);
+        return new Music(context, dbName, null, defaultVersion);
     }
 
     public Music(Context context, String name, SQLiteDatabase.CursorFactory factory, int version)
