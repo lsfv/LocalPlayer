@@ -1,4 +1,4 @@
-package com.linson.android.dal.dbhelper;
+package app.dal.dbhelper;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
