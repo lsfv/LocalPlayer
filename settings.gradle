@@ -1,1 +1,1 @@
-include ':app', ':lslibrary', ':Model'
+include ':app', ':lslibrary', ':Model', ':dal'
