@@ -7,6 +7,8 @@ import android.os.Bundle;
 
 import app.lslibrary.androidHelper.LSLog;
 
+//自动生成model。 dbhelper. 测试DBHELPER。 dal.
+
 public class MainActivity extends AppCompatActivity
 {
     public static Context appContext;
