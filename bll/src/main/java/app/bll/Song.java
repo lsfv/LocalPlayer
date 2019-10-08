@@ -5,6 +5,7 @@ import android.content.Context;
 public class Song
 {
     private app.dal.Song dal;
+
     public Song(Context context)
     {
         dal=new app.dal.Song(context);

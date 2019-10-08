@@ -10,19 +10,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
 import com.linson.android.localplayer.R;
-
 import java.util.LinkedList;
 import java.util.List;
-
-import app.lslibrary.androidHelper.LSLog;
 
 
 public class Adapter_List extends RecyclerView.Adapter<Adapter_List.MyHolderView>
 {
     private List<app.model.List> mdata=new LinkedList<>();
     private float prex=-1;
+    private boolean isMove=false;
     private int maxWidth=240;
     private boolean isHiden=true;
     private IAdapter_ListHander mIAdapter_listHander;
@@ -39,7 +36,6 @@ public class Adapter_List extends RecyclerView.Adapter<Adapter_List.MyHolderView
     public MyHolderView onCreateViewHolder(@NonNull ViewGroup viewGroup, int i)
     {
         View view=LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_delete, viewGroup, false);
-
         return new MyHolderView(view);
     }
 
@@ -71,9 +67,11 @@ public class Adapter_List extends RecyclerView.Adapter<Adapter_List.MyHolderView
                 if(event.getAction()==MotionEvent.ACTION_DOWN)
                 {
                     prex=event.getX();
+                    isMove=false;
                 }
                 else if(event.getAction()==MotionEvent.ACTION_MOVE)
                 {
+                    isMove=true;
                     ConstraintLayout.LayoutParams lp=(ConstraintLayout.LayoutParams)myHolderView.mTvItem.getLayoutParams();
 
                     float currentX=event.getX();
@@ -87,44 +85,54 @@ public class Adapter_List extends RecyclerView.Adapter<Adapter_List.MyHolderView
                 }
                 else if(event.getAction()==MotionEvent.ACTION_CANCEL ||event.getAction()==MotionEvent.ACTION_UP )
                 {
-                    final ConstraintLayout.LayoutParams lp=(ConstraintLayout.LayoutParams)myHolderView.mTvItem.getLayoutParams();
-                    boolean wantToShow=true;
-                    int currentMargin=lp.getMarginEnd();
-                    if(isHiden)
+                    //处理2类事件。点击和滑动
+                    if(isMove==false && event.getAction()==MotionEvent.ACTION_UP && isHiden)
                     {
-                        wantToShow=(float)currentMargin/maxWidth>=0.5?true:false;//键盘判断，拖动超过一半就显示.
-                    }
-                    else
-                    {
-                        wantToShow=false;//显示状态，除非触碰按钮，否则无条件关闭按钮。
-                    }
-
-                    int endMargin;
-                    if(wantToShow)
-                    {
-                        endMargin=maxWidth;
-                        isHiden=false;
-                    }
-                    else
-                    {
-                        endMargin=0;
-                        isHiden=true;
-                    }
-                    //play animator
-                    ValueAnimator animator=ValueAnimator.ofInt(currentMargin,endMargin);
-                    animator.setDuration(300);
-                    animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener()
-                    {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator animation)
+                        if(mIAdapter_listHander!=null)
                         {
-                            int changingValue=(int)animation.getAnimatedValue();
-                            lp.setMargins(0, 0, changingValue, 0);
-                            myHolderView.mTvItem.setLayoutParams(lp);
+                            mIAdapter_listHander.onClickItem(i);
                         }
-                    });
-                    animator.start();
-                    //end play animator
+                    }
+                    else
+                    {
+
+                        final ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) myHolderView.mTvItem.getLayoutParams();
+                        boolean wantToShow = true;
+                        int currentMargin = lp.getMarginEnd();
+                        if (isHiden)
+                        {
+                            wantToShow = (float) currentMargin / maxWidth >= 0.5 ? true : false;//键盘判断，拖动超过一半就显示.
+                        } else
+                        {
+                            wantToShow = false;//显示状态，除非触碰按钮，否则无条件关闭按钮。
+                        }
+
+                        int endMargin;
+                        if (wantToShow)
+                        {
+                            endMargin = maxWidth;
+                            isHiden = false;
+                        } else
+                        {
+                            endMargin = 0;
+                            isHiden = true;
+                        }
+                        //play animator
+                        ValueAnimator animator = ValueAnimator.ofInt(currentMargin, endMargin);
+                        animator.setDuration(300);
+                        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener()
+                        {
+                            @Override
+                            public void onAnimationUpdate(ValueAnimator animation)
+                            {
+                                int changingValue = (int) animation.getAnimatedValue();
+                                lp.setMargins(0, 0, changingValue, 0);
+                                myHolderView.mTvItem.setLayoutParams(lp);
+                            }
+                        });
+                        animator.start();
+                        //end play animator
+                    }
                 }
                 return true;
             }
@@ -180,6 +188,7 @@ public class Adapter_List extends RecyclerView.Adapter<Adapter_List.MyHolderView
     public interface IAdapter_ListHander
     {
         void onClickDelete(int index);
+        void onClickItem(int index);
     }
     //endregion
 }

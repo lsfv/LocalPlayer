@@ -1,30 +1,25 @@
 package com.linson.android.localplayer.activities;
 
 import android.Manifest;
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Adapter.Adapter_List;
 import com.linson.android.localplayer.activities.Dialog.Dialog_addlist;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.LinkedList;
-
+import app.lslibrary.androidHelper.LSActivity;
 import app.lslibrary.androidHelper.LSContentResolver;
 import app.lslibrary.androidHelper.LSLog;
 import app.model.List;
@@ -33,7 +28,6 @@ import app.model.List;
 //1.一个列表展示（带删除） 2.一个新建列表。3。一个更新歌曲。
 //3.独立模块。1.仅仅一个展示和一个删除逻辑。2.一个添加逻辑，并对2模块进行刷新。
 //以上逻辑和母模板页面没有任何交互。
-//!todo 2:新加的时候有数据库就出错，删除新家的也会出粗。  3.
 //!todo getMenuTitle 并没有保证会加入所有菜单。
 public class ListIndex extends Fragment implements MasterPage.IFragmentForMaster
 {
@@ -80,17 +74,10 @@ public class ListIndex extends Fragment implements MasterPage.IFragmentForMaster
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        //建立adapter，并给rcyleview。
         findControls();
         setupRecycle();
-
     }
 
-    @Override
-    public void onDestroy()
-    {
-        super.onDestroy();
-    }
 
     private void setupRecycle()
     {
@@ -99,6 +86,15 @@ public class ListIndex extends Fragment implements MasterPage.IFragmentForMaster
         mRvList.setAdapter(adapter_list);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this.getContext());
         mRvList.setLayoutManager(linearLayoutManager);
+        mRvList.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                LSLog.Log_INFO(v.toString()+"recycleview touch"+event.getAction());
+                return false;
+            }
+        });
     }
 
 
@@ -134,14 +130,6 @@ public class ListIndex extends Fragment implements MasterPage.IFragmentForMaster
         return true;
     }
 
-    private void realUpdataLocalSongs()
-    {
-        LSContentResolver lsContentResolver=new LSContentResolver(MainActivity.appContext);
-        java.util.List<LSContentResolver.SongInfo> localSongs= lsContentResolver.SearchSong(60*1000);
-        mLocalSong_bll.updateSongsFromLocal(localSongs);
-        Toast.makeText(getContext(), "更新完毕",Toast.LENGTH_SHORT ).show();
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
@@ -155,6 +143,15 @@ public class ListIndex extends Fragment implements MasterPage.IFragmentForMaster
             }
         });
     }
+
+    private void realUpdataLocalSongs()
+    {
+        LSContentResolver lsContentResolver=new LSContentResolver(MainActivity.appContext);
+        java.util.List<LSContentResolver.SongInfo> localSongs= lsContentResolver.SearchSong(60*1000);
+        mLocalSong_bll.updateSongsFromLocal(localSongs);
+        Toast.makeText(getContext(), "更新完毕",Toast.LENGTH_SHORT ).show();
+    }
+
 
     //region no static class
     public class Adapter_listHandler implements Adapter_List.IAdapter_ListHander
@@ -178,8 +175,19 @@ public class ListIndex extends Fragment implements MasterPage.IFragmentForMaster
                 }
             }
         }
+
+        @Override
+        public void onClickItem(int index)
+        {
+            app.model.List theItem= getAdapter().getitem(index);
+            ((MasterPage)getActivity()).startPageWithBack(new ListDetail());
+        }
     }
 
+    private Adapter_List getAdapter()
+    {
+        return (Adapter_List)mRvList.getAdapter();
+    }
 
     public class popupWindowHander implements Dialog_addlist.Idialogcallback
     {
@@ -192,6 +200,5 @@ public class ListIndex extends Fragment implements MasterPage.IFragmentForMaster
             ( (Adapter_List)mRvList.getAdapter()).addItem(temp);
         }
     }
-
     //endregion
 }
