@@ -2,7 +2,11 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/bll/src/main/java/app/bll/List.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/bll/src/main/java/app/bll/List_Song.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/bll/src/main/java/app/bll/LocalSong.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/bll/src/main/java/app/bll/Song.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dal/src/main/java/app/dal/List.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dal/src/main/java/app/dal/List_Song.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dal/src/main/java/app/dal/LocalSong.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dal/src/main/java/app/dal/Song.java" charset="UTF-8" />
   </component>

@@ -46,20 +46,15 @@ public class List
 
 
     //extend
-    public java.util.List<app.model.List> Test_getModelList()
+    public java.util.List<app.model.List> getAllLists()
     {
-        java.util.List<app.model.List> res=new LinkedList<>();
+        app.model.List allSong=new app.model.List();
+        allSong.L_name="所有歌曲";
+        allSong.L_id=0;
 
-        app.model.List temp1=new app.model.List("好听","info","pic","pic");
-        temp1.L_id=1;
-
-        app.model.List temp2=new app.model.List("好听2","info","pic","pic");
-        temp2.L_id=2;
-        res.add(temp1);
-        res.add(temp2);
-
-
-        return  res;
+        java.util.List<app.model.List> res=dal.getModelList(" order by L_id");
+        res.add(0, allSong);
+        return res;
     }
 
 

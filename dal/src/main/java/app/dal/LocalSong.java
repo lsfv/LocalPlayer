@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import app.dal.dbhelper.Music;
 
@@ -108,5 +109,40 @@ public class LocalSong
         }
 
         return lists;
+    }
+
+
+    //extend
+    public void clear()
+    {
+        DBHelper.getWritableDatabase().execSQL("delete from LocalSong");
+    }
+
+    public void updateSongs()
+    {
+        /*跟新存在的version，添加新的，删除odl version */
+        int version=Calendar.getInstance().get(Calendar.SECOND)+Calendar.getInstance().get(Calendar.MINUTE)*100+Calendar.getInstance().get(Calendar.HOUR)*10000+Calendar.getInstance().get(Calendar.DAY_OF_MONTH)*1000000;
+        String strVersion=  version+"";
+        String sql1="update Song set S_version="+strVersion+" where  S_path in (select LS_path from localSong)";
+        String sql2="delete from localSong where LS_path in(select S_path from Song)";
+        String sql3="insert into Song(S_musicName,S_artist,S_duration,S_path,S_songID,S_version,S_ps) select LS_musicName,LS_artist,LS_duration,LS_path,LS_songID,"+strVersion+",'' from localsong";
+        String sql4="delete from Song where S_version !="+strVersion;
+        String sql5="delete from localSong";
+
+        SQLiteDatabase db= DBHelper.getWritableDatabase();
+        db.beginTransaction();
+        try
+        {
+            db.execSQL(sql1);
+            db.execSQL(sql2);
+            db.execSQL(sql3);
+            db.execSQL(sql4);
+            db.execSQL(sql5);
+            db.setTransactionSuccessful();
+        }
+        finally
+        {
+            db.endTransaction();
+        }
     }
 }

@@ -1,8 +1,10 @@
 package com.linson.android.localplayer.activities;
 
+import android.Manifest;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -12,12 +14,14 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Adapter.Adapter_List;
 import com.linson.android.localplayer.activities.Dialog.Dialog_addlist;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -45,12 +49,14 @@ public class ListIndex extends Fragment implements MasterPage.IFragmentForMaster
 
     //region other member variable
     private app.bll.List mList_bll;
+    private app.bll.LocalSong mLocalSong_bll;
     //endregion
 
 
     public ListIndex()
     {
         mList_bll=new app.bll.List(MainActivity.appContext);
+        mLocalSong_bll=new app.bll.LocalSong(MainActivity.appContext);
     }
 
 
@@ -88,7 +94,7 @@ public class ListIndex extends Fragment implements MasterPage.IFragmentForMaster
 
     private void setupRecycle()
     {
-        java.util.List<List> res=mList_bll.getModelList("");
+        java.util.List<List> res=mList_bll.getAllLists();
         Adapter_List adapter_list=new Adapter_List(res, new Adapter_listHandler());
         mRvList.setAdapter(adapter_list);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this.getContext());
@@ -115,13 +121,39 @@ public class ListIndex extends Fragment implements MasterPage.IFragmentForMaster
         }
         else if(menuItem.getTitle().toString()==app.bll.List.menu_upsong)
         {
-            LSLog.Log_INFO("update songs");
             //获得本地歌曲。插入到临时表：localsong。更新歌曲表:song
-            LSContentResolver lsContentResolver=new LSContentResolver(MainActivity.appContext);
-            java.util.List<LSContentResolver.SongInfo> localSongs= lsContentResolver.SearchSong(60*1000);
-
+            LSContentResolver.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new LSContentResolver.VoidHandler()
+            {
+                @Override
+                public void doit()
+                {
+                    realUpdataLocalSongs();
+                }
+            });
         }
         return true;
+    }
+
+    private void realUpdataLocalSongs()
+    {
+        LSContentResolver lsContentResolver=new LSContentResolver(MainActivity.appContext);
+        java.util.List<LSContentResolver.SongInfo> localSongs= lsContentResolver.SearchSong(60*1000);
+        mLocalSong_bll.updateSongsFromLocal(localSongs);
+        Toast.makeText(getContext(), "更新完毕",Toast.LENGTH_SHORT ).show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        LSContentResolver.progressCheck(getActivity(), requestCode, grantResults, 1, new LSContentResolver.VoidHandler()
+        {
+            @Override
+            public void doit()
+            {
+                realUpdataLocalSongs();
+            }
+        });
     }
 
     //region no static class
@@ -130,16 +162,24 @@ public class ListIndex extends Fragment implements MasterPage.IFragmentForMaster
         @Override
         public void onClickDelete(int index)
         {
-            RecyclerView.Adapter adapter= mRvList.getAdapter();
-            if(adapter instanceof Adapter_List)
+            RecyclerView.Adapter adapter = mRvList.getAdapter();
+            if (adapter instanceof Adapter_List)
             {
-                Adapter_List adapter_list=(Adapter_List)adapter;
-                app.model.List temp=adapter_list.getitem(index);
-                mList_bll.delete(temp.L_id);//从数据库删除
-                adapter_list.deleteItem(index);//从内存删除
+                Adapter_List adapter_list = (Adapter_List) adapter;
+                app.model.List temp = adapter_list.getitem(index);
+                if (temp.L_id > 0)
+                {
+                    mList_bll.delete(temp.L_id);//从数据库删除
+                    adapter_list.deleteItem(index);//从内存删除
+                }
+                else//list 'allsongs' should't delete.
+                {
+                    Toast.makeText(getContext(), "you can't delete it", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }
+
 
     public class popupWindowHander implements Dialog_addlist.Idialogcallback
     {
