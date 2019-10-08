@@ -1,4 +1,4 @@
-﻿package app.model;
+package app.model;
 import java.util.Date;
 public class V_List_Song
 {

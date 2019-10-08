@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ContentActivity">
+    <group android:id="@+id/groupindex" android:visible="false">
+        <item
+            android:id="@+id/action_updateSongs"
+            android:title="查找本地"
+            app:showAsAction="always" />
+        <item
+            android:id="@+id/action_newList"
+            android:title="新建歌单"
+            app:showAsAction="always" />
+    </group>
+    <group android:id="@+id/groupdetail" android:visible="false">
+        <item
+            android:id="@+id/action_editList"
+            android:title="编辑歌单"
+            app:showAsAction="always" />
+    </group>
+</menu>

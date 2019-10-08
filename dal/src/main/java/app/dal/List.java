@@ -1,4 +1,4 @@
-﻿package app.dal;
+package app.dal;
 
 import android.content.ContentValues;
 import android.content.Context;
