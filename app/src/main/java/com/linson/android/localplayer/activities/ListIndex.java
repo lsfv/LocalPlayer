@@ -14,6 +14,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+import android.widget.Toolbar;
+
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Adapter.Adapter_List;
@@ -29,7 +31,7 @@ import app.model.List;
 //3.独立模块。1.仅仅一个展示和一个删除逻辑。2.一个添加逻辑，并对2模块进行刷新。
 //以上逻辑和母模板页面没有任何交互。
 //!todo getMenuTitle 并没有保证会加入所有菜单。
-public class ListIndex extends Fragment implements MasterPage.IFragmentForMaster
+public class ListIndex extends Fragment
 {
     private RecyclerView mRvList;
 
@@ -75,7 +77,24 @@ public class ListIndex extends Fragment implements MasterPage.IFragmentForMaster
     {
         super.onActivityCreated(savedInstanceState);
         findControls();
+
         setupRecycle();
+        //最早放入到母模板回调，但是1.母模板不能列出所有页面跳转。2，要额外写回退时加载菜单。
+        //所以放入到首次加载和回退都会执行的生命周期中，会比较好。
+        setupToolbarMenu();
+    }
+
+    private void setupToolbarMenu()
+    {
+        ((MasterPage)getActivity()).getToolbar().getMenu().clear();
+        ((MasterPage)getActivity()).getToolbar().setOnMenuItemClickListener(new MenuHandler());
+        java.util.List<String> menus=mList_bll.getMenuTitle();
+
+        for(int i=0;i<menus.size();i++)
+        {
+            ((MasterPage)getActivity()).getToolbar().getMenu().add(menus.get(i));
+            ((MasterPage)getActivity()).getToolbar().getMenu().getItem(i).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        }
     }
 
 
@@ -98,37 +117,9 @@ public class ListIndex extends Fragment implements MasterPage.IFragmentForMaster
     }
 
 
-    @Override
-    public java.util.List<String> getMenuTitle()
-    {
-        return mList_bll.getMenuTitle();
-    }
 
 
-    @Override
-    public boolean onMenuItemClick(MenuItem menuItem)
-    {
-        if(menuItem.getTitle().toString()==app.bll.List.menu_addlist)
-        {
-            //popup window for add list
-            Dialog_addlist dialog_addlist=new Dialog_addlist(getContext(), new popupWindowHander());
-            dialog_addlist.show();
 
-        }
-        else if(menuItem.getTitle().toString()==app.bll.List.menu_upsong)
-        {
-            //获得本地歌曲。插入到临时表：localsong。更新歌曲表:song
-            LSContentResolver.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new LSContentResolver.VoidHandler()
-            {
-                @Override
-                public void doit()
-                {
-                    realUpdataLocalSongs();
-                }
-            });
-        }
-        return true;
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
@@ -200,6 +191,34 @@ public class ListIndex extends Fragment implements MasterPage.IFragmentForMaster
             int id= mList_bll.add(temp);
             temp=mList_bll.getModel(id);
             ( (Adapter_List)mRvList.getAdapter()).addItem(temp);
+        }
+    }
+
+    public class MenuHandler implements android.support.v7.widget.Toolbar.OnMenuItemClickListener
+    {
+        @Override
+        public boolean onMenuItemClick(MenuItem menuItem)
+        {
+            if(menuItem.getTitle().toString()==app.bll.List.menu_addlist)
+            {
+                //popup window for add list
+                Dialog_addlist dialog_addlist=new Dialog_addlist(getContext(), new popupWindowHander());
+                dialog_addlist.show();
+
+            }
+            else if(menuItem.getTitle().toString()==app.bll.List.menu_upsong)
+            {
+                //获得本地歌曲。插入到临时表：localsong。更新歌曲表:song
+                LSContentResolver.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new LSContentResolver.VoidHandler()
+                {
+                    @Override
+                    public void doit()
+                    {
+                        realUpdataLocalSongs();
+                    }
+                });
+            }
+            return true;
         }
     }
     //endregion

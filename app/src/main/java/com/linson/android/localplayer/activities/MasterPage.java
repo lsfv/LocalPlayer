@@ -90,41 +90,11 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
                 mDrawerMainMenu.openDrawer(Gravity.LEFT);
             }
         });
-
-        mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener()
-        {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem)
-            {
-                if(getSupportFragmentManager().findFragmentById(R.id.mainFragment) instanceof IFragmentForMaster)
-                {
-                    IFragmentForMaster fragment=(IFragmentForMaster) getSupportFragmentManager().findFragmentById(R.id.mainFragment);
-                    return fragment.onMenuItemClick(menuItem);
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        });
     }
 
-    //无法和回退配合。
     private void startPage(Fragment fragment)
     {
-        if(fragment instanceof IFragmentForMaster)
-        {
-            mToolbar.getMenu().clear();
-
-            List<String> menus=((IFragmentForMaster) fragment).getMenuTitle();
-            for(int i=0;i<menus.size();i++)
-            {
-                mToolbar.getMenu().add(menus.get(i));
-                mToolbar.getMenu().getItem(i).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            }
-        }
         LSActivity.replaceFragment(getSupportFragmentManager(), false, R.id.mainFragment, fragment);
-
         mDrawerMainMenu.closeDrawer(Gravity.LEFT);
     }
 
@@ -134,27 +104,18 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
     //region 母模板public出去的方法，提供给fragment使用。
     public void startPageWithBack(Fragment fragment)
     {
-        if(fragment instanceof IFragmentForMaster)
-        {
-            mToolbar.getMenu().clear();
-
-            List<String> menus=((IFragmentForMaster) fragment).getMenuTitle();
-            for(int i=0;i<menus.size();i++)
-            {
-                mToolbar.getMenu().add(menus.get(i));
-                mToolbar.getMenu().getItem(i).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            }
-        }
-
         LSActivity.replaceFragment(getSupportFragmentManager(), true, R.id.mainFragment, fragment);
     }
+    public Toolbar getToolbar()
+    {
+        return mToolbar;
+    }
+
     //endregion
 
     //region 母模板需要每个页面实现的功能接口。
     public interface IFragmentForMaster
     {
-        List<String> getMenuTitle();
-        boolean onMenuItemClick(MenuItem menuItem);
     }
     //endregion
 }

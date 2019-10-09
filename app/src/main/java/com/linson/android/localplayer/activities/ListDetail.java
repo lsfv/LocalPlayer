@@ -15,18 +15,13 @@ import android.widget.TextView;
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Adapter.Adapter_Songs;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-import app.bll.List_Song;
-import app.bll.Song;
 import app.bll.V_List_Song;
 import app.lslibrary.androidHelper.LSLog;
 
 
-public class ListDetail extends Fragment implements MasterPage.IFragmentForMaster
+public class ListDetail extends Fragment
 {
     private TextView mTvListname;
     private RecyclerView mRvSonglist;
@@ -53,7 +48,6 @@ public class ListDetail extends Fragment implements MasterPage.IFragmentForMaste
     public void setListID(int lid)
     {
         mListID=lid;
-
     }
 
     @Override
@@ -70,7 +64,9 @@ public class ListDetail extends Fragment implements MasterPage.IFragmentForMaste
         findControls();
 
         setupRecyleview();
+        setupToolbarMenu();
     }
+
 
     private void setupRecyleview()
     {
@@ -90,20 +86,34 @@ public class ListDetail extends Fragment implements MasterPage.IFragmentForMaste
         mRvSonglist.setLayoutManager(linearLayoutManager);
     }
 
-    @Override
-    public java.util.List<String> getMenuTitle()
+
+    private void setupToolbarMenu()
     {
-        return mV_list_song_bll.getMenuTitle();
+        ((MasterPage)getActivity()).getToolbar().getMenu().clear();
+        ((MasterPage)getActivity()).getToolbar().setOnMenuItemClickListener(new MenuHandler());
+        java.util.List<String> menus=mV_list_song_bll.getMenuTitle();
+
+        for(int i=0;i<menus.size();i++)
+        {
+            ((MasterPage)getActivity()).getToolbar().getMenu().add(menus.get(i));
+            ((MasterPage)getActivity()).getToolbar().getMenu().getItem(i).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        }
     }
 
-    @Override
-    public boolean onMenuItemClick(MenuItem menuItem)
+
+    public class MenuHandler implements android.support.v7.widget.Toolbar.OnMenuItemClickListener
     {
-        if(menuItem.getTitle().toString()==mV_list_song_bll.menu_editlist)
+        @Override
+        public boolean onMenuItemClick(MenuItem menuItem)
         {
-            LSLog.Log_INFO("editlist");
-            //编辑菜单
+            if(menuItem.getTitle().toString()==V_List_Song.menu_editlist)
+            {
+                //popup window for add list
+                LSLog.Log_INFO("edit list");
+            }
+            return true;
         }
-        return true;
     }
+
+
 }
