@@ -2,6 +2,10 @@ package app.bll;
 
 import android.content.Context;
 
+import java.util.LinkedList;
+
+import app.dal.Song;
+
 public class List_Song
 {
     private app.dal.List_Song dal;

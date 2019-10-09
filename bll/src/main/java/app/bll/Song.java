@@ -2,6 +2,8 @@ package app.bll;
 
 import android.content.Context;
 
+import java.util.LinkedList;
+
 public class Song
 {
     private app.dal.Song dal;
@@ -35,4 +37,10 @@ public class Song
     {
         return dal.getModelList(where);
     }
+
+
+    //extend
+
+
+
 }

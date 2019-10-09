@@ -21,7 +21,11 @@ import java.util.List;
 import app.lslibrary.androidHelper.LSActivity;
 import app.lslibrary.androidHelper.LSLog;
 
-//!todo! 1，还有一个不是很完善的地方：if(fragment instanceof ISetupMaster)。 没有强制的要求接口。
+//!todo 1，还有一个不是很完善的地方：if(fragment instanceof ISetupMaster)。 没有强制的要求接口。
+//!todo 逻辑层的分类，按表划分，会导致扩表操作的方法，无法定位放置位置。 如果按模块划分，如页面，页面太多，或小页面又会导致逻辑类太多。这个。
+//!todo savedInstanceState 实际工程使用范例.
+//!todo 1.建立界面 .2 建立初始化函数 3.填充数据recycleview. 4.处理编辑清单功能。  ！！！！清单id出现的不一样。
+//!todo 还是需要一个模板啊。比如adapter 的大致样子都是差不多的。
 public class MasterPage extends AppCompatActivity implements View.OnClickListener
 {
     //region 母模板 自己功能实现的代码块。
@@ -29,11 +33,8 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
     private Toolbar mToolbar;
     private ConstraintLayout mMainFragment;
     private Button mBtnPage1;
-    private Button mBtnPage2;
-
 
     private boolean loadMenu=false;
-
 
     //region  findcontrols and bind click event.
     private void findControls()
@@ -42,11 +43,9 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mMainFragment = (ConstraintLayout) findViewById(R.id.mainFragment);
         mBtnPage1 = (Button) findViewById(R.id.btn_page1);
-        mBtnPage2 = (Button) findViewById(R.id.btn_page2);
 
         //set event handler
         mBtnPage1.setOnClickListener(this);
-        mBtnPage2.setOnClickListener(this);
     }
 
 
@@ -58,11 +57,6 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
             case R.id.btn_page1:
             {
                 startPage(new ListIndex());
-                break;
-            }
-            case R.id.btn_page2:
-            {
-                startPage(new ListDetail());
                 break;
             }
             default: { break; }
@@ -80,12 +74,12 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_master_page);
         findControls();//1.控件绑定
-        setupMenu();//2.配置菜单
+        setupDrawerMenu();//2.配置左侧滑动菜单
         startPage(new ListIndex());//3.加载首页
     }
 
 
-    private void setupMenu()
+    private void setupDrawerMenu()
     {
         mToolbar.setNavigationIcon(R.drawable.list);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener()
@@ -115,7 +109,7 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
         });
     }
 
-
+    //无法和回退配合。
     private void startPage(Fragment fragment)
     {
         if(fragment instanceof IFragmentForMaster)
@@ -129,7 +123,6 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
                 mToolbar.getMenu().getItem(i).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             }
         }
-
         LSActivity.replaceFragment(getSupportFragmentManager(), false, R.id.mainFragment, fragment);
 
         mDrawerMainMenu.closeDrawer(Gravity.LEFT);

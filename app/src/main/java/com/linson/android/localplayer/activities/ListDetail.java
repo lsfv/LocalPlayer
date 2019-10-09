@@ -2,49 +2,108 @@ package com.linson.android.localplayer.activities;
 
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
+import com.linson.android.localplayer.activities.Adapter.Adapter_Songs;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
+import app.bll.List_Song;
+import app.bll.Song;
+import app.bll.V_List_Song;
 import app.lslibrary.androidHelper.LSLog;
 
-/**
- * A simple {@link Fragment} subclass.
- */
+
 public class ListDetail extends Fragment implements MasterPage.IFragmentForMaster
 {
+    private TextView mTvListname;
+    private RecyclerView mRvSonglist;
+
+    //region  findcontrols and bind click event.
+    private void findControls()
+    {   //findControls
+        mTvListname = (TextView) getActivity().findViewById(R.id.tv_listname);
+        mRvSonglist = (RecyclerView) getActivity().findViewById(R.id.rv_songlist);
+    }
+    //endregion
+
+    //region other member variable
+    private int mListID=0;
+    private app.bll.V_List_Song mV_list_song_bll;
+    //endregion
+
+
     public ListDetail()
     {
-        // Required empty public constructor
+        mV_list_song_bll=new V_List_Song(MainActivity.appContext);
+    }
+
+    public void setListID(int lid)
+    {
+        mListID=lid;
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_list_detail, container, false);
     }
 
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState)
+    {
+        super.onActivityCreated(savedInstanceState);
+        findControls();
+
+        setupRecyleview();
+    }
+
+    private void setupRecyleview()
+    {
+        List<app.model.V_List_Song> res=null;
+        if(mListID==0)
+        {
+            res= mV_list_song_bll.getModelByZeroList();
+        }
+        else if(mListID>0)
+        {
+            res=mV_list_song_bll.getModelByLid(mListID);
+        }
+
+        Adapter_Songs adapter_songs=new Adapter_Songs(res);
+        mRvSonglist.setAdapter(adapter_songs);
+        LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getContext());
+        mRvSonglist.setLayoutManager(linearLayoutManager);
+    }
+
+    @Override
     public java.util.List<String> getMenuTitle()
     {
-        java.util.List<String> res=new LinkedList<>();
-        res.add("编辑列表");
-        return res;
+        return mV_list_song_bll.getMenuTitle();
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem menuItem)
     {
-        LSLog.Log_INFO(menuItem.getTitle().toString());
-        return false;
+        if(menuItem.getTitle().toString()==mV_list_song_bll.menu_editlist)
+        {
+            LSLog.Log_INFO("editlist");
+            //编辑菜单
+        }
+        return true;
     }
 }

@@ -180,7 +180,9 @@ public class ListIndex extends Fragment implements MasterPage.IFragmentForMaster
         public void onClickItem(int index)
         {
             app.model.List theItem= getAdapter().getitem(index);
-            ((MasterPage)getActivity()).startPageWithBack(new ListDetail());
+            ListDetail fragment= new ListDetail();
+            fragment.setListID(theItem.L_id);
+            ((MasterPage)getActivity()).startPageWithBack(fragment);
         }
     }
 
