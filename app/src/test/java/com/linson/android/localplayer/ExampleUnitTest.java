@@ -1,6 +1,10 @@
 package com.linson.android.localplayer;
 
+import android.support.annotation.NonNull;
+
 import org.junit.Test;
+
+import app.model.Song;
 
 import static org.junit.Assert.*;
 
@@ -11,9 +15,21 @@ import static org.junit.Assert.*;
  */
 public class ExampleUnitTest
 {
+    public static final app.model.Song abc = new Song();
     @Test
     public void addition_isCorrect()
     {
         assertEquals(4, 2 + 2);
+    }
+
+    @Test
+    public void tt()
+    {
+        abc.S_musicName="hi";
+    }
+
+    public void testnull(@NonNull Integer abc)
+    {
+        int a=abc/2;
     }
 }

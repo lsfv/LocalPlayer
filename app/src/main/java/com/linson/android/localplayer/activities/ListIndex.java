@@ -48,13 +48,11 @@ public class ListIndex extends Fragment
     private app.bll.LocalSong mLocalSong_bll;
     //endregion
 
-
     public ListIndex()
     {
         mList_bll=new app.bll.List(MainActivity.appContext);
         mLocalSong_bll=new app.bll.LocalSong(MainActivity.appContext);
     }
-
 
     //一般只需要执行一次的代码(不涉及到activity)放到这里
     @Override
@@ -63,13 +61,12 @@ public class ListIndex extends Fragment
         super.onCreate(savedInstanceState);
     }
 
-    //固定的加载视图的地方,初始和回退都会触发
+    //固定的加载视图的地方,初始和回退都会触发.不明白为什么google要如此设计？
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         return inflater.inflate(R.layout.fragment_list_index, container, false);
     }
-
 
     //一般绑定事件,和处理逻辑的地方.
     @Override
@@ -97,7 +94,6 @@ public class ListIndex extends Fragment
         }
     }
 
-
     private void setupRecycle()
     {
         java.util.List<List> res=mList_bll.getAllLists();
@@ -110,16 +106,10 @@ public class ListIndex extends Fragment
             @Override
             public boolean onTouch(View v, MotionEvent event)
             {
-                LSLog.Log_INFO(v.toString()+"recycleview touch"+event.getAction());
                 return false;
             }
         });
     }
-
-
-
-
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
@@ -142,7 +132,6 @@ public class ListIndex extends Fragment
         mLocalSong_bll.updateSongsFromLocal(localSongs);
         Toast.makeText(getContext(), "更新完毕",Toast.LENGTH_SHORT ).show();
     }
-
 
     //region no static class
     public class Adapter_listHandler implements Adapter_List.IAdapter_ListHander
@@ -172,7 +161,10 @@ public class ListIndex extends Fragment
         {
             app.model.List theItem= getAdapter().getitem(index);
             ListDetail fragment= new ListDetail();
-            fragment.setListID(theItem.L_id);
+            Bundle bundle=new Bundle();
+            bundle.putInt(ListDetail.argumentname_lid, theItem.L_id);
+            bundle.putString(ListDetail.argumentname_lname, theItem.L_name);
+            fragment.setArguments(bundle);
             ((MasterPage)getActivity()).startPageWithBack(fragment);
         }
     }
@@ -187,10 +179,13 @@ public class ListIndex extends Fragment
         @Override
         public void submit(String name)
         {
-            app.model.List temp=new List(name, "info", "pic", "ps");
-            int id= mList_bll.add(temp);
-            temp=mList_bll.getModel(id);
-            ( (Adapter_List)mRvList.getAdapter()).addItem(temp);
+            if(name!=null && name.trim().length()!=0)
+            {
+                app.model.List temp = new List(name, "info", "pic", "ps");
+                int id = mList_bll.add(temp);
+                temp = mList_bll.getModel(id);
+                ((Adapter_List) mRvList.getAdapter()).addItem(temp);
+            }
         }
     }
 

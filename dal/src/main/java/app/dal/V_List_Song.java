@@ -20,7 +20,8 @@ public class V_List_Song
     {
         app.model.V_List_Song model=null;
 
-        Cursor cursor = DBHelper.getReadableDatabase().rawQuery("select LS_id,LS_lid,S_artist,S_duration,S_path,S_songID,S_version,S_ps,LS_sid,L_id,L_name,L_info,L_pic,L_ps,S_id,S_musicName from V_List_Song where LS_id=" + id, null);
+        SQLiteDatabase db=DBHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select LS_id,LS_lid,S_artist,S_duration,S_path,S_songID,S_version,S_ps,LS_sid,L_id,L_name,L_info,L_pic,L_ps,S_id,S_musicName from V_List_Song where LS_id=" + id, null);
         if (cursor.moveToFirst())
         {
             model = new app.model.V_List_Song();
@@ -42,14 +43,15 @@ public class V_List_Song
             model.S_musicName = cursor.getString(15);
 
         }
-
+        db.close();
         return model;
     }
 
     public java.util.List<app.model.V_List_Song> getModelList(String appendWhereSql)
     {
         java.util.List<app.model.V_List_Song> lists = new ArrayList<>();
-        Cursor cursor = DBHelper.getReadableDatabase().rawQuery("select LS_id,LS_lid,S_artist,S_duration,S_path,S_songID,S_version,S_ps,LS_sid,L_id,L_name,L_info,L_pic,L_ps,S_id,S_musicName from V_List_Song " + appendWhereSql, null);
+        SQLiteDatabase db=DBHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select LS_id,LS_lid,S_artist,S_duration,S_path,S_songID,S_version,S_ps,LS_sid,L_id,L_name,L_info,L_pic,L_ps,S_id,S_musicName from V_List_Song " + appendWhereSql, null);
         if (cursor.moveToFirst())
         {
             int size = cursor.getCount();
@@ -79,6 +81,7 @@ public class V_List_Song
             }
         }
 
+        db.close();
         return lists;
     }
 }

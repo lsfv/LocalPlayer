@@ -40,12 +40,15 @@ public class LocalSong
         {
             db.endTransaction();
         }
+        db.close();
         return res;
     }
 
     public boolean delete(int id)
     {
-        int res=DBHelper.getWritableDatabase().delete("LocalSong", "LS_id=?", new String[]{id+""});
+        SQLiteDatabase db=DBHelper.getWritableDatabase();
+        int res=db.delete("LocalSong", "LS_id=?", new String[]{id+""});
+        db.close();
         return res==1?true:false;
     }
 
@@ -59,7 +62,9 @@ public class LocalSong
         contentValues.put("LS_songID", model.LS_songID);
         contentValues.put("LS_version", model.LS_version);
 
-        int res=DBHelper.getWritableDatabase().update("LocalSong", contentValues,"LS_id=?" , new String[]{model.LS_id+""});
+        SQLiteDatabase db=DBHelper.getWritableDatabase();
+        int res=db.update("LocalSong", contentValues,"LS_id=?" , new String[]{model.LS_id+""});
+        db.close();
         return res==1?true:false;
     }
 
@@ -67,7 +72,8 @@ public class LocalSong
     {
         app.model.LocalSong model=null;
 
-        Cursor cursor = DBHelper.getReadableDatabase().rawQuery("select LS_id,LS_musicName,LS_artist,LS_duration,LS_path,LS_songID,LS_version from LocalSong where LS_id=" + id, null);
+        SQLiteDatabase db=DBHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select LS_id,LS_musicName,LS_artist,LS_duration,LS_path,LS_songID,LS_version from LocalSong where LS_id=" + id, null);
         if (cursor.moveToFirst())
         {
             model = new app.model.LocalSong();
@@ -80,14 +86,15 @@ public class LocalSong
             model.LS_version = cursor.getInt(6);
 
         }
-
+        db.close();
         return model;
     }
 
     public java.util.List<app.model.LocalSong> getModelList(String appendWhereSql)
     {
         java.util.List<app.model.LocalSong> lists = new ArrayList<>();
-        Cursor cursor = DBHelper.getReadableDatabase().rawQuery("select LS_id,LS_musicName,LS_artist,LS_duration,LS_path,LS_songID,LS_version from LocalSong " + appendWhereSql, null);
+        SQLiteDatabase db=DBHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select LS_id,LS_musicName,LS_artist,LS_duration,LS_path,LS_songID,LS_version from LocalSong " + appendWhereSql, null);
         if (cursor.moveToFirst())
         {
             int size = cursor.getCount();
@@ -108,6 +115,7 @@ public class LocalSong
             }
         }
 
+        db.close();
         return lists;
     }
 
@@ -129,6 +137,7 @@ public class LocalSong
         String sql4="delete from Song where S_version !="+strVersion;
         String sql5="delete from localSong";
 
+
         SQLiteDatabase db= DBHelper.getWritableDatabase();
         db.beginTransaction();
         try
@@ -144,5 +153,6 @@ public class LocalSong
         {
             db.endTransaction();
         }
+        db.close();
     }
 }

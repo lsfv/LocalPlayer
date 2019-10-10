@@ -1,9 +1,11 @@
 package com.linson.android.localplayer.activities;
 
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,12 +13,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Adapter.Adapter_Songs;
+
+import java.util.ArrayList;
 import java.util.List;
 
+import app.bll.List_Song;
+import app.bll.Song;
 import app.bll.V_List_Song;
 import app.lslibrary.androidHelper.LSLog;
 
@@ -36,19 +43,27 @@ public class ListDetail extends Fragment
 
     //region other member variable
     private int mListID=0;
+    private String mListName="";
     private app.bll.V_List_Song mV_list_song_bll;
+    private app.bll.List_Song mList_song_bll;
+
+
+    public static String argumentname_lid="lid";
+    public static String argumentname_lname="lname";
     //endregion
+
 
 
     public ListDetail()
     {
         mV_list_song_bll=new V_List_Song(MainActivity.appContext);
+        mList_song_bll=new List_Song(MainActivity.appContext);
     }
 
-    public void setListID(int lid)
-    {
-        mListID=lid;
-    }
+
+    //public ListDetail(int a)!todo 什么时候fragment需要从建立开始恢复？ 导致得到参数必须是通过argumentbundle。
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -62,7 +77,9 @@ public class ListDetail extends Fragment
     {
         super.onActivityCreated(savedInstanceState);
         findControls();
-
+        mListID=getArguments().getInt(argumentname_lid, mListID);//把类的自定义初始化禁止了，导致起不到初始化作用。糟糕的设计。
+        mListName=getArguments().getString(argumentname_lname, "");
+        mTvListname.setText(mListName);
         setupRecyleview();
         setupToolbarMenu();
     }
@@ -89,6 +106,7 @@ public class ListDetail extends Fragment
 
     private void setupToolbarMenu()
     {
+
         ((MasterPage)getActivity()).getToolbar().getMenu().clear();
         ((MasterPage)getActivity()).getToolbar().setOnMenuItemClickListener(new MenuHandler());
         java.util.List<String> menus=mV_list_song_bll.getMenuTitle();
@@ -108,8 +126,55 @@ public class ListDetail extends Fragment
         {
             if(menuItem.getTitle().toString()==V_List_Song.menu_editlist)
             {
-                //popup window for add list
-                LSLog.Log_INFO("edit list");
+                if(mListID!=0)
+                {
+
+                    final List<app.model.V_List_Song> allSongs = mV_list_song_bll.getModelByZeroList();
+                    List<app.model.V_List_Song> mySongs = ((Adapter_Songs) mRvSonglist.getAdapter()).getCloneData();
+                    mySongs = mySongs == null ? new ArrayList<app.model.V_List_Song>() : mySongs;
+                    CharSequence[] nameList = mV_list_song_bll.getNameList(allSongs);
+                    final boolean[] ischooseList = mV_list_song_bll.getIsChoose(allSongs, mySongs);
+
+                    //数据检测,正常就弹出系统api，多选对话窗口。
+                    //实时修改 是否选中的局部数据,确定按钮后才把局部数据更新到adapter和数据库。
+                    if (allSongs != null && mySongs != null)
+                    {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ListDetail.this.getContext());
+                        builder.setMultiChoiceItems(nameList, ischooseList, new DialogInterface.OnMultiChoiceClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which, boolean isChecked)
+                            {
+                                ischooseList[which] = isChecked;
+                            }
+                        });
+                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                //1.更新adapter数据。2.更新数据库。
+                                List<app.model.V_List_Song> newChoosed = mV_list_song_bll.getChooseList(allSongs, ischooseList);
+                                ((Adapter_Songs) mRvSonglist.getAdapter()).updateData(newChoosed);
+                                mList_song_bll.updateBatch(mListID, mV_list_song_bll.getsidList(newChoosed));
+                                dialog.dismiss();
+                            }
+                        });
+                        builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                dialog.dismiss();
+                            }
+                        });
+                        builder.show();
+                    }
+                }
+                else
+                {
+                    Toast.makeText(getContext(), "不需要编辑'所有歌曲'列表", Toast.LENGTH_SHORT).show();
+                }
             }
             return true;
         }

@@ -4,7 +4,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
+import java.util.List;
 
 import app.dal.dbhelper.Music;
 
@@ -39,12 +42,15 @@ public class List_Song
         {
             db.endTransaction();
         }
+        db.close();
         return res;
     }
 
     public boolean delete(int id)
     {
-        int res=DBHelper.getWritableDatabase().delete("List_Song", "LS_id=?", new String[]{id+""});
+        SQLiteDatabase db=DBHelper.getWritableDatabase();
+        int res=db.delete("List_Song", "LS_id=?", new String[]{id+""});
+        db.close();
         return res==1?true:false;
     }
 
@@ -54,15 +60,17 @@ public class List_Song
         contentValues.put("LS_lid", model.LS_lid);
         contentValues.put("LS_sid", model.LS_sid);
 
-        int res=DBHelper.getWritableDatabase().update("List_Song", contentValues,"LS_id=?" , new String[]{model.LS_id+""});
+        SQLiteDatabase db=DBHelper.getWritableDatabase();
+        int res=db.update("List_Song", contentValues,"LS_id=?" , new String[]{model.LS_id+""});
+        db.close();
         return res==1?true:false;
     }
 
     public app.model.List_Song getModel(int id)
     {
         app.model.List_Song model=null;
-
-        Cursor cursor = DBHelper.getReadableDatabase().rawQuery("select LS_id,LS_lid,LS_sid from List_Song where LS_id=" + id, null);
+        SQLiteDatabase db=DBHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select LS_id,LS_lid,LS_sid from List_Song where LS_id=" + id, null);
         if (cursor.moveToFirst())
         {
             model = new app.model.List_Song();
@@ -71,14 +79,15 @@ public class List_Song
             model.LS_sid = cursor.getInt(2);
 
         }
-
+        db.close();
         return model;
     }
 
     public java.util.List<app.model.List_Song> getModelList(String appendWhereSql)
     {
         java.util.List<app.model.List_Song> lists = new ArrayList<>();
-        Cursor cursor = DBHelper.getReadableDatabase().rawQuery("select LS_id,LS_lid,LS_sid from List_Song " + appendWhereSql, null);
+        SQLiteDatabase db=DBHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select LS_id,LS_lid,LS_sid from List_Song " + appendWhereSql, null);
         if (cursor.moveToFirst())
         {
             int size = cursor.getCount();
@@ -94,8 +103,35 @@ public class List_Song
                 cursor.moveToNext();
             }
         }
-
+        db.close();
         return lists;
     }
 
+
+    //extend
+    public void updateBatch(int lid,@NonNull List<Integer> songid)
+    {
+        if(lid>0)
+        {
+            SQLiteDatabase db=DBHelper.getWritableDatabase();
+            db.beginTransaction();
+            try
+            {
+                db.delete("List_Song", "LS_lid=?", new String[]{lid+""});
+                for(int i=0;i<songid.size();i++)
+                {
+                    String sql = "insert into List_Song (LS_lid,LS_sid) values (?,?)";
+                    Object[] parameters = new Object[]{lid,songid.get(i)};
+
+                    db.execSQL(sql, parameters);
+                }
+
+                db.setTransactionSuccessful();
+            }
+            finally
+            {
+                db.endTransaction();
+            }
+        }
+    }
 }

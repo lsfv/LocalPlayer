@@ -1,9 +1,12 @@
 package app.bll;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 import app.dal.Song;
 
@@ -69,6 +72,89 @@ public class V_List_Song
             temp.S_ps=allsongs.get(i).S_ps;
             res.add(temp);
         }
+        return res;
+    }
+
+    public CharSequence[] getNameList(@NonNull java.util.List<app.model.V_List_Song> songs)
+    {
+        if(songs==null)
+        {
+            return null;
+        }
+        int size=songs.size();
+        CharSequence[] res=new CharSequence[size];
+
+        for (int i = 0; i < songs.size(); i++)
+        {
+            res[i] = songs.get(i).getSongTitle();
+        }
+
+        return res;
+    }
+
+    public List<Integer> getsidList(@NonNull java.util.List<app.model.V_List_Song> songs)
+    {
+        if(songs==null)
+        {
+            return null;
+        }
+        int size=songs.size();
+        List<Integer> res=new ArrayList<>();
+
+        for (int i = 0; i < songs.size(); i++)
+        {
+            res.add(songs.get(i).S_id);
+        }
+
+        return res;
+    }
+
+
+
+    public java.util.List<app.model.V_List_Song> getChooseList(@NonNull java.util.List<app.model.V_List_Song> songs ,boolean[] choose)
+    {
+        java.util.List<app.model.V_List_Song> res=new ArrayList<>();
+        if(songs.size()==choose.length)
+        {
+            for(int i=0;i<choose.length;i++)
+            {
+                if(choose[i])
+                {
+                    res.add(songs.get(i));
+                }
+            }
+        }
+        return res;
+    }
+
+    public boolean[] getIsChoose(@NonNull java.util.List<app.model.V_List_Song> songs, @NonNull List<app.model.V_List_Song> mysongs)
+    {
+        if(songs==null)
+        {
+            return null;
+        }
+
+        int size=songs.size();
+        boolean[] res=new boolean[size];
+
+        if(mysongs==null)
+        {
+            mysongs=new ArrayList<>();
+        }
+
+        for(int i=0;i<size;i++)
+        {
+            res[i]=false;
+            for(int j=0;j<mysongs.size();j++)
+            {
+                if(mysongs.get(j).S_id==songs.get(i).S_id)
+                {
+                    res[i]=true;
+                    break;
+                }
+            }
+        }
+
         return res;
     }
 }

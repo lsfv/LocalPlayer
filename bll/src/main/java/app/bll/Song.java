@@ -1,8 +1,10 @@
 package app.bll;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import java.util.LinkedList;
+import java.util.List;
 
 public class Song
 {
@@ -33,14 +35,13 @@ public class Song
         return dal.getModel(id);
     }
 
-    public java.util.List<app.model.Song> getModelList(String where)
+    public java.util.List<app.model.Song> getAllSongs()
     {
-        return dal.getModelList(where);
+        return dal.getModelList("");
     }
 
 
     //extend
-
 
 
 }

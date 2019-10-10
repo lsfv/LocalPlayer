@@ -22,10 +22,12 @@ import app.lslibrary.androidHelper.LSActivity;
 import app.lslibrary.androidHelper.LSLog;
 
 //!todo 1，还有一个不是很完善的地方：if(fragment instanceof ISetupMaster)。 没有强制的要求接口。
+//!todo ,返回到首页，有时候No adapter attached; skipping layout
 //!todo 逻辑层的分类，按表划分，会导致扩表操作的方法，无法定位放置位置。 如果按模块划分，如页面，页面太多，或小页面又会导致逻辑类太多。这个。
 //!todo savedInstanceState 实际工程使用范例.
-//!todo 1.建立界面 .2 建立初始化函数 3.填充数据recycleview. 4.处理编辑清单功能。  ！！！！清单id出现的不一样。
+//!todo 4.处理编辑清单功能。 初始化fragment.
 //!todo 还是需要一个模板啊。比如adapter 的大致样子都是差不多的。
+//!todo 需要总结工程。如model 需要添加各种方法。如song 的条目显示。
 public class MasterPage extends AppCompatActivity implements View.OnClickListener
 {
     //region 母模板 自己功能实现的代码块。
@@ -33,6 +35,7 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
     private Toolbar mToolbar;
     private ConstraintLayout mMainFragment;
     private Button mBtnPage1;
+    private Button mbtn_back;
 
     private boolean loadMenu=false;
 
@@ -43,9 +46,11 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mMainFragment = (ConstraintLayout) findViewById(R.id.mainFragment);
         mBtnPage1 = (Button) findViewById(R.id.btn_page1);
+        mbtn_back=(Button)findViewById(R.id.btn_back);
 
         //set event handler
         mBtnPage1.setOnClickListener(this);
+        mbtn_back.setOnClickListener(this);
     }
 
 
@@ -58,6 +63,13 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
             {
                 startPage(new ListIndex());
                 break;
+            }
+            case R.id.btn_back:
+            {
+                if(getSupportFragmentManager().getBackStackEntryCount()>0)
+                {
+                    getSupportFragmentManager().popBackStack();
+                }
             }
             default: { break; }
         }

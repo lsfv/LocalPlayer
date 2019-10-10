@@ -18,4 +18,9 @@ public class V_List_Song
 	public int S_songID;
 	public int S_version;
 	public String S_ps;
+
+	public String getSongTitle()
+	{
+		return S_musicName+" - "+S_artist;
+	}
 }

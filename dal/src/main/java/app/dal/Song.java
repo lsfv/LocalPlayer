@@ -39,12 +39,15 @@ public class Song
         {
             db.endTransaction();
         }
+        db.close();
         return res;
     }
 
     public boolean delete(int id)
     {
-        int res=DBHelper.getWritableDatabase().delete("Song", "S_id=?", new String[]{id+""});
+        SQLiteDatabase db=DBHelper.getWritableDatabase();
+        int res=db.delete("Song", "S_id=?", new String[]{id+""});
+        db.close();
         return res==1?true:false;
     }
 
@@ -59,7 +62,9 @@ public class Song
         contentValues.put("S_version", model.S_version);
         contentValues.put("S_ps", model.S_ps);
 
-        int res=DBHelper.getWritableDatabase().update("Song", contentValues,"S_id=?" , new String[]{model.S_id+""});
+        SQLiteDatabase db=DBHelper.getWritableDatabase();
+        int res=db.update("Song", contentValues,"S_id=?" , new String[]{model.S_id+""});
+        db.close();
         return res==1?true:false;
     }
 
@@ -67,7 +72,8 @@ public class Song
     {
         app.model.Song model=null;
 
-        Cursor cursor = DBHelper.getReadableDatabase().rawQuery("select S_id,S_musicName,S_artist,S_duration,S_path,S_songID,S_version,S_ps from Song where S_id=" + id, null);
+        SQLiteDatabase db=DBHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select S_id,S_musicName,S_artist,S_duration,S_path,S_songID,S_version,S_ps from Song where S_id=" + id, null);
         if (cursor.moveToFirst())
         {
             model = new app.model.Song();
@@ -81,14 +87,15 @@ public class Song
             model.S_ps = cursor.getString(7);
 
         }
-
+db.close();
         return model;
     }
 
     public java.util.List<app.model.Song> getModelList(String appendWhereSql)
     {
         java.util.List<app.model.Song> lists = new ArrayList<>();
-        Cursor cursor = DBHelper.getReadableDatabase().rawQuery("select S_id,S_musicName,S_artist,S_duration,S_path,S_songID,S_version,S_ps from Song " + appendWhereSql, null);
+        SQLiteDatabase db=DBHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select S_id,S_musicName,S_artist,S_duration,S_path,S_songID,S_version,S_ps from Song " + appendWhereSql, null);
         if (cursor.moveToFirst())
         {
             int size = cursor.getCount();
@@ -109,7 +116,7 @@ public class Song
                 cursor.moveToNext();
             }
         }
-
+db.close();
         return lists;
     }
 }

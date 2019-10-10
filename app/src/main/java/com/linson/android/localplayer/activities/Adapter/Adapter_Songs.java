@@ -7,8 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.linson.android.localplayer.R;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
 
 
 public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHolder>
@@ -36,7 +39,7 @@ public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHold
     public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i)
     {
         app.model.V_List_Song tempSong=msongs.get(i);
-        myViewHolder.mTvItem.setText(tempSong.S_musicName);
+        myViewHolder.mTvItem.setText(tempSong.getSongTitle());
     }
 
 
@@ -44,6 +47,18 @@ public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHold
     public int getItemCount()
     {
         return msongs.size();
+    }
+
+
+    public List<app.model.V_List_Song> getCloneData()
+    {
+        return  new ArrayList<app.model.V_List_Song>(msongs);
+    }
+
+    public void updateData(List<app.model.V_List_Song> data)
+    {
+        msongs=data;
+        this.notifyDataSetChanged();
     }
 
 

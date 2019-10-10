@@ -39,12 +39,15 @@ public class List
         {
             db.endTransaction();
         }
+        db.close();
         return res;
     }
 
     public boolean delete(int id)
     {
-        int res=DBHelper.getWritableDatabase().delete("List", "L_id=?", new String[]{id+""});
+        SQLiteDatabase db=DBHelper.getWritableDatabase();
+        int res=db.delete("List", "L_id=?", new String[]{id+""});
+        db.close();
         return res==1?true:false;
     }
 
@@ -56,7 +59,9 @@ public class List
         contentValues.put("L_pic", model.L_pic);
         contentValues.put("L_ps", model.L_ps);
 
-        int res=DBHelper.getWritableDatabase().update("List", contentValues,"L_id=?" , new String[]{model.L_id+""});
+        SQLiteDatabase db=DBHelper.getWritableDatabase();
+        int res=db.update("List", contentValues,"L_id=?" , new String[]{model.L_id+""});
+        db.close();
         return res==1?true:false;
     }
 
@@ -64,7 +69,8 @@ public class List
     {
         app.model.List model=null;
 
-        Cursor cursor = DBHelper.getReadableDatabase().rawQuery("select L_id,L_name,L_info,L_pic,L_ps from List where L_id=" + id, null);
+        SQLiteDatabase db=DBHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select L_id,L_name,L_info,L_pic,L_ps from List where L_id=" + id, null);
         if (cursor.moveToFirst())
         {
             model = new app.model.List();
@@ -75,14 +81,15 @@ public class List
             model.L_ps = cursor.getString(4);
 
         }
-
+        db.close();
         return model;
     }
 
     public java.util.List<app.model.List> getModelList(String appendWhereSql)
     {
         java.util.List<app.model.List> lists = new ArrayList<>();
-        Cursor cursor = DBHelper.getReadableDatabase().rawQuery("select L_id,L_name,L_info,L_pic,L_ps from List " + appendWhereSql, null);
+        SQLiteDatabase db=DBHelper.getReadableDatabase();
+        Cursor cursor =db.rawQuery("select L_id,L_name,L_info,L_pic,L_ps from List " + appendWhereSql, null);
         if (cursor.moveToFirst())
         {
             int size = cursor.getCount();
@@ -101,6 +108,7 @@ public class List
             }
         }
 
+        db.close();
         return lists;
     }
 }

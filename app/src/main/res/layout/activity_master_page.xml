@@ -33,7 +33,11 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" >
-
+            <Button
+                android:text="@string/back"
+                android:id="@+id/btn_back"
+                android:layout_width="40dp"
+                android:layout_height="match_parent" />
             </android.support.v7.widget.Toolbar>
 
             <android.support.constraint.ConstraintLayout
@@ -52,7 +56,7 @@
             android:layout_gravity="left">
             <Button
                 android:id="@+id/btn_page1"
-                android:text="page1"
+                android:text="@string/menu1"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:layout_width="wrap_content"
