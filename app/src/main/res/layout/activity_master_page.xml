@@ -33,11 +33,15 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" >
-            <Button
-                android:text="@string/back"
-                android:id="@+id/btn_back"
-                android:layout_width="40dp"
-                android:layout_height="match_parent" />
+
+                <Button
+                    android:id="@+id/btn_back"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/colorPrimary"
+                    android:text="@string/back"
+                    tools:layout_editor_absoluteX="16dp"
+                    tools:layout_editor_absoluteY="4dp" />
             </android.support.v7.widget.Toolbar>
 
             <android.support.constraint.ConstraintLayout

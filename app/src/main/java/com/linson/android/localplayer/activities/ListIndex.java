@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -54,19 +55,14 @@ public class ListIndex extends Fragment
         mLocalSong_bll=new app.bll.LocalSong(MainActivity.appContext);
     }
 
-    //一般只需要执行一次的代码(不涉及到activity)放到这里
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-    }
 
     //固定的加载视图的地方,初始和回退都会触发.不明白为什么google要如此设计？
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         return inflater.inflate(R.layout.fragment_list_index, container, false);
     }
+
 
     //一般绑定事件,和处理逻辑的地方.
     @Override
@@ -74,25 +70,10 @@ public class ListIndex extends Fragment
     {
         super.onActivityCreated(savedInstanceState);
         findControls();
-
         setupRecycle();
-        //最早放入到母模板回调，但是1.母模板不能列出所有页面跳转。2，要额外写回退时加载菜单。
-        //所以放入到首次加载和回退都会执行的生命周期中，会比较好。
-        setupToolbarMenu();
+        ((MasterPage)getActivity()).setupToolbarMenu(mList_bll.getMenuTitle(), new MenuHandler());
     }
 
-    private void setupToolbarMenu()
-    {
-        ((MasterPage)getActivity()).getToolbar().getMenu().clear();
-        ((MasterPage)getActivity()).getToolbar().setOnMenuItemClickListener(new MenuHandler());
-        java.util.List<String> menus=mList_bll.getMenuTitle();
-
-        for(int i=0;i<menus.size();i++)
-        {
-            ((MasterPage)getActivity()).getToolbar().getMenu().add(menus.get(i));
-            ((MasterPage)getActivity()).getToolbar().getMenu().getItem(i).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        }
-    }
 
     private void setupRecycle()
     {
@@ -101,28 +82,13 @@ public class ListIndex extends Fragment
         mRvList.setAdapter(adapter_list);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this.getContext());
         mRvList.setLayoutManager(linearLayoutManager);
-        mRvList.setOnTouchListener(new View.OnTouchListener()
-        {
-            @Override
-            public boolean onTouch(View v, MotionEvent event)
-            {
-                return false;
-            }
-        });
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        LSContentResolver.progressCheck(getActivity(), requestCode, grantResults, 1, new LSContentResolver.VoidHandler()
-        {
-            @Override
-            public void doit()
-            {
-                realUpdataLocalSongs();
-            }
-        });
+        LSContentResolver.progressCheck(getActivity(), requestCode, grantResults, 1, new RequestHandler());
     }
 
     private void realUpdataLocalSongs()
@@ -133,7 +99,8 @@ public class ListIndex extends Fragment
         Toast.makeText(getContext(), "更新完毕",Toast.LENGTH_SHORT ).show();
     }
 
-    //region no static class
+
+    //region no static class :class's extend.
     public class Adapter_listHandler implements Adapter_List.IAdapter_ListHander
     {
         @Override
@@ -159,7 +126,7 @@ public class ListIndex extends Fragment
         @Override
         public void onClickItem(int index)
         {
-            app.model.List theItem= getAdapter().getitem(index);
+            app.model.List theItem= ((Adapter_List)mRvList.getAdapter()).getitem(index);
             ListDetail fragment= new ListDetail();
             Bundle bundle=new Bundle();
             bundle.putInt(ListDetail.argumentname_lid, theItem.L_id);
@@ -167,11 +134,6 @@ public class ListIndex extends Fragment
             fragment.setArguments(bundle);
             ((MasterPage)getActivity()).startPageWithBack(fragment);
         }
-    }
-
-    private Adapter_List getAdapter()
-    {
-        return (Adapter_List)mRvList.getAdapter();
     }
 
     public class popupWindowHander implements Dialog_addlist.Idialogcallback
@@ -203,18 +165,23 @@ public class ListIndex extends Fragment
             }
             else if(menuItem.getTitle().toString()==app.bll.List.menu_upsong)
             {
-                //获得本地歌曲。插入到临时表：localsong。更新歌曲表:song
-                LSContentResolver.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new LSContentResolver.VoidHandler()
-                {
-                    @Override
-                    public void doit()
-                    {
-                        realUpdataLocalSongs();
-                    }
-                });
+                LSContentResolver.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new RequestHandler());
             }
             return true;
         }
     }
+
+    public class RequestHandler implements LSContentResolver.VoidHandler
+    {
+        @Override
+        public void doit()
+        {
+            realUpdataLocalSongs();
+        }
+    }
+    //endregion
+
+    //region static class : class's helper
+
     //endregion
 }

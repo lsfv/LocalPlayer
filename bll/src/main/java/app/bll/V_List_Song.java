@@ -31,7 +31,6 @@ public class V_List_Song
     }
 
     //extend
-    //extend
     public static String menu_editlist="编辑清单";
 
     public java.util.List<String> getMenuTitle()
@@ -59,8 +58,11 @@ public class V_List_Song
             temp.LS_sid=allsongs.get(i).S_id;
             temp.LS_id=0;
 
+            temp.L_info="";
+            temp.L_pic="";
+            temp.L_ps="";
             temp.L_id=0;
-            temp.L_name="all songs";
+            temp.L_name=app.bll.List.allname;
 
             temp.S_id=allsongs.get(i).S_id;
             temp.S_artist=allsongs.get(i).S_artist;
@@ -74,6 +76,8 @@ public class V_List_Song
         }
         return res;
     }
+
+
 
     public CharSequence[] getNameList(@NonNull java.util.List<app.model.V_List_Song> songs)
     {

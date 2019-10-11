@@ -46,10 +46,11 @@ public class List
 
 
     //extend
+    public static final String allname="所有歌曲";
     public java.util.List<app.model.List> getAllLists()
     {
         app.model.List allSong=new app.model.List();
-        allSong.L_name="所有歌曲";
+        allSong.L_name=allname;
         allSong.L_id=0;
 
         java.util.List<app.model.List> res=dal.getModelList(" order by L_id");

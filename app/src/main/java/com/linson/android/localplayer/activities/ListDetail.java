@@ -53,7 +53,6 @@ public class ListDetail extends Fragment
     //endregion
 
 
-
     public ListDetail()
     {
         mV_list_song_bll=new V_List_Song(MainActivity.appContext);
@@ -62,7 +61,6 @@ public class ListDetail extends Fragment
 
 
     //public ListDetail(int a)!todo 什么时候fragment需要从建立开始恢复？ 导致得到参数必须是通过argumentbundle。
-
 
 
     @Override
@@ -81,7 +79,7 @@ public class ListDetail extends Fragment
         mListName=getArguments().getString(argumentname_lname, "");
         mTvListname.setText(mListName);
         setupRecyleview();
-        setupToolbarMenu();
+        ((MasterPage)getActivity()).setupToolbarMenu(mV_list_song_bll.getMenuTitle(), new MenuHandler());
     }
 
 
@@ -96,6 +94,10 @@ public class ListDetail extends Fragment
         {
             res=mV_list_song_bll.getModelByLid(mListID);
         }
+        else
+        {
+            res=new ArrayList<>();
+        }
 
         Adapter_Songs adapter_songs=new Adapter_Songs(res);
         mRvSonglist.setAdapter(adapter_songs);
@@ -104,17 +106,46 @@ public class ListDetail extends Fragment
     }
 
 
-    private void setupToolbarMenu()
+    public class MultiChoiceHandler implements DialogInterface.OnMultiChoiceClickListener
     {
+        boolean[] ischooseList;
 
-        ((MasterPage)getActivity()).getToolbar().getMenu().clear();
-        ((MasterPage)getActivity()).getToolbar().setOnMenuItemClickListener(new MenuHandler());
-        java.util.List<String> menus=mV_list_song_bll.getMenuTitle();
-
-        for(int i=0;i<menus.size();i++)
+        public MultiChoiceHandler(boolean[] choose)
         {
-            ((MasterPage)getActivity()).getToolbar().getMenu().add(menus.get(i));
-            ((MasterPage)getActivity()).getToolbar().getMenu().getItem(i).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            ischooseList=choose;
+        }
+        @Override
+        public void onClick(DialogInterface dialog, int which, boolean isChecked)
+        {
+            ischooseList[which] = isChecked;
+        }
+    }
+
+    public class MultiChoiceClick implements DialogInterface.OnClickListener
+    {
+        List<app.model.V_List_Song> allSongs;
+        boolean[] ischooseList;
+
+        public MultiChoiceClick(List<app.model.V_List_Song> Songs,boolean[] ischoose)
+        {
+            allSongs=Songs;
+            ischooseList=ischoose;
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which)
+        {
+            if(which==-dialog.BUTTON_POSITIVE)
+            {
+                List<app.model.V_List_Song> newChoosed = mV_list_song_bll.getChooseList(allSongs, ischooseList);
+                ((Adapter_Songs) mRvSonglist.getAdapter()).updateData(newChoosed);
+                mList_song_bll.updateBatch(mListID, mV_list_song_bll.getsidList(newChoosed));
+                dialog.dismiss();
+            }
+            else if(which==dialog.BUTTON_NEGATIVE)
+            {
+                dialog.dismiss();
+            }
         }
     }
 
@@ -129,56 +160,30 @@ public class ListDetail extends Fragment
                 if(mListID!=0)
                 {
 
-                    final List<app.model.V_List_Song> allSongs = mV_list_song_bll.getModelByZeroList();
+                    List<app.model.V_List_Song> allSongs = mV_list_song_bll.getModelByZeroList();
                     List<app.model.V_List_Song> mySongs = ((Adapter_Songs) mRvSonglist.getAdapter()).getCloneData();
                     mySongs = mySongs == null ? new ArrayList<app.model.V_List_Song>() : mySongs;
                     CharSequence[] nameList = mV_list_song_bll.getNameList(allSongs);
-                    final boolean[] ischooseList = mV_list_song_bll.getIsChoose(allSongs, mySongs);
+                    boolean[] ischooseList = mV_list_song_bll.getIsChoose(allSongs, mySongs);
 
                     //数据检测,正常就弹出系统api，多选对话窗口。
                     //实时修改 是否选中的局部数据,确定按钮后才把局部数据更新到adapter和数据库。
                     if (allSongs != null && mySongs != null)
                     {
                         AlertDialog.Builder builder = new AlertDialog.Builder(ListDetail.this.getContext());
-                        builder.setMultiChoiceItems(nameList, ischooseList, new DialogInterface.OnMultiChoiceClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which, boolean isChecked)
-                            {
-                                ischooseList[which] = isChecked;
-                            }
-                        });
-                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                //1.更新adapter数据。2.更新数据库。
-                                List<app.model.V_List_Song> newChoosed = mV_list_song_bll.getChooseList(allSongs, ischooseList);
-                                ((Adapter_Songs) mRvSonglist.getAdapter()).updateData(newChoosed);
-                                mList_song_bll.updateBatch(mListID, mV_list_song_bll.getsidList(newChoosed));
-                                dialog.dismiss();
-                            }
-                        });
-                        builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                dialog.dismiss();
-                            }
-                        });
+                        builder.setMultiChoiceItems(nameList, ischooseList, new MultiChoiceHandler(ischooseList));
+
+                        builder.setPositiveButton("确定", new MultiChoiceClick(allSongs,ischooseList ));
+                        builder.setNegativeButton("取消", new MultiChoiceClick(allSongs,ischooseList ));
                         builder.show();
                     }
                 }
                 else
                 {
-                    Toast.makeText(getContext(), "不需要编辑'所有歌曲'列表", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "'所有歌曲'不需要编辑!", Toast.LENGTH_SHORT).show();
                 }
             }
             return true;
         }
     }
-
-
 }

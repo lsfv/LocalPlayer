@@ -131,6 +131,7 @@ public class List_Song
             finally
             {
                 db.endTransaction();
+                db.close();
             }
         }
     }
