@@ -115,12 +115,6 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
 
 
     //region 母模板public出去的方法，提供给fragment使用。统一管理.
-    public void startPageWithBack(Fragment fragment)
-    {
-        LSActivity.replaceFragment(getSupportFragmentManager(), true, R.id.mainFragment, fragment);
-    }
-
-
     public void setupToolbarMenu(java.util.List<String> menus,android.support.v7.widget.Toolbar.OnMenuItemClickListener handler)
     {
         mToolbar.setOnMenuItemClickListener(handler);

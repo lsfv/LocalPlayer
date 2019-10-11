@@ -6,8 +6,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".activities.PlaySong">
     <android.support.constraint.ConstraintLayout
+        android:id="@+id/content"
         android:layout_width="0dp"
-        android:layout_height="0dp">
+        android:layout_height="0dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/botton_menu">
     </android.support.constraint.ConstraintLayout>
 
     <android.support.constraint.ConstraintLayout

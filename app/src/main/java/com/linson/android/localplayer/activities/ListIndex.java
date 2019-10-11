@@ -21,6 +21,7 @@ import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Adapter.Adapter_List;
 import com.linson.android.localplayer.activities.Dialog.Dialog_addlist;
+import com.linson.android.localplayer.appHelper;
 
 import app.lslibrary.androidHelper.LSActivity;
 import app.lslibrary.androidHelper.LSContentResolver;
@@ -32,7 +33,7 @@ import app.model.List;
 //3.独立模块。1.仅仅一个展示和一个删除逻辑。2.一个添加逻辑，并对2模块进行刷新。
 //以上逻辑和母模板页面没有任何交互。
 //!todo getMenuTitle 并没有保证会加入所有菜单。
-public class ListIndex extends Fragment
+public class ListIndex extends BaseFragment
 {
     private RecyclerView mRvList;
 
@@ -71,7 +72,7 @@ public class ListIndex extends Fragment
         super.onActivityCreated(savedInstanceState);
         findControls();
         setupRecycle();
-        ((MasterPage)getActivity()).setupToolbarMenu(mList_bll.getMenuTitle(), new MenuHandler());
+        getMaster().setupToolbarMenu(mList_bll.getMenuTitle(), new MenuHandler());
     }
 
 
@@ -132,7 +133,7 @@ public class ListIndex extends Fragment
             bundle.putInt(ListDetail.argumentname_lid, theItem.L_id);
             bundle.putString(ListDetail.argumentname_lname, theItem.L_name);
             fragment.setArguments(bundle);
-            ((MasterPage)getActivity()).startPageWithBack(fragment);
+            appHelper.startPageWithBack(getFragmentManager(), fragment);
         }
     }
 

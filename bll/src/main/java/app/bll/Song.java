@@ -39,21 +39,4 @@ public class Song
     {
         return dal.getModelList("");
     }
-
-
-    //extend
-    public static String menu_IncressVolume=" + ";
-    public static String menu_DecressVolume=" - ";
-    public static String menu_PlayerMode="随机播放";
-
-    public java.util.List<String> getMenuTitle()
-    {
-        java.util.List<String> res=new LinkedList<>();
-        res.add(menu_IncressVolume);
-        res.add(menu_DecressVolume);
-        res.add(menu_PlayerMode);
-        return res;
-    }
-
-
 }

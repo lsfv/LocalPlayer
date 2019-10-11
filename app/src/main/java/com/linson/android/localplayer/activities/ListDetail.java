@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Adapter.Adapter_Songs;
+import com.linson.android.localplayer.appHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +26,11 @@ import java.util.List;
 import app.bll.List_Song;
 import app.bll.Song;
 import app.bll.V_List_Song;
+import app.lslibrary.androidHelper.LSActivity;
 import app.lslibrary.androidHelper.LSLog;
 
 
-public class ListDetail extends Fragment
+public class ListDetail extends BaseFragment
 {
     private TextView mTvListname;
     private RecyclerView mRvSonglist;
@@ -55,6 +57,7 @@ public class ListDetail extends Fragment
 
     public ListDetail()
     {
+        super();
         mV_list_song_bll=new V_List_Song(MainActivity.appContext);
         mList_song_bll=new List_Song(MainActivity.appContext);
     }
@@ -79,7 +82,7 @@ public class ListDetail extends Fragment
         mListName=getArguments().getString(argumentname_lname, "");
         mTvListname.setText(mListName);
         setupRecyleview();
-        ((MasterPage)getActivity()).setupToolbarMenu(mV_list_song_bll.getMenuTitle(), new MenuHandler());
+        getMaster().setupToolbarMenu(mV_list_song_bll.getMenuTitle(), new MenuHandler());
     }
 
 
@@ -99,13 +102,14 @@ public class ListDetail extends Fragment
             res=new ArrayList<>();
         }
 
-        Adapter_Songs adapter_songs=new Adapter_Songs(res);
+        Adapter_Songs adapter_songs=new Adapter_Songs(res,new RecycleHandler());
         mRvSonglist.setAdapter(adapter_songs);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getContext());
         mRvSonglist.setLayoutManager(linearLayoutManager);
     }
 
 
+    //region not static class: extend for top class
     public class MultiChoiceHandler implements DialogInterface.OnMultiChoiceClickListener
     {
         boolean[] ischooseList;
@@ -149,7 +153,6 @@ public class ListDetail extends Fragment
         }
     }
 
-
     public class MenuHandler implements android.support.v7.widget.Toolbar.OnMenuItemClickListener
     {
         @Override
@@ -186,4 +189,20 @@ public class ListDetail extends Fragment
             return true;
         }
     }
+
+    public class RecycleHandler implements Adapter_Songs.IItemHander
+    {
+        @Override
+        public void onClick(app.model.V_List_Song item)
+        {
+            LSLog.Log_INFO("goto player");
+            Fragment fragment=new PlaySong();
+            Bundle bundle=new Bundle();
+            bundle.putSerializable(PlaySong.argumentname_ls, item);
+            fragment.setArguments(bundle);
+
+            appHelper.startPageWithBack(getFragmentManager(),fragment);
+        }
+    }
+    //endregion
 }

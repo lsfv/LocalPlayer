@@ -17,9 +17,12 @@ import java.util.List;
 public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHolder>
 {
     private List<app.model.V_List_Song> msongs;
-    public Adapter_Songs(@NonNull List<app.model.V_List_Song> songs)
+    private IItemHander mHander;
+
+    public Adapter_Songs(@NonNull List<app.model.V_List_Song> songs,@NonNull IItemHander hander)
     {
         msongs=songs;
+        mHander=hander;
         if(msongs==null)
         {
             msongs=new LinkedList<>();
@@ -36,10 +39,21 @@ public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHold
 
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i)
+    public void onBindViewHolder(@NonNull final MyViewHolder myViewHolder, int i)
     {
         app.model.V_List_Song tempSong=msongs.get(i);
         myViewHolder.mTvItem.setText(tempSong.getSongTitle());
+        myViewHolder.mView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if(mHander!=null)
+                {
+                    mHander.onClick(msongs.get(myViewHolder.getAdapterPosition()));
+                }
+            }
+        });
     }
 
 
@@ -74,6 +88,11 @@ public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHold
             mTvItem = (TextView) itemView.findViewById(R.id.tv_item);
             mView=itemView;
         }
+    }
+
+    public interface IItemHander
+    {
+        void onClick(app.model.V_List_Song item);
     }
 
 }
