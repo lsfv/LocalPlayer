@@ -16,6 +16,7 @@ import com.linson.android.localplayer.Services.PlayServices;
 import com.linson.android.localplayer.activities.MasterPage;
 
 import app.lslibrary.androidHelper.LSLog;
+import app.model.V_List_Song;
 
 //自动生成model。 dbhelper. 测试DBHELPER。 dal.
 
@@ -23,7 +24,7 @@ public class MainActivity extends AppCompatActivity
 {
     public static Context appContext;
     private myConnection mm;
-    private boolean isback=false;
+    private boolean isFirstLoad=true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -31,28 +32,44 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         initGlobalArgument();//初始化全局变量
-        boolean isServiceOK= StartServicesabc();//测试服务
-        startIndex(isServiceOK);//跳转首页
+        StartServicesabc();//测试服务
     }
 
 
-    private void startIndex(boolean isServiceOK)
+
+
+
+    @Override
+    protected void onStart()
     {
-        if(isServiceOK)
+        super.onStart();
+        if(isFirstLoad)
         {
-            startActivity(new Intent(this, MasterPage.class));
+            startIndex();//跳转首页
+            isFirstLoad=false;
         }
         else
         {
-            Toast.makeText(appContext, "fail to start Service!", Toast.LENGTH_SHORT).show();
+            unbindService(mm);
+            Intent intent_service=new Intent();
+            intent_service.setPackage("com.linson.android.localplayer");//哪个程序
+            intent_service.setAction("abc");//哪个服务
+            stopService(intent_service);
+
+            finish();
         }
+    }
+
+
+    private void startIndex()
+    {
+        startActivity(new Intent(this, MasterPage.class));
     }
 
     private void initGlobalArgument()
     {
         appContext = getApplicationContext();//全局变量
         LSLog.Log_DBinfo();//数据库地址
-        isback=true;
     }
 
 
@@ -68,23 +85,6 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    @Override
-    protected void onStart()
-    {
-        super.onStart();
-        if(isback)
-        {
-            unbindService(mm);
-            Intent intent_service=new Intent();
-            intent_service.setPackage("com.linson.android.localplayer");//哪个程序
-            intent_service.setAction("abc");//哪个服务
-            stopService(intent_service);
-
-            finish();
-        }
-    }
-
-
     private class myConnection implements ServiceConnection
     {
         @Override
@@ -95,6 +95,11 @@ public class MainActivity extends AppCompatActivity
                 IPlayer res=IPlayer.Stub.asInterface(service);
                 int a = res.add(3, 4);
                 LSLog.Log_INFO("StartServices:ok"+"."+a);
+
+//                app.model.V_List_Song temp=new V_List_Song();
+//                temp.L_name="name";
+//                String newname=res.modifymodel(temp);
+//                LSLog.Log_INFO("ok"+newname);
             } catch (Exception e)
             {
                 LSLog.Log_Exception(e,"StartServices: ");

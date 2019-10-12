@@ -6,4 +6,5 @@ package com.linson.android.localplayer.AIDL;
 interface IPlayer
 {
     int add(int a,int b);
+    //String modifymodel(in app.model.V_List_Song mm);
 }

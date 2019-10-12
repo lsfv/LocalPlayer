@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import com.linson.android.localplayer.AIDL.IPlayer;
 
 import app.lslibrary.androidHelper.LSLog;
+import app.model.V_List_Song;
 
 public class PlayServices extends Service
 {
@@ -27,11 +28,15 @@ public class PlayServices extends Service
 
     public class RemoteServiceProxy extends IPlayer.Stub
     {
-
         @Override
         public int add(int a, int b) throws RemoteException
         {
             return a+b;
         }
+//        @Override
+//        public String modifymodel(V_List_Song mm) throws RemoteException
+//        {
+//            return mm.L_name+"new name";
+//        }
     }
 }
