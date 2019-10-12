@@ -1,7 +1,7 @@
 package app.model;
 import java.io.Serializable;
 import java.util.Date;
-public class V_List_Song implements Serializable
+public class V_List_Song  implements Serializable
 {
 	public int LS_id;
 	public int LS_lid;

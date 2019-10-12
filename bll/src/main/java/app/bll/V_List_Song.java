@@ -42,15 +42,13 @@ public class V_List_Song
 
 
     //extend
-    public static String menu_IncressVolume=" + ";
-    public static String menu_DecressVolume=" - ";
-    public static String menu_PlayerMode="随机播放";
+    public static String menu_IncressVolume="音量";
+    public static String menu_PlayerMode="播放模式";
 
     public java.util.List<String> getMenuPlayerTitle()
     {
         java.util.List<String> res=new LinkedList<>();
         res.add(menu_IncressVolume);
-        res.add(menu_DecressVolume);
         res.add(menu_PlayerMode);
         return res;
     }

@@ -20,6 +20,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.MasterPage" />
+
+        <service android:process=":playServices" android:name=".Services.PlayServices" android:enabled="true" android:exported="true" >
+            <intent-filter>
+                <action android:name="abc"></action>
+                <category android:name="android.intent.category.DEFAULT"></category>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
