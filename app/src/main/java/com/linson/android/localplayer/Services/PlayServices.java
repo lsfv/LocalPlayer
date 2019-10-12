@@ -33,10 +33,11 @@ public class PlayServices extends Service
         {
             return a+b;
         }
-//        @Override
-//        public String modifymodel(V_List_Song mm) throws RemoteException
-//        {
-//            return mm.L_name+"new name";
-//        }
+
+        @Override
+        public void modifymodel(V_List_Song mm) throws RemoteException
+        {
+            mm.L_name+="v1";
+        }
     }
 }

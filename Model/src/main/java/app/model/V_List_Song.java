@@ -45,6 +45,27 @@ public class V_List_Song  implements Serializable,Parcelable
 		S_ps = in.readString();
 	}
 
+
+	public void readFromParcel(Parcel in)
+	{
+		LS_id = in.readInt();
+		LS_lid = in.readInt();
+		LS_sid = in.readInt();
+		L_id = in.readInt();
+		L_name = in.readString();
+		L_info = in.readString();
+		L_pic = in.readString();
+		L_ps = in.readString();
+		S_id = in.readInt();
+		S_musicName = in.readString();
+		S_artist = in.readString();
+		S_duration = in.readInt();
+		S_path = in.readString();
+		S_songID = in.readInt();
+		S_version = in.readInt();
+		S_ps = in.readString();
+	}
+
 	public static final Creator<V_List_Song> CREATOR = new Creator<V_List_Song>()
 	{
 		@Override

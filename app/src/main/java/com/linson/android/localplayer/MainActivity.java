@@ -96,10 +96,10 @@ public class MainActivity extends AppCompatActivity
                 int a = res.add(3, 4);
                 LSLog.Log_INFO("StartServices:ok"+"."+a);
 
-//                app.model.V_List_Song temp=new V_List_Song();
-//                temp.L_name="name";
-//                String newname=res.modifymodel(temp);
-//                LSLog.Log_INFO("ok"+newname);
+                app.model.V_List_Song temp=new V_List_Song();
+                temp.L_name="name";
+                res.modifymodel(temp);
+                LSLog.Log_INFO(temp.L_name);
             } catch (Exception e)
             {
                 LSLog.Log_Exception(e,"StartServices: ");
