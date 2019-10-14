@@ -44,23 +44,15 @@ public class ListDetail extends BaseFragment
     //endregion
 
     //region other member variable
-    private int mListID=0;
+    private int mListID=appHelper.defaultListID;
     private String mListName="";
-    private app.bll.V_List_Song mV_list_song_bll;
-    private app.bll.List_Song mList_song_bll;
+    private app.bll.V_List_Song mV_list_song_bll=new V_List_Song(MainActivity.appContext);
+    private app.bll.List_Song mList_song_bll=new List_Song(MainActivity.appContext);
 
 
     public static String argumentname_lid="lid";
     public static String argumentname_lname="lname";
     //endregion
-
-
-    public ListDetail()
-    {
-        super();
-        mV_list_song_bll=new V_List_Song(MainActivity.appContext);
-        mList_song_bll=new List_Song(MainActivity.appContext);
-    }
 
 
     //public ListDetail(int a)!todo 什么时候fragment需要从建立开始恢复？ 导致得到参数必须是通过argumentbundle。
@@ -88,16 +80,8 @@ public class ListDetail extends BaseFragment
 
     private void setupRecyleview()
     {
-        List<app.model.V_List_Song> res=null;
-        if(mListID==0)
-        {
-            res= mV_list_song_bll.getModelByZeroList();
-        }
-        else if(mListID>0)
-        {
-            res=mV_list_song_bll.getModelByLid(mListID);
-        }
-        else
+        List<app.model.V_List_Song> res=mV_list_song_bll.getModelByLid(mListID);
+        if(res==null)
         {
             res=new ArrayList<>();
         }
@@ -139,7 +123,7 @@ public class ListDetail extends BaseFragment
         @Override
         public void onClick(DialogInterface dialog, int which)
         {
-            if(which==-dialog.BUTTON_POSITIVE)
+            if(which==dialog.BUTTON_POSITIVE)
             {
                 List<app.model.V_List_Song> newChoosed = mV_list_song_bll.getChooseList(allSongs, ischooseList);
                 ((Adapter_Songs) mRvSonglist.getAdapter()).updateData(newChoosed);
@@ -160,10 +144,10 @@ public class ListDetail extends BaseFragment
         {
             if(menuItem.getTitle().toString()==V_List_Song.menu_editlist)
             {
-                if(mListID!=0)
+                if(mListID>1)
                 {
 
-                    List<app.model.V_List_Song> allSongs = mV_list_song_bll.getModelByZeroList();
+                    List<app.model.V_List_Song> allSongs = mV_list_song_bll.getModelByLid(appHelper.defaultListID);
                     List<app.model.V_List_Song> mySongs = ((Adapter_Songs) mRvSonglist.getAdapter()).getCloneData();
                     mySongs = mySongs == null ? new ArrayList<app.model.V_List_Song>() : mySongs;
                     CharSequence[] nameList = mV_list_song_bll.getNameList(allSongs);
@@ -193,12 +177,11 @@ public class ListDetail extends BaseFragment
     public class RecycleHandler implements Adapter_Songs.IItemHander
     {
         @Override
-        public void onClick(int lid, int sid)
+        public void onClick(int lsid)
         {
             Fragment fragment=new PlaySong();
             Bundle bundle=new Bundle();
-            bundle.putInt(PlaySong.argumentListid, lid);
-            bundle.putInt(PlaySong.argumentsid, sid);
+            bundle.putInt(PlaySong.argumentLsid, lsid);
             fragment.setArguments(bundle);
 
             appHelper.startPageWithBack(getFragmentManager(),fragment);

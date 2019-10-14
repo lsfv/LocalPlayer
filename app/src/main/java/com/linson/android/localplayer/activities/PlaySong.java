@@ -83,12 +83,10 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
     //endregion
 
     //region other member variable
-    public static final String argumentListid = "list_id";
-    public static final String argumentsid = "songid";
+    public static final String argumentLsid = "ls_id";
 
 
-    private int mlistID=-1;
-    private int msid=-1;
+    private int mlsid=-1;
     private final app.bll.V_List_Song mV_list_song_bll=new app.bll.V_List_Song(MainActivity.appContext);
     private MyConnection mMyConnection=new MyConnection();
     //endregion
@@ -122,9 +120,8 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
     {
         super.onActivityCreated(savedInstanceState);
         findControls();
-        mlistID = getArguments().getInt(argumentListid);
-        msid=getArguments().getInt(argumentsid);
-        LSLog.Log_INFO(String.format ("sid:%d,lid:%d",mlistID,msid));
+        mlsid = getArguments().getInt(argumentLsid);
+        LSLog.Log_INFO(String.format ("lsid:%d",mlsid));
         getMaster().setupToolbarMenu(mV_list_song_bll.getMenuPlayerTitle(), new MenuClickHandler());
 
         //虽然onActivityCreated，每次回退都会调用。但是bind如果连接存在是不会连2此的。

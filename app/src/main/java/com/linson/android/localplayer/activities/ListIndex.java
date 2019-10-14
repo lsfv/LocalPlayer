@@ -46,15 +46,9 @@ public class ListIndex extends BaseFragment
     //endregion
 
     //region other member variable
-    private app.bll.List mList_bll;
-    private app.bll.LocalSong mLocalSong_bll;
+    private app.bll.List mList_bll=new app.bll.List(MainActivity.appContext);
+    private app.bll.LocalSong mLocalSong_bll=new app.bll.LocalSong(MainActivity.appContext);
     //endregion
-
-    public ListIndex()
-    {
-        mList_bll=new app.bll.List(MainActivity.appContext);
-        mLocalSong_bll=new app.bll.LocalSong(MainActivity.appContext);
-    }
 
 
     //固定的加载视图的地方,初始和回退都会触发.不明白为什么google要如此设计？
@@ -78,7 +72,7 @@ public class ListIndex extends BaseFragment
 
     private void setupRecycle()
     {
-        java.util.List<List> res=mList_bll.getAllLists();
+        java.util.List<List> res=mList_bll.getAlllList();
         Adapter_List adapter_list=new Adapter_List(res, new Adapter_listHandler());
         mRvList.setAdapter(adapter_list);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this.getContext());
@@ -112,7 +106,7 @@ public class ListIndex extends BaseFragment
             {
                 Adapter_List adapter_list = (Adapter_List) adapter;
                 app.model.List temp = adapter_list.getitem(index);
-                if (temp.L_id > 0)
+                if (temp.L_id != appHelper.defaultListID)
                 {
                     mList_bll.delete(temp.L_id);//从数据库删除
                     adapter_list.deleteItem(index);//从内存删除

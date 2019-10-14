@@ -31,11 +31,13 @@ public class Music extends SQLiteOpenHelper
             String sql_create4 = new String("CREATE TABLE List_Song ( `LS_id` integer PRIMARY KEY AUTOINCREMENT, `LS_lid` integer NOT NULL, `LS_sid` integer NOT NULL )");
             String sql = "CREATE VIEW V_List_Song as select LS_id,LS_lid,LS_sid,L_id,L_name,L_info,L_pic,L_ps,S_id,S_musicName,S_artist,S_duration,S_path,S_songID,S_version,S_ps from list_song as a left join list as b on b.l_id=a.ls_lid left join song as c on c.s_id=a.LS_sid";
 
+            String sql_defaultData="insert into List (L_name,L_info,L_pic,L_ps) values ('所有歌曲','默认添加，不要删除','','')";
             db.execSQL(sql_create1);
             db.execSQL(sql_create2);
             db.execSQL(sql_create3);
             db.execSQL(sql_create4);
             db.execSQL(sql);
+            db.execSQL(sql_defaultData);
 
             db.setTransactionSuccessful();
         }

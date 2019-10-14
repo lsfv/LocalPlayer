@@ -58,40 +58,6 @@ public class V_List_Song
         return dal.getModelList("where LS_lid = "+lid);
     }
 
-    public java.util.List<app.model.V_List_Song> getModelByZeroList()
-    {
-        app.dal.Song dal_song = new Song(mContext);
-        java.util.List<app.model.Song> allsongs = dal_song.getModelList("");
-
-        java.util.List<app.model.V_List_Song> res = new ArrayList<>();
-        for (int i = 0; i < allsongs.size(); i++)
-        {
-            app.model.V_List_Song temp=new app.model.V_List_Song();
-            temp.LS_lid=0;
-            temp.LS_sid=allsongs.get(i).S_id;
-            temp.LS_id=0;
-
-            temp.L_info="";
-            temp.L_pic="";
-            temp.L_ps="";
-            temp.L_id=0;
-            temp.L_name=app.bll.List.allname;
-
-            temp.S_id=allsongs.get(i).S_id;
-            temp.S_artist=allsongs.get(i).S_artist;
-            temp.S_duration=allsongs.get(i).S_duration;
-            temp.S_songID=allsongs.get(i).S_songID;
-            temp.S_version=allsongs.get(i).S_version;
-            temp.S_musicName=allsongs.get(i).S_musicName;
-            temp.S_path=allsongs.get(i).S_path;
-            temp.S_ps=allsongs.get(i).S_ps;
-            res.add(temp);
-        }
-        return res;
-    }
-
-
-
     public CharSequence[] getNameList(@NonNull java.util.List<app.model.V_List_Song> songs)
     {
         if(songs==null)

@@ -137,6 +137,9 @@ public class LocalSong
         String sql4="delete from Song where S_version !="+strVersion;
         String sql5="delete from localSong";
 
+        String sql6="delete from List_Song where LS_lid=1";
+        String sql7="insert into List_Song (ls_lid,ls_sid) select 1, s_id from song";
+
 
         SQLiteDatabase db= DBHelper.getWritableDatabase();
         db.beginTransaction();
@@ -147,6 +150,8 @@ public class LocalSong
             db.execSQL(sql3);
             db.execSQL(sql4);
             db.execSQL(sql5);
+            db.execSQL(sql6);
+            db.execSQL(sql7);
             db.setTransactionSuccessful();
         }
         finally
