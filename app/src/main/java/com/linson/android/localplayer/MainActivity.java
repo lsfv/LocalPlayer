@@ -51,10 +51,7 @@ public class MainActivity extends AppCompatActivity
         else
         {
             unbindService(mm);
-            Intent intent_service=new Intent();
-            intent_service.setPackage("com.linson.android.localplayer");//哪个程序
-            intent_service.setAction("abc");//哪个服务
-            stopService(intent_service);
+            stopService(appHelper.getServiceIntent());
 
             finish();
         }
@@ -76,12 +73,10 @@ public class MainActivity extends AppCompatActivity
     //start and test services
     private boolean StartServicesabc()
     {
-        Intent intent_service=new Intent();
-        intent_service.setPackage("com.linson.android.localplayer");//哪个程序
-        intent_service.setAction("abc");//哪个服务
-        startService(intent_service);
+
         mm=new myConnection();
-        return bindService(intent_service, mm , BIND_AUTO_CREATE);
+        startService(appHelper.getServiceIntent());
+        return bindService(appHelper.getServiceIntent(), mm , BIND_AUTO_CREATE);
     }
 
 

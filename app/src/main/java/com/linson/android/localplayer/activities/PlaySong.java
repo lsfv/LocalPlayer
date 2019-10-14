@@ -1,7 +1,13 @@
 package com.linson.android.localplayer.activities;
 
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.net.IpPrefix;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
@@ -11,7 +17,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.linson.android.localplayer.AIDL.IPlayer;
+import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
+import com.linson.android.localplayer.appHelper;
 
 import app.lslibrary.androidHelper.LSLog;
 import app.lslibrary.customUI.LSCircleImage;
@@ -74,21 +83,33 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
     //endregion
 
     //region other member variable
+    public static final String argumentListid = "list_id";
+    public static final String argumentsid = "songid";
+
+
+    private int mlistID=-1;
+    private int msid=-1;
+    private final app.bll.V_List_Song mV_list_song_bll=new app.bll.V_List_Song(MainActivity.appContext);
+    private MyConnection mMyConnection=new MyConnection();
     //endregion
 
 
-    public static final String argumentname_ls = "list_song";
 
-
-    private app.model.V_List_Song mListSong;
-    private app.bll.V_List_Song mV_list_song_bll;
 
 
     public PlaySong()
     {
-        mV_list_song_bll = new app.bll.V_List_Song(getContext());
+        //连接services,对应于destroy的释放。连接放到构造函数中。
     }
 
+
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        requireActivity().unbindService(mMyConnection);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -101,10 +122,14 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
     {
         super.onActivityCreated(savedInstanceState);
         findControls();
-        mListSong = (app.model.V_List_Song) getArguments().getSerializable(argumentname_ls);
+        mlistID = getArguments().getInt(argumentListid);
+        msid=getArguments().getInt(argumentsid);
+        LSLog.Log_INFO(String.format ("sid:%d,lid:%d",mlistID,msid));
         getMaster().setupToolbarMenu(mV_list_song_bll.getMenuPlayerTitle(), new MenuClickHandler());
 
-        //连接services，并调用播放功能
+        //虽然onActivityCreated，每次回退都会调用。但是bind如果连接存在是不会连2此的。
+        requireActivity().bindService(appHelper.getServiceIntent(), mMyConnection, Context.BIND_AUTO_CREATE);
+
     }
 
 
@@ -115,7 +140,17 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
 
     private void play()
     {
-
+        if(mMyConnection.mPlayerProxy!=null)
+        {
+            try
+            {
+                mMyConnection.mPlayerProxy.playSong(4);
+            }
+            catch (Exception e)
+            {
+                LSLog.Log_Exception(e);
+            }
+        }
     }
 
     private void next()
@@ -134,5 +169,27 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
             return false;
         }
     }
+
+    public class MyConnection implements ServiceConnection
+    {
+        IPlayer mPlayerProxy;
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service)
+        {
+            mPlayerProxy=(IPlayer.Stub.asInterface(service));//必须用它提供的转义方法，它有一个是否是远程服务的区别。
+            if(mPlayerProxy==null)
+            {
+                LSLog.Log_INFO("error get null services");
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name)
+        {
+
+        }
+    }
     //endregion
+
+
 }

@@ -193,12 +193,12 @@ public class ListDetail extends BaseFragment
     public class RecycleHandler implements Adapter_Songs.IItemHander
     {
         @Override
-        public void onClick(app.model.V_List_Song item)
+        public void onClick(int lid, int sid)
         {
-            LSLog.Log_INFO("goto player");
             Fragment fragment=new PlaySong();
             Bundle bundle=new Bundle();
-            bundle.putSerializable(PlaySong.argumentname_ls, item);
+            bundle.putInt(PlaySong.argumentListid, lid);
+            bundle.putInt(PlaySong.argumentsid, sid);
             fragment.setArguments(bundle);
 
             appHelper.startPageWithBack(getFragmentManager(),fragment);

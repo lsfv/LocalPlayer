@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import org.junit.Test;
 
+import app.lslibrary.androidHelper.LSLog;
 import app.model.Song;
 
 import static org.junit.Assert.*;
@@ -15,6 +16,9 @@ import static org.junit.Assert.*;
  */
 public class ExampleUnitTest
 {
+
+
+
     public static final app.model.Song abc = new Song();
     @Test
     public void addition_isCorrect()
@@ -31,5 +35,15 @@ public class ExampleUnitTest
     public void testnull(@NonNull Integer abc)
     {
         int a=abc/2;
+    }
+
+
+    public static class testclass
+    {
+        private final Integer mnum=5;
+        public testclass()
+        {
+            LSLog.Log_INFO(mnum==null?"null":"abc");
+        }
     }
 }

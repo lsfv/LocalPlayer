@@ -39,9 +39,9 @@ public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHold
 
 
     @Override
-    public void onBindViewHolder(@NonNull final MyViewHolder myViewHolder, int i)
+    public void onBindViewHolder(@NonNull final MyViewHolder myViewHolder, final int i)
     {
-        app.model.V_List_Song tempSong=msongs.get(i);
+        final app.model.V_List_Song tempSong=msongs.get(i);
         myViewHolder.mTvItem.setText(tempSong.getSongTitle());
         myViewHolder.mView.setOnClickListener(new View.OnClickListener()
         {
@@ -50,7 +50,7 @@ public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHold
             {
                 if(mHander!=null)
                 {
-                    mHander.onClick(msongs.get(myViewHolder.getAdapterPosition()));
+                    mHander.onClick(tempSong.L_id,tempSong.S_id);
                 }
             }
         });
@@ -92,7 +92,7 @@ public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHold
 
     public interface IItemHander
     {
-        void onClick(app.model.V_List_Song item);
+        void onClick(int lid,int sid);
     }
 
 }

@@ -23,7 +23,7 @@
 
         <service android:process=":playServices" android:name=".Services.PlayServices" android:enabled="true" android:exported="true" >
             <intent-filter>
-                <action android:name="abc"></action>
+                <action android:name="musicService"></action>
                 <category android:name="android.intent.category.DEFAULT"></category>
             </intent-filter>
         </service>
