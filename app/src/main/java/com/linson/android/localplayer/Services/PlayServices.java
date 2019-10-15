@@ -70,5 +70,27 @@ public class PlayServices extends Service
             LSLog.Log_INFO("play "+index);
             return 0;
         }
+
+        @Override
+        public int pre() throws RemoteException
+        {
+            LSLog.Log_INFO("pre ");
+            return 0;
+        }
+
+        @Override
+        public int next() throws RemoteException
+        {
+            LSLog.Log_INFO("next ");
+            return 0;
+        }
+
+        @Override
+        public int changemode() throws RemoteException
+        {
+            LSLog.Log_INFO("changemode ");
+            mPlayMode++;
+            return 0;
+        }
     }
 }

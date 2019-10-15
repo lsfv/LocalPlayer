@@ -22,13 +22,11 @@ import app.lslibrary.androidHelper.LSActivity;
 import app.lslibrary.androidHelper.LSLog;
 
 //!todo 1，还有一个不是很完善的地方：if(fragment instanceof ISetupMaster)。 没有强制的要求接口。
+//!todo 更新歌单，可能需要一个更低耗的方法。
 //!todo 左侧菜单栏目没有清空回退的功能。
 //!todo ,返回到首页，有时候No adapter attached; skipping layout
-//!todo 逻辑层的分类，按表划分，会导致连表的方法，无法定位放置位置。 如果按模块划分，如页面. 页面太多，或小页面又会导致逻辑类太多，甚至删除某哦页面。
-// 按逻辑又是主观性太强。来来去去还是按表划分比较中规中矩，因为表的建立就是逻辑划分的部分体现。
 //!todo savedInstanceState 实际工程使用范例.
 //!todo 还是需要一个模板啊。比如adapter 的大致样子都是差不多的。
-//!todo 需要总结工程。如model 需要添加各种方法。如song 的条目显示。
 public class MasterPage extends AppCompatActivity implements View.OnClickListener
 {
     //region 母模板 自己功能实现的代码块。

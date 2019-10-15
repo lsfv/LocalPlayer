@@ -22,14 +22,16 @@ import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.appHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import app.bll.V_List_Song;
 import app.lslibrary.androidHelper.LSLog;
 import app.lslibrary.customUI.LSCircleImage;
 
 
 //!todo findcontrol 还是可以试下，放入到扩展类中。
-//!todo 1.显示菜单，并测试功能。2.显示底部菜单。3.进行底部菜单的单元测试.4.启动主页时，就启动services。
-//!todo services 先建立一个测试方法，并测试连接。之后 建立播放，发送基本信息,定时发送广播功能。并进行测试。
-//!todo 4.连接services，并调用方法 播放歌曲。 5.services 发送定时广播,
+//!todo 逻辑ok。开始大框架。0.status class pracable,1. player class 2.init ,set,play ,pre...getstatusinfo. 3.media player.
 public class PlaySong extends BaseFragment implements View.OnClickListener
 {
     private ConstraintLayout mContent;
@@ -82,16 +84,18 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
     }
     //endregion
 
+
     //region other member variable
-    public static final String argumentLsid = "ls_id";
+    public static final String argumentLsid = "lid";
 
 
     private int mlsid=-1;
+    private int mIndex=-1;
     private final app.bll.V_List_Song mV_list_song_bll=new app.bll.V_List_Song(MainActivity.appContext);
     private MyConnection mMyConnection=new MyConnection();
+    private List<app.model.V_List_Song> mV_list_songs=new ArrayList<>();
+
     //endregion
-
-
 
 
 
@@ -120,19 +124,35 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
     {
         super.onActivityCreated(savedInstanceState);
         findControls();
-        mlsid = getArguments().getInt(argumentLsid);
-        LSLog.Log_INFO(String.format ("lsid:%d",mlsid));
+        initMemberVariable();
         getMaster().setupToolbarMenu(mV_list_song_bll.getMenuPlayerTitle(), new MenuClickHandler());
 
         //虽然onActivityCreated，每次回退都会调用。但是bind如果连接存在是不会连2此的。
         requireActivity().bindService(appHelper.getServiceIntent(), mMyConnection, Context.BIND_AUTO_CREATE);
 
+
+    }
+
+    private void initMemberVariable()
+    {
+        mlsid = getArguments().getInt(argumentLsid);
+        mV_list_songs=mV_list_song_bll.getModelByLid(mlsid);
     }
 
 
     private void pre()
     {
-
+        if(mMyConnection.mPlayerProxy!=null)
+        {
+            try
+            {
+                int res=mMyConnection.mPlayerProxy.pre();
+            }
+            catch (Exception e)
+            {
+                LSLog.Log_Exception(e);
+            }
+        }
     }
 
     private void play()
@@ -141,7 +161,7 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
         {
             try
             {
-                mMyConnection.mPlayerProxy.playSong(4);
+                int res=mMyConnection.mPlayerProxy.playSong(mIndex);
             }
             catch (Exception e)
             {
@@ -152,7 +172,17 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
 
     private void next()
     {
-
+        if(mMyConnection.mPlayerProxy!=null)
+        {
+            try
+            {
+                int res=mMyConnection.mPlayerProxy.next();
+            }
+            catch (Exception e)
+            {
+                LSLog.Log_Exception(e);
+            }
+        }
     }
 
 
@@ -162,7 +192,25 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
         @Override
         public boolean onMenuItemClick(MenuItem menuItem)
         {
-            LSLog.Log_INFO(menuItem.getTitle().toString());
+            if(menuItem.getTitle().toString()==V_List_Song.menu_IncressVolume)
+            {
+                LSLog.Log_INFO("popup volume window!");
+            }
+            else if(menuItem.getTitle().toString()==V_List_Song.menu_PlayerMode)
+            {
+                if(mMyConnection.mPlayerProxy!=null)
+                {
+                    try
+                    {
+                        int res=mMyConnection.mPlayerProxy.changemode();
+                        //!todo get status from services to local. and display in ui.
+                    }
+                    catch (Exception e)
+                    {
+                        LSLog.Log_Exception(e);
+                    }
+                }
+            }
             return false;
         }
     }
@@ -177,6 +225,17 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
             if(mPlayerProxy==null)
             {
                 LSLog.Log_INFO("error get null services");
+            }
+            else
+            {
+                try
+                {
+                    mPlayerProxy.setAllSongs(mV_list_songs);
+                    mPlayerProxy.playSong(mIndex);
+                } catch (Exception e)
+                {
+                    LSLog.Log_Exception(e);
+                }
             }
         }
 

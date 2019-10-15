@@ -12,4 +12,7 @@ interface IPlayer
 
     void setAllSongs(in List<app.model.V_List_Song> songs);
     int playSong(int index);
+    int pre();
+    int next();
+    int changemode();
 }

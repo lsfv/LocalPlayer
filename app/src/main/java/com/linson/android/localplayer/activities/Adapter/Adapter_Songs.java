@@ -50,7 +50,7 @@ public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHold
             {
                 if(mHander!=null)
                 {
-                    mHander.onClick(tempSong.LS_id);
+                    mHander.onClick(tempSong.L_id);
                 }
             }
         });

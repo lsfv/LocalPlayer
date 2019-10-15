@@ -63,6 +63,7 @@ public class LocalSong
         }
 
         dal.updateSongs();
+        V_List_Song.cacheIsLast=false;//只要更新过本地。那么缓存设置为过期。必须重新读起数据库。
         return true;
     }
 }

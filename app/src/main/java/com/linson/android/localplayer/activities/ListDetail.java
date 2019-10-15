@@ -177,11 +177,11 @@ public class ListDetail extends BaseFragment
     public class RecycleHandler implements Adapter_Songs.IItemHander
     {
         @Override
-        public void onClick(int lsid)
+        public void onClick(int lid)
         {
             Fragment fragment=new PlaySong();
             Bundle bundle=new Bundle();
-            bundle.putInt(PlaySong.argumentLsid, lsid);
+            bundle.putInt(PlaySong.argumentLsid, lid);
             fragment.setArguments(bundle);
 
             appHelper.startPageWithBack(getFragmentManager(),fragment);

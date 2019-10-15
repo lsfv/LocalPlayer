@@ -5,15 +5,22 @@ import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import app.dal.Song;
+import app.lslibrary.androidHelper.LSLog;
 
 public class V_List_Song
 {
     private app.dal.V_List_Song dal;
     private Context mContext;
+    private static List<app.model.V_List_Song> cache_list_songs=null;//加入缓存策略，简单有效。
+    public static boolean cacheIsLast=false;
+    public static final int allsongid=1;
+
     public V_List_Song(Context context)
     {
         mContext=context;
@@ -55,7 +62,19 @@ public class V_List_Song
 
     public java.util.List<app.model.V_List_Song> getModelByLid(int lid)
     {
-        return dal.getModelList("where LS_lid = "+lid);
+        if(lid==allsongid)
+        {
+            if (cacheIsLast == false)
+            {
+                cache_list_songs = dal.getModelList("where LS_lid = " + lid);
+                cacheIsLast = true;
+            }
+            return cache_list_songs;
+        }
+        else
+        {
+            return dal.getModelList("where LS_lid = " + lid);
+        }
     }
 
     public CharSequence[] getNameList(@NonNull java.util.List<app.model.V_List_Song> songs)
@@ -91,8 +110,6 @@ public class V_List_Song
 
         return res;
     }
-
-
 
     public java.util.List<app.model.V_List_Song> getChooseList(@NonNull java.util.List<app.model.V_List_Song> songs ,boolean[] choose)
     {
