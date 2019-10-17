@@ -4,7 +4,7 @@ import android.os.Parcelable;
 
 import java.io.Serializable;
 import java.util.Date;
-public class V_List_Song  implements Serializable,Parcelable
+public class V_List_Song  implements Parcelable
 {
 	public int LS_id;
 	public int LS_lid;
@@ -103,6 +103,7 @@ public class V_List_Song  implements Serializable,Parcelable
 		dest.writeString(L_info);
 		dest.writeString(L_pic);
 		dest.writeString(L_ps);
+		dest.writeInt(S_id);
 		dest.writeString(S_musicName);
 		dest.writeString(S_artist);
 		dest.writeInt(S_duration);

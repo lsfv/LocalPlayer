@@ -51,8 +51,7 @@ public class MainActivity extends AppCompatActivity
         else
         {
             unbindService(mm);
-            stopService(appHelper.getServiceIntent());
-
+            //stopService(appHelper.getServiceIntent());还是不能退出服务。服务就让用户手动关闭把。
             finish();
         }
     }

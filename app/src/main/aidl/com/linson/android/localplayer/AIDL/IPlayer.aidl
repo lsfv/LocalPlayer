@@ -17,4 +17,6 @@ interface IPlayer
     int next();
     int changemode(int mode);
     int playOrPause();
+    void ondisconnected();
+    app.model.PlayerBaseInfo getBaseInfo();
 }

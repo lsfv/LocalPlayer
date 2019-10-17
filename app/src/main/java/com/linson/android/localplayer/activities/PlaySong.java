@@ -31,7 +31,8 @@ import app.lslibrary.customUI.LSCircleImage;
 
 
 //!todo findcontrol 还是可以试下，放入到扩展类中。
-//!todo 逻辑ok。开始大框架。0.status class pracable,1. player class 2.init ,set,play ,pre...getstatusinfo. 3.media player.歌曲索引错误。其他专辑不会播放。
+//!todo 1.播完一首重复，再暂停，无效。2.status 的获得.
+//!todo 需要模板生成器。
 public class PlaySong extends BaseFragment implements View.OnClickListener
 {
     private ConstraintLayout mContent;
@@ -111,6 +112,19 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
     public void onDestroy()
     {
         super.onDestroy();
+        if(mMyConnection!=null)
+        {
+            if(mMyConnection.mPlayerProxy!=null)
+            {
+                try
+                {
+                    mMyConnection.mPlayerProxy.ondisconnected();
+                } catch (Exception e)
+                {
+                    LSLog.Log_Exception(e);
+                }
+            }
+        }
         requireActivity().unbindService(mMyConnection);
     }
 
@@ -204,6 +218,7 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
                 {
                     try
                     {
+
                         int res=mMyConnection.mPlayerProxy.changemode(1);
                         //!todo get status from services to local. and display in ui.
                     }
@@ -242,10 +257,11 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
             }
         }
 
+
+
         @Override
         public void onServiceDisconnected(ComponentName name)
         {
-
         }
     }
     //endregion
