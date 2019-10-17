@@ -50,7 +50,7 @@ public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHold
             {
                 if(mHander!=null)
                 {
-                    mHander.onClick(tempSong.L_id);
+                    mHander.onClick(tempSong.L_id,i);
                 }
             }
         });
@@ -92,7 +92,7 @@ public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHold
 
     public interface IItemHander
     {
-        void onClick(int ls_id);
+        void onClick(int ls_id,int index);
     }
 
 }

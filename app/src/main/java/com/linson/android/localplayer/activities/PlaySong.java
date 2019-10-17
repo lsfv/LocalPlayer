@@ -31,7 +31,7 @@ import app.lslibrary.customUI.LSCircleImage;
 
 
 //!todo findcontrol 还是可以试下，放入到扩展类中。
-//!todo 逻辑ok。开始大框架。0.status class pracable,1. player class 2.init ,set,play ,pre...getstatusinfo. 3.media player.
+//!todo 逻辑ok。开始大框架。0.status class pracable,1. player class 2.init ,set,play ,pre...getstatusinfo. 3.media player.歌曲索引错误。其他专辑不会播放。
 public class PlaySong extends BaseFragment implements View.OnClickListener
 {
     private ConstraintLayout mContent;
@@ -87,6 +87,7 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
 
     //region other member variable
     public static final String argumentLsid = "lid";
+    public static final String argumentindex="index";
 
 
     private int mlsid=-1;
@@ -136,6 +137,7 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
     private void initMemberVariable()
     {
         mlsid = getArguments().getInt(argumentLsid);
+        mIndex=getArguments().getInt(argumentindex);
         mV_list_songs=mV_list_song_bll.getModelByLid(mlsid);
     }
 
@@ -161,7 +163,7 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
         {
             try
             {
-                int res=mMyConnection.mPlayerProxy.playSong(mIndex);
+                int res=mMyConnection.mPlayerProxy.playOrPause();
             }
             catch (Exception e)
             {
@@ -202,7 +204,7 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
                 {
                     try
                     {
-                        int res=mMyConnection.mPlayerProxy.changemode();
+                        int res=mMyConnection.mPlayerProxy.changemode(1);
                         //!todo get status from services to local. and display in ui.
                     }
                     catch (Exception e)
@@ -230,9 +232,10 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
             {
                 try
                 {
-                    mPlayerProxy.setAllSongs(mV_list_songs);
-                    mPlayerProxy.playSong(mIndex);
-                } catch (Exception e)
+                    LSLog.Log_INFO("client:"+mIndex);
+                    mPlayerProxy.playSong(mIndex,mV_list_songs);
+                }
+                catch (Exception e)
                 {
                     LSLog.Log_Exception(e);
                 }
