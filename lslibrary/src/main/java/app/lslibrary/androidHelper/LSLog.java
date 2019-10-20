@@ -28,7 +28,7 @@ public class LSLog
         Log.i(LOGTAG, getAutoJumpLogInfos()+" : "+e.toString()+".\r\n");
         for(StackTraceElement item : e.getStackTrace())
         {
-            Log.i(LOGTAG, item.toString()+".\r\n");
+            Log.i(LOGTAG, "Error"+item.toString()+".\r\n");
         }
     }
     public static void Log_Exception(Exception e,String prefix) {

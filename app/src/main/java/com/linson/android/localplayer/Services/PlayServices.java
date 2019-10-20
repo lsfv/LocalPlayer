@@ -19,72 +19,44 @@ import app.lslibrary.androidHelper.LSLog;
 import app.model.PlayerBaseInfo;
 import app.model.V_List_Song;
 
-//多个连接是共享一个播放器。甚至我想所有链接共享一个接口实现。接口的实现可以做成一个单例模式。这样播放器也可以放入到单例中，自然就只有一个播放器。
+//多个连接是共享一个播放器。甚至所有链接共享一个实现。接口的实现可以做成一个单例模式。这样播放器也可以放入到单例中，自然就只有一个播放器。
+//其实因为server，不管start执行多少次onCreate只会执行一次，所以不需要单例，可以把实现的建立直接放入到onCreate.这样每次onBind都返回的是同一个，整个app只有一个service和实现的实例。
+//由实例自己释放播放器。完结。刚开始以为播放器是非托管资源。后来查下资料java这里应该都是托管资源，播放器要和服务同在。所以我们根本不用管释放问题。让java虚拟机自己处理。这是个标准的java对象。
+//当然也可以手动，在服务析构的时候，手动释放播放器。
+//
 public class PlayServices extends Service
 {
-    public static MediaPlayer mMediaPlayer;
     public RemoteServiceProxy mRemoteServiceProxy;
 
     public PlayServices()
     {
-        mMediaPlayer=new MediaPlayer();
-        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
-        {
-            @Override
-            public void onCompletion(MediaPlayer mp)
-            {
-               if( mRemoteServiceProxy.mBaseInfo.playMode==PlayerBaseInfo.playModel_single)
-               {
-               }
-               else if( mRemoteServiceProxy.mBaseInfo.playMode==PlayerBaseInfo.playModel_singleRepeat)
-               {
-                   mRemoteServiceProxy.playNow();
-               }
-               else if( mRemoteServiceProxy.mBaseInfo.playMode==PlayerBaseInfo.playModel_all)
-               {
-                   try
-                   {
-                       mRemoteServiceProxy.next();
-                   } catch (Exception e)
-                   {
-                       LSLog.Log_Exception(e);
-                   }
-               }
-               else if( mRemoteServiceProxy.mBaseInfo.playMode==PlayerBaseInfo.playModel_random)
-               {
-                   try
-                   {
-                       Random random=new Random();
-                       int a=random.nextInt();
-                        a=a %mRemoteServiceProxy.mAllSongs.size()-1;
-                       mRemoteServiceProxy.playOneSong(a);
-                   } catch (Exception e)
-                   {
-                       LSLog.Log_Exception(e);
-                   }
-               }
-            }
-        });
+        LSLog.Log_INFO("services PlayServices");
+    }
+
+    @Override
+    public void onCreate()
+    {
+        LSLog.Log_INFO("services onCreate");
+        super.onCreate();
+        mRemoteServiceProxy=new RemoteServiceProxy();
     }
 
     @Nullable @Override
     public IBinder onBind(Intent intent)
     {
-        LSLog.Log_INFO("services");
-        mRemoteServiceProxy=new RemoteServiceProxy();
+        LSLog.Log_INFO("services onBind");
         return mRemoteServiceProxy;
     }
+
 
 
     @Override
     public void onDestroy()
     {
+        LSLog.Log_INFO("services onDestroy");
+        mRemoteServiceProxy.onMyDestroy();//先手动调用释放播放器。
         super.onDestroy();
-        mMediaPlayer.stop();
-        mMediaPlayer.release();
     }
-
-
 
 
 
@@ -94,12 +66,55 @@ public class PlayServices extends Service
     {
         public static int gotoStartSecond=5000;
 
-        @Override
-        public void ondisconnected()
-        {
-            LSLog.Log_INFO("destroy");
-        }
+        public MediaPlayer mMediaPlayer;
+        private List<app.model.V_List_Song> mAllSongs;
+        private app.model.PlayerBaseInfo mBaseInfo;
 
+
+
+        public RemoteServiceProxy()
+        {
+            mBaseInfo=new app.model.PlayerBaseInfo();
+            mMediaPlayer=new MediaPlayer();
+
+            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
+            {
+                @Override
+                public void onCompletion(MediaPlayer mp)
+                {
+                    if(mBaseInfo.playMode==PlayerBaseInfo.playModel_single)
+                    {
+                    }
+                    else if(mBaseInfo.playMode==PlayerBaseInfo.playModel_singleRepeat)
+                    {
+                        playNow();
+                    }
+                    else if(mBaseInfo.playMode==PlayerBaseInfo.playModel_all)
+                    {
+                        try
+                        {
+                            next();
+                        } catch (Exception e)
+                        {
+                            LSLog.Log_Exception(e);
+                        }
+                    }
+                    else if(mBaseInfo.playMode==PlayerBaseInfo.playModel_random)
+                    {
+                        try
+                        {
+                            Random random=new Random();
+                            int a=random.nextInt();
+                            a=a %mAllSongs.size()-1;
+                            playOneSong(a);
+                        } catch (Exception e)
+                        {
+                            LSLog.Log_Exception(e);
+                        }
+                    }
+                }
+            });
+        }
 
         //region test funcion discard
         @Override
@@ -115,8 +130,7 @@ public class PlayServices extends Service
         }
         //endregion
 
-        private List<app.model.V_List_Song> mAllSongs=null;
-        private app.model.PlayerBaseInfo mBaseInfo=new app.model.PlayerBaseInfo();
+
 
 
         private String displayStatus()
@@ -211,7 +225,6 @@ public class PlayServices extends Service
             {
                 try
                 {
-                    mMediaPlayer.stop();
                     mMediaPlayer.reset();
                     mMediaPlayer.setDataSource(songPath);
                     mMediaPlayer.prepare();
@@ -296,6 +309,24 @@ public class PlayServices extends Service
         public app.model.PlayerBaseInfo getBaseInfo()
         {
             return mBaseInfo;
+        }
+
+
+        @Override
+        public void ondisconnected()
+        {
+            LSLog.Log_INFO("on disconnected.beacause it's a share connection.  a connecter will use it later.don't clear anything.");
+        }
+
+
+        public void onMyDestroy()
+        {
+            if(mMediaPlayer.isPlaying())
+            {
+                mMediaPlayer.stop();
+            }
+            mMediaPlayer.reset();
+            mMediaPlayer.release();
         }
 
     }

@@ -23,7 +23,7 @@ import app.model.V_List_Song;
 public class MainActivity extends AppCompatActivity
 {
     public static Context appContext;
-    private myConnection mm;
+    //private myConnection mm;
     private boolean isFirstLoad=true;
 
     @Override
@@ -32,11 +32,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         initGlobalArgument();//初始化全局变量
-        StartServicesabc();//测试服务
+        StartServicesabc();//启动服务，并在这里关闭服务。其他页面，绑动服务就ok了。
     }
-
-
-
 
 
     @Override
@@ -50,9 +47,9 @@ public class MainActivity extends AppCompatActivity
         }
         else
         {
-            unbindService(mm);
-            //stopService(appHelper.getServiceIntent());还是不能退出服务。服务就让用户手动关闭把。
+            //stopService(appHelper.getServiceIntent());//还是不能退出服务。服务就让用户手动关闭把。
             finish();
+            System.exit(0);
         }
     }
 
@@ -68,42 +65,10 @@ public class MainActivity extends AppCompatActivity
         LSLog.Log_DBinfo();//数据库地址
     }
 
-
     //start and test services
     private boolean StartServicesabc()
     {
-
-        mm=new myConnection();
         startService(appHelper.getServiceIntent());
-        return bindService(appHelper.getServiceIntent(), mm , BIND_AUTO_CREATE);
-    }
-
-
-    private class myConnection implements ServiceConnection
-    {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service)
-        {
-            try
-            {
-                IPlayer res=IPlayer.Stub.asInterface(service);
-                int a = res.add(3, 4);
-                LSLog.Log_INFO("StartServices:ok"+"."+a);
-
-                app.model.V_List_Song temp=new V_List_Song();
-                temp.L_name="name";
-                res.modifymodel(temp);
-                LSLog.Log_INFO(temp.L_name);
-            } catch (Exception e)
-            {
-                LSLog.Log_Exception(e,"StartServices: ");
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name)
-        {
-
-        }
+        return true;
     }
 }

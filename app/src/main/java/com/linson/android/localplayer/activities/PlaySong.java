@@ -31,6 +31,7 @@ import app.lslibrary.customUI.LSCircleImage;
 
 
 //!todo findcontrol 还是可以试下，放入到扩展类中。
+//!todo 建立了aidl对象后实现后，无法停止service。虽然释放了播放器。不过对用户来说，已经停止了播放器，也算停止了服务。之后再看下。
 //!todo 1.播完一首重复，再暂停，无效。2.status 的获得.
 //!todo 需要模板生成器。
 public class PlaySong extends BaseFragment implements View.OnClickListener

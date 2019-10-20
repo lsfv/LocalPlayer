@@ -33,7 +33,6 @@ public class LSCircleImage extends View
         super(context, attrs);
         TypedArray array=context.obtainStyledAttributes(attrs, R.styleable.LSCircleImage);
         mRadius=(int)array.getDimension(R.styleable.LSCircleImage_CircleImage_radius, Integer.MAX_VALUE);
-        LSLog.Log_INFO("radius:"+mRadius);
         mImgResourceID=array.getResourceId(R.styleable.LSCircleImage_CircleImage_img,0 );
         mPaint=new Paint();
     }
