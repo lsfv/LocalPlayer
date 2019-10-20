@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 
 import com.linson.android.localplayer.AIDL.IPlayer;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -41,6 +42,7 @@ public class PlayServices extends Service
         mRemoteServiceProxy=new RemoteServiceProxy();
     }
 
+
     @Nullable @Override
     public IBinder onBind(Intent intent)
     {
@@ -49,15 +51,13 @@ public class PlayServices extends Service
     }
 
 
-
     @Override
     public void onDestroy()
     {
         LSLog.Log_INFO("services onDestroy");
-        mRemoteServiceProxy.onMyDestroy();//先手动调用释放播放器。
+        mRemoteServiceProxy.ReasePlayer();//先手动调用释放播放器。
         super.onDestroy();
     }
-
 
 
     //所有歌曲全部copy过来。1万首歌曲的信息一般也就1m，可以考虑极端情况，但是不要顾全所有极端情况。满足95%的用户就达到标准了.
@@ -69,7 +69,6 @@ public class PlayServices extends Service
         public MediaPlayer mMediaPlayer;
         private List<app.model.V_List_Song> mAllSongs;
         private app.model.PlayerBaseInfo mBaseInfo;
-
 
 
         public RemoteServiceProxy()
@@ -116,22 +115,6 @@ public class PlayServices extends Service
             });
         }
 
-        //region test funcion discard
-        @Override
-        public int add(int a, int b) throws RemoteException
-        {
-            return a+b;
-        }
-
-        @Override
-        public void modifymodel(V_List_Song mm) throws RemoteException
-        {
-            mm.L_name+="v1";
-        }
-        //endregion
-
-
-
 
         private String displayStatus()
         {
@@ -149,6 +132,7 @@ public class PlayServices extends Service
                 if(songs!=null && index>=0 && index<songs.size())
                 {
                     mAllSongs=songs;
+                    mBaseInfo.lid=mAllSongs.get(index).L_id;
                     mBaseInfo.index=(int) index;
                     mBaseInfo.status=playNow();
                     if(mBaseInfo.status==PlayerBaseInfo.status_playing)
@@ -230,7 +214,13 @@ public class PlayServices extends Service
                     mMediaPlayer.prepare();
                     mMediaPlayer.start();
                     res=PlayerBaseInfo.status_playing;
-                } catch (Exception e)
+                }
+                catch (IOException e)
+                {
+                    res=PlayerBaseInfo.status_error_nofile;
+                    LSLog.Log_Exception(e);
+                }
+                catch (Exception e)
                 {
                     res=PlayerBaseInfo.status_error_other;
                     LSLog.Log_Exception(e);
@@ -319,7 +309,7 @@ public class PlayServices extends Service
         }
 
 
-        public void onMyDestroy()
+        public void ReasePlayer()
         {
             if(mMediaPlayer.isPlaying())
             {

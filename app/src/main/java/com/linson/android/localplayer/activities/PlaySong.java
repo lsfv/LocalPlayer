@@ -145,8 +145,6 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
 
         //虽然onActivityCreated，每次回退都会调用。但是bind如果连接存在是不会连2此的。
         requireActivity().bindService(appHelper.getServiceIntent(), mMyConnection, Context.BIND_AUTO_CREATE);
-
-
     }
 
     private void initMemberVariable()
@@ -248,8 +246,18 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
             {
                 try
                 {
-                    LSLog.Log_INFO("client:"+mIndex);
-                    mPlayerProxy.playSong(mIndex,mV_list_songs);
+
+                    //查看基本信息，判断是查看，还是播放。
+                    app.model.PlayerBaseInfo baseInfo=mPlayerProxy.getBaseInfo();
+
+                    LSLog.Log_INFO(String.format("onServiceConnected.argument lid %d,index:%d, base :lid:%d,sid:%d",mlsid,mIndex,baseInfo.lid,baseInfo.index));
+                    if(baseInfo.lid==mlsid && baseInfo.index==mIndex)
+                    {
+                    }
+                    else
+                    {
+                        mPlayerProxy.playSong(mIndex,mV_list_songs);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -258,14 +266,10 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
             }
         }
 
-
-
         @Override
         public void onServiceDisconnected(ComponentName name)
         {
         }
     }
     //endregion
-
-
 }
