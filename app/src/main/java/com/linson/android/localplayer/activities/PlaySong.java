@@ -1,25 +1,31 @@
 package com.linson.android.localplayer.activities;
 
 
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.media.AudioManager;
 import android.net.IpPrefix;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.linson.android.localplayer.AIDL.IPlayer;
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
+import com.linson.android.localplayer.activities.Dialog.Dialog_Volume;
 import com.linson.android.localplayer.appHelper;
 
 import java.util.ArrayList;
@@ -27,12 +33,14 @@ import java.util.List;
 
 import app.bll.V_List_Song;
 import app.lslibrary.androidHelper.LSLog;
+import app.lslibrary.androidHelper.LSSystemServices;
 import app.lslibrary.customUI.LSCircleImage;
+import app.model.PlayerBaseInfo;
 
 
 //!todo findcontrol 还是可以试下，放入到扩展类中。
 //!todo 建立了aidl对象后实现后，无法停止service。虽然释放了播放器。不过对用户来说，已经停止了播放器，也算停止了服务。之后再看下。
-//!todo 1.播完一首重复，再暂停，无效。2.status 的获得.
+//!todo 1.清单显示播放歌曲。3.点击歌曲。不进入详细页面。
 //!todo 需要模板生成器。
 public class PlaySong extends BaseFragment implements View.OnClickListener
 {
@@ -86,7 +94,6 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
     }
     //endregion
 
-
     //region other member variable
     public static final String argumentLsid = "lid";
     public static final String argumentindex="index";
@@ -97,33 +104,27 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
     private final app.bll.V_List_Song mV_list_song_bll=new app.bll.V_List_Song(MainActivity.appContext);
     private MyConnection mMyConnection=new MyConnection();
     private List<app.model.V_List_Song> mV_list_songs=new ArrayList<>();
+    private app.model.PlayerBaseInfo mBaseInfo=new PlayerBaseInfo();
 
     //endregion
 
-
-
     public PlaySong()
     {
-        //连接services,对应于destroy的释放。连接放到构造函数中。
     }
-
 
 
     @Override
     public void onDestroy()
     {
         super.onDestroy();
-        if(mMyConnection!=null)
+        if(mMyConnection!=null && mMyConnection.mPlayerProxy!=null)
         {
-            if(mMyConnection.mPlayerProxy!=null)
+            try
             {
-                try
-                {
-                    mMyConnection.mPlayerProxy.ondisconnected();
-                } catch (Exception e)
-                {
-                    LSLog.Log_Exception(e);
-                }
+                mMyConnection.mPlayerProxy.ondisconnected();
+            } catch (Exception e)
+            {
+                LSLog.Log_Exception(e);
             }
         }
         requireActivity().unbindService(mMyConnection);
@@ -147,11 +148,13 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
         requireActivity().bindService(appHelper.getServiceIntent(), mMyConnection, Context.BIND_AUTO_CREATE);
     }
 
+
     private void initMemberVariable()
     {
         mlsid = getArguments().getInt(argumentLsid);
         mIndex=getArguments().getInt(argumentindex);
         mV_list_songs=mV_list_song_bll.getModelByLid(mlsid);
+        LSLog.Log_INFO(String.format("init playsong. id:%d,index:%d",mlsid,mIndex));
     }
 
 
@@ -201,25 +204,41 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
     }
 
 
+    private void UpdateUi_mode(@NonNull app.model.PlayerBaseInfo baseInfo)
+    {
+        getMaster().changeMenuTitel(1, baseInfo.getModeName());
+    }
+
+
     //region not static class: extend for top class
     public class MenuClickHandler implements Toolbar.OnMenuItemClickListener
     {
         @Override
         public boolean onMenuItemClick(MenuItem menuItem)
         {
-            if(menuItem.getTitle().toString()==V_List_Song.menu_IncressVolume)
+            if(menuItem.getIntent().getStringExtra(MasterPage.FIXMENUTITLENAME)==V_List_Song.menu_IncressVolume)
             {
-                LSLog.Log_INFO("popup volume window!");
+                LSSystemServices.StreamVolumeInfo info=LSSystemServices.getVolumeInfo(MainActivity.appContext, AudioManager.STREAM_MUSIC);
+                Dialog_Volume dialog=new Dialog_Volume(getContext(), info.max, info.now, new Dialog_Volume.IVolumeHander()
+                {
+                    @Override
+                    public void onChangeValue(int value)
+                    {
+                        LSSystemServices.setVolume(AudioManager.STREAM_MUSIC, MainActivity.appContext, value);
+                    }
+                });
+                dialog.show();
             }
-            else if(menuItem.getTitle().toString()==V_List_Song.menu_PlayerMode)
+            else if(menuItem.getIntent().getStringExtra(MasterPage.FIXMENUTITLENAME)== V_List_Song.menu_PlayerMode)
             {
+                LSLog.Log_INFO("change mode!"+menuItem.getIntent());
                 if(mMyConnection.mPlayerProxy!=null)
                 {
                     try
                     {
-
-                        int res=mMyConnection.mPlayerProxy.changemode(1);
-                        //!todo get status from services to local. and display in ui.
+                        mBaseInfo.changeMode();
+                        mMyConnection.mPlayerProxy.changemode(mBaseInfo.playMode);
+                        UpdateUi_mode(mBaseInfo);
                     }
                     catch (Exception e)
                     {
@@ -227,44 +246,55 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
                     }
                 }
             }
-            return false;
+            return true;
         }
     }
 
     public class MyConnection implements ServiceConnection
     {
         IPlayer mPlayerProxy;
+
+
+        @Override
+        public void onBindingDied(ComponentName name)
+        {
+            LSLog.Log_INFO("error onBindingDied");
+        }
+
+        @Override
+        public void onNullBinding(ComponentName name)
+        {
+            LSLog.Log_INFO("error get null services");
+        }
+
         @Override
         public void onServiceConnected(ComponentName name, IBinder service)
         {
+            LSLog.Log_INFO("onServiceConnected");
             mPlayerProxy=(IPlayer.Stub.asInterface(service));//必须用它提供的转义方法，它有一个是否是远程服务的区别。
-            if(mPlayerProxy==null)
-            {
-                LSLog.Log_INFO("error get null services");
-            }
-            else
+
+            if(mPlayerProxy!=null)
             {
                 try
                 {
+                    mBaseInfo = mPlayerProxy.getBaseInfo();//查看基本信息，判断是查看，还是播放。
 
-                    //查看基本信息，判断是查看，还是播放。
-                    app.model.PlayerBaseInfo baseInfo=mPlayerProxy.getBaseInfo();
-
-                    LSLog.Log_INFO(String.format("onServiceConnected.argument lid %d,index:%d, base :lid:%d,sid:%d",mlsid,mIndex,baseInfo.lid,baseInfo.index));
-                    if(baseInfo.lid==mlsid && baseInfo.index==mIndex)
+                    LSLog.Log_INFO(String.format("onServiceConnected.argument lid %d,index:%d, base :lid:%d,sid:%d", mlsid, mIndex, mBaseInfo.lid, mBaseInfo.index));
+                    if (mBaseInfo.lid == mlsid && mBaseInfo.index == mIndex)
                     {
                     }
                     else
                     {
-                        mPlayerProxy.playSong(mIndex,mV_list_songs);
+                        mPlayerProxy.playSong(mIndex, mV_list_songs);
                     }
-                }
-                catch (Exception e)
+                    UpdateUi_mode(mBaseInfo);
+                } catch (Exception e)
                 {
                     LSLog.Log_Exception(e);
                 }
             }
         }
+
 
         @Override
         public void onServiceDisconnected(ComponentName name)

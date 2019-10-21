@@ -81,6 +81,7 @@ public class PlayServices extends Service
                 @Override
                 public void onCompletion(MediaPlayer mp)
                 {
+                    LSLog.Log_INFO("end.start:"+mBaseInfo.getModeName());
                     if(mBaseInfo.playMode==PlayerBaseInfo.playModel_single)
                     {
                     }
@@ -103,7 +104,7 @@ public class PlayServices extends Service
                         try
                         {
                             Random random=new Random();
-                            int a=random.nextInt();
+                            int a=random.nextInt(mAllSongs.size());
                             a=a %mAllSongs.size()-1;
                             playOneSong(a);
                         } catch (Exception e)
@@ -155,6 +156,7 @@ public class PlayServices extends Service
             int res=-1;
             if(mBaseInfo.status!=PlayerBaseInfo.status_init)//必须初始化之后才能点播
             {
+                mBaseInfo.index=index;
                 mBaseInfo.index=mBaseInfo.index>=0?mBaseInfo.index:0;
                 mBaseInfo.index=mBaseInfo.index<mAllSongs.size()?mBaseInfo.index:mAllSongs.size()-1;
 

@@ -75,6 +75,7 @@ public class ListDetail extends BaseFragment
         mTvListname.setText(mListName);
         setupRecyleview();
         getMaster().setupToolbarMenu(mV_list_song_bll.getMenuTitle(), new MenuHandler());
+        LSLog.Log_INFO(String.format("init listdetail. id:%d,name:%s",mListID,mListName));
     }
 
 
@@ -125,9 +126,13 @@ public class ListDetail extends BaseFragment
         {
             if(which==dialog.BUTTON_POSITIVE)
             {
+                //逻辑是硬伤，这里获得是默认清单的数据，包含了清单数据,如lid，其实还是应该用song这种更正确的类。导致最初直接给list来显示，用了错lid.
+                //那就只用list的song id。重新读一次数据库把。这个逻辑才是正确，避免以后又添加了什么新数据，手工是避免不了错误的。
                 List<app.model.V_List_Song> newChoosed = mV_list_song_bll.getChooseList(allSongs, ischooseList);
-                ((Adapter_Songs) mRvSonglist.getAdapter()).updateData(newChoosed);
                 mList_song_bll.updateBatch(mListID, mV_list_song_bll.getsidList(newChoosed));
+                newChoosed=mV_list_song_bll.getModelByLid(mListID);
+                ((Adapter_Songs) mRvSonglist.getAdapter()).updateData(newChoosed);
+
                 dialog.dismiss();
             }
             else if(which==dialog.BUTTON_NEGATIVE)

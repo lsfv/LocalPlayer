@@ -1,5 +1,6 @@
 package com.linson.android.localplayer.activities;
 
+import android.content.Intent;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -20,7 +21,7 @@ import java.util.List;
 
 import app.lslibrary.androidHelper.LSActivity;
 import app.lslibrary.androidHelper.LSLog;
-
+//!todo 还是需要自带的常用所有控件都过一遍。是否需要建立一个歌词服务器?
 //!todo 1，还有一个不是很完善的地方：if(fragment instanceof ISetupMaster)。 没有强制的要求接口。
 //!todo 更新歌单，可能需要一个更低耗的方法。
 //!todo 左侧菜单栏目没有清空回退的功能。
@@ -37,6 +38,8 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
     private Button mbtn_back;
 
     private boolean loadMenu=false;
+
+    public static final String FIXMENUTITLENAME="title";
 
     //region  findcontrols and bind click event.
     private void findControls()
@@ -121,8 +124,16 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
         for(int i=0;i<menus.size();i++)
         {
             MenuItem tempitem= mToolbar.getMenu().add(menus.get(i));
+            Intent tempIntent=new Intent();
+            tempIntent.putExtra(FIXMENUTITLENAME, menus.get(i));
+            tempitem.setIntent(tempIntent);
             tempitem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
+    }
+
+    public void changeMenuTitel(int index,String title)
+    {
+        mToolbar.getMenu().getItem(1).setTitle(title);
     }
     //endregion
 

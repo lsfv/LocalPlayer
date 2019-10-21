@@ -43,6 +43,38 @@ public class PlayerBaseInfo implements Parcelable
         playingSeconds = in.readInt();
     }
 
+    //这里用枚举就不用 写死 hardcode了。
+    public void changeMode()
+    {
+        playMode++;
+        playMode=playMode>playModel_random?playModel_singleRepeat:playMode;
+    }
+
+    public String getModeName()
+    {
+        String res="";
+        switch (playMode)
+        {
+            case playModel_single:
+            {
+                res="播放一首";break;
+            }
+            case playModel_singleRepeat:
+            {
+                res="单曲循环";break;
+            }
+            case playModel_random:
+            {
+                res="随机播放";break;
+            }
+            case playModel_all:
+            {
+                res="顺序全部";break;
+            }
+        }
+        return res;
+    }
+
     public static final Creator<PlayerBaseInfo> CREATOR = new Creator<PlayerBaseInfo>()
     {
         @Override
