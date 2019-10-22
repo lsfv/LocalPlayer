@@ -1,6 +1,5 @@
 package com.linson.android.localplayer.activities;
 
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -34,7 +33,6 @@ import app.bll.V_List_Song;
 import app.lslibrary.androidHelper.LSActivity;
 import app.lslibrary.androidHelper.LSLog;
 import app.model.PlayerBaseInfo;
-
 
 public class ListDetail extends BaseFragment
 {
