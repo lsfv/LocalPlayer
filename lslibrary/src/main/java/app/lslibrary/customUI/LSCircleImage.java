@@ -8,6 +8,7 @@ import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Shader;
+import android.support.annotation.IdRes;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -79,5 +80,20 @@ public class LSCircleImage extends View
     private void initPaint(Paint paint)
     {
         paint.reset();
+    }
+
+
+    public void setImage( int id)
+    {
+        if(id!=0 && id!=mImgResourceID)
+        {
+            mImgResourceID=id;
+            invalidate();
+        }
+    }
+
+    public int getImage()
+    {
+        return mImgResourceID;
     }
 }

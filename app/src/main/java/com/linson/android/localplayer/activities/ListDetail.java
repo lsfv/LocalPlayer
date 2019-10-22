@@ -54,10 +54,12 @@ public class ListDetail extends BaseFragment
     private String mListName="";
     private app.bll.V_List_Song mV_list_song_bll=new V_List_Song(MainActivity.appContext);
     private app.bll.List_Song mList_song_bll=new List_Song(MainActivity.appContext);
+    private MyConnection mMyConnection;
 
 
     public static String argumentname_lid="lid";
     public static String argumentname_lname="lname";
+
     //endregion
 
 
@@ -79,7 +81,8 @@ public class ListDetail extends BaseFragment
         mListID=getArguments().getInt(argumentname_lid, mListID);//把类的自定义初始化禁止了，导致起不到初始化作用。糟糕的设计。
         mListName=getArguments().getString(argumentname_lname, "");
         mTvListname.setText(mListName);
-        getActivity().bindService(appHelper.getServiceIntent(), new MyConnection(), Context.BIND_AUTO_CREATE);
+        mMyConnection=new MyConnection();
+        getActivity().bindService(appHelper.getServiceIntent(),mMyConnection , Context.BIND_AUTO_CREATE);
 
         setupRecyleview();
         getMaster().setupToolbarMenu(mV_list_song_bll.getMenuTitle(), new MenuHandler());
@@ -107,15 +110,16 @@ public class ListDetail extends BaseFragment
 
     public class MyConnection implements ServiceConnection
     {
+        private IPlayer mPlayer;
         @Override
         public void onServiceConnected(ComponentName name, IBinder service)
         {
-            IPlayer player=IPlayer.Stub.asInterface(service);
-            if(player!=null)
+            mPlayer=IPlayer.Stub.asInterface(service);
+            if(mPlayer!=null)
             {
                 try
                 {
-                    PlayerBaseInfo baseInfo = player.getBaseInfo();
+                    PlayerBaseInfo baseInfo = mPlayer.getBaseInfo();
                     if(baseInfo.lid==mListID )
                     {
                         ((Adapter_Songs) mRvSonglist.getAdapter()).showImagePlaying(baseInfo.index);
@@ -226,13 +230,33 @@ public class ListDetail extends BaseFragment
         @Override
         public void onClick(int lid,int index)
         {
-            Fragment fragment=new PlaySong();
-            Bundle bundle=new Bundle();
-            bundle.putInt(PlaySong.argumentLsid, lid);
-            bundle.putInt(PlaySong.argumentindex, index);
-            fragment.setArguments(bundle);
+            //连接服务，播放歌曲。
+            if(mMyConnection!=null && mMyConnection.mPlayer!=null)
+            {
+                try
+                {
+                    app.model.PlayerBaseInfo info=mMyConnection.mPlayer.getBaseInfo();
+                    if(info.lid!=mListID || info.index!=index)//点击正在播放的应该无响应。
+                    {
+                        mMyConnection.mPlayer.playSong(index, ((Adapter_Songs) mRvSonglist.getAdapter()).getCloneData());
+                        ((Adapter_Songs) ((Adapter_Songs) mRvSonglist.getAdapter())).showImagePlaying(index);
+                    }
+                    else
+                    {
+                        Fragment fragment=new PlaySong();
+                        Bundle bundle=new Bundle();
+                        bundle.putInt(PlaySong.argumentLsid, lid);
+                        bundle.putInt(PlaySong.argumentindex, index);
+                        fragment.setArguments(bundle);
 
-            appHelper.startPageWithBack(getFragmentManager(),fragment);
+                        appHelper.startPageWithBack(getFragmentManager(),fragment);
+                    }
+                }
+                catch (Exception e)
+                {
+                    LSLog.Log_Exception(e);
+                }
+            }
         }
     }
     //endregion

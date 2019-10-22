@@ -105,4 +105,9 @@ public class PlayerBaseInfo implements Parcelable
         dest.writeInt(status);
         dest.writeInt(playingSeconds);
     }
+
+    public String displayStatus()
+    {
+        return (String.format("status:%d,index:%d.mode:%s",status,index,getModeName()));
+    }
 }

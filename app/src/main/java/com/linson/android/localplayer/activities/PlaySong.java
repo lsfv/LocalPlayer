@@ -165,6 +165,8 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
             try
             {
                 int res=mMyConnection.mPlayerProxy.pre();
+                mBaseInfo=mMyConnection.mPlayerProxy.getBaseInfo();
+                UpdateUi_mode(mBaseInfo);
             }
             catch (Exception e)
             {
@@ -180,6 +182,9 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
             try
             {
                 int res=mMyConnection.mPlayerProxy.playOrPause();
+                //直接重新获得数据，这种非网络的数据，如硬盘，数据库等，如果直接获得更简洁那么不需要优化这点效率，除非大数据和非常频繁。
+                mBaseInfo=mMyConnection.mPlayerProxy.getBaseInfo();
+                UpdateUi_mode(mBaseInfo);
             }
             catch (Exception e)
             {
@@ -195,6 +200,8 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
             try
             {
                 int res=mMyConnection.mPlayerProxy.next();
+                mBaseInfo=mMyConnection.mPlayerProxy.getBaseInfo();
+                UpdateUi_mode(mBaseInfo);
             }
             catch (Exception e)
             {
@@ -207,6 +214,23 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
     private void UpdateUi_mode(@NonNull app.model.PlayerBaseInfo baseInfo)
     {
         getMaster().changeMenuTitel(1, baseInfo.getModeName());
+
+        boolean IsPlaying=false;
+        if(baseInfo.status==PlayerBaseInfo.status_playing)
+        {
+            IsPlaying=true;
+        }
+
+        String imgpath=mBtnPlay.getImage()==R.drawable.video?"play":"pause";
+        LSLog.Log_INFO("server mode IsPlaying:"+IsPlaying+". img:"+imgpath+"."+baseInfo.displayStatus());
+        if(IsPlaying==true && mBtnPlay.getImage()==R.drawable.video)
+        {
+            mBtnPlay.setImage(R.drawable.pause);
+        }
+        else if(IsPlaying==false && mBtnPlay.getImage()==R.drawable.pause)
+        {
+            mBtnPlay.setImage(R.drawable.video);
+        }
     }
 
 
