@@ -8,4 +8,5 @@
     <string name="holderTitle">好听的歌曲</string>
     <string name="menu1">列表清单</string>
     <string name="back"><![CDATA[<]]></string>
+    <string name="playing">playing</string>
 </resources>

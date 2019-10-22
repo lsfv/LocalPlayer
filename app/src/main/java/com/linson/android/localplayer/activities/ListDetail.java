@@ -1,8 +1,12 @@
 package com.linson.android.localplayer.activities;
 
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -15,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.linson.android.localplayer.AIDL.IPlayer;
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Adapter.Adapter_Songs;
@@ -28,6 +33,7 @@ import app.bll.Song;
 import app.bll.V_List_Song;
 import app.lslibrary.androidHelper.LSActivity;
 import app.lslibrary.androidHelper.LSLog;
+import app.model.PlayerBaseInfo;
 
 
 public class ListDetail extends BaseFragment
@@ -73,6 +79,8 @@ public class ListDetail extends BaseFragment
         mListID=getArguments().getInt(argumentname_lid, mListID);//把类的自定义初始化禁止了，导致起不到初始化作用。糟糕的设计。
         mListName=getArguments().getString(argumentname_lname, "");
         mTvListname.setText(mListName);
+        getActivity().bindService(appHelper.getServiceIntent(), new MyConnection(), Context.BIND_AUTO_CREATE);
+
         setupRecyleview();
         getMaster().setupToolbarMenu(mV_list_song_bll.getMenuTitle(), new MenuHandler());
         LSLog.Log_INFO(String.format("init listdetail. id:%d,name:%s",mListID,mListName));
@@ -87,7 +95,7 @@ public class ListDetail extends BaseFragment
             res=new ArrayList<>();
         }
 
-        Adapter_Songs adapter_songs=new Adapter_Songs(res,new RecycleHandler());
+        Adapter_Songs adapter_songs=new Adapter_Songs(res,new RecycleHandler(),-1);
         mRvSonglist.setAdapter(adapter_songs);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getContext());
         mRvSonglist.setLayoutManager(linearLayoutManager);
@@ -95,6 +103,39 @@ public class ListDetail extends BaseFragment
 
 
     //region not static class: extend for top class
+
+
+    public class MyConnection implements ServiceConnection
+    {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service)
+        {
+            IPlayer player=IPlayer.Stub.asInterface(service);
+            if(player!=null)
+            {
+                try
+                {
+                    PlayerBaseInfo baseInfo = player.getBaseInfo();
+                    if(baseInfo.lid==mListID )
+                    {
+                        ((Adapter_Songs) mRvSonglist.getAdapter()).showImagePlaying(baseInfo.index);
+                    }
+                } catch (Exception e)
+                {
+                    LSLog.Log_Exception(e);
+                }
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name)
+        {
+
+        }
+    }
+
+
+
     public class MultiChoiceHandler implements DialogInterface.OnMultiChoiceClickListener
     {
         boolean[] ischooseList;
@@ -131,7 +172,7 @@ public class ListDetail extends BaseFragment
                 List<app.model.V_List_Song> newChoosed = mV_list_song_bll.getChooseList(allSongs, ischooseList);
                 mList_song_bll.updateBatch(mListID, mV_list_song_bll.getsidList(newChoosed));
                 newChoosed=mV_list_song_bll.getModelByLid(mListID);
-                ((Adapter_Songs) mRvSonglist.getAdapter()).updateData(newChoosed);
+                ((Adapter_Songs) mRvSonglist.getAdapter()).updateData(newChoosed,-1);
 
                 dialog.dismiss();
             }
@@ -178,6 +219,7 @@ public class ListDetail extends BaseFragment
             return true;
         }
     }
+
 
     public class RecycleHandler implements Adapter_Songs.IItemHander
     {

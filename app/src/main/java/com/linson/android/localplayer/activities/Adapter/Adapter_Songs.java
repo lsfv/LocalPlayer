@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import com.linson.android.localplayer.R;
 
@@ -18,11 +19,13 @@ public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHold
 {
     private List<app.model.V_List_Song> msongs;
     private IItemHander mHander;
+    private int mPlayingIndex=-1;
 
-    public Adapter_Songs(@NonNull List<app.model.V_List_Song> songs,@NonNull IItemHander hander)
+    public Adapter_Songs(@NonNull List<app.model.V_List_Song> songs,@NonNull IItemHander hander,int playingIndex)
     {
         msongs=songs;
         mHander=hander;
+        mPlayingIndex=playingIndex;
         if(msongs==null)
         {
             msongs=new LinkedList<>();
@@ -43,6 +46,14 @@ public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHold
     {
         final app.model.V_List_Song tempSong=msongs.get(i);
         myViewHolder.mTvItem.setText(tempSong.getSongTitle());
+        if(i==mPlayingIndex)
+        {
+            myViewHolder.mIvPlaying.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            myViewHolder.mIvPlaying.setVisibility(View.INVISIBLE);
+        }
         myViewHolder.mView.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -69,9 +80,16 @@ public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHold
         return  new ArrayList<app.model.V_List_Song>(msongs);
     }
 
-    public void updateData(List<app.model.V_List_Song> data)
+    public void updateData(List<app.model.V_List_Song> data,int playingIndex)
     {
         msongs=data;
+        mPlayingIndex=playingIndex;
+        this.notifyDataSetChanged();
+    }
+
+    public void showImagePlaying(int playingIndex)
+    {
+        mPlayingIndex=playingIndex;
         this.notifyDataSetChanged();
     }
 
@@ -79,6 +97,7 @@ public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHold
     public static class MyViewHolder extends RecyclerView.ViewHolder
     {
         private TextView mTvItem;
+        private ImageView mIvPlaying;
         private View mView;
 
 
@@ -86,6 +105,7 @@ public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHold
         {
             super(itemView);
             mTvItem = (TextView) itemView.findViewById(R.id.tv_item);
+            mIvPlaying = (ImageView)itemView.findViewById(R.id.iv_playing);
             mView=itemView;
         }
     }
