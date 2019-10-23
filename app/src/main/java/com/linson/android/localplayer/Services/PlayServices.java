@@ -24,7 +24,7 @@ import app.model.V_List_Song;
 //其实因为server，不管start执行多少次onCreate只会执行一次，所以不需要单例，可以把实现的建立直接放入到onCreate.这样每次onBind都返回的是同一个，整个app只有一个service和实现的实例。
 //由实例自己释放播放器。完结。刚开始以为播放器是非托管资源。后来查下资料java这里应该都是托管资源，播放器要和服务同在。所以我们根本不用管释放问题。让java虚拟机自己处理。这是个标准的java对象。
 //当然也可以手动，在服务析构的时候，手动释放播放器。
-//
+//!todo 可以访问数据库。这里改动就大了。
 public class PlayServices extends Service
 {
     public RemoteServiceProxy mRemoteServiceProxy;

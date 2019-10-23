@@ -28,6 +28,7 @@ import app.lslibrary.androidHelper.LSLog;
 //!todo ,返回到首页，有时候No adapter attached; skipping layout
 //!todo savedInstanceState 实际工程使用范例.
 //!todo 还是需要一个模板啊。比如adapter 的大致样子都是差不多的。
+//!todo 界面更新的逻辑，根据编码的原则和2个方案的有缺点，决定还是server主动的才广播。否则还是用耦合度高的一个动作更新2个子界面的方式处理。
 public class MasterPage extends AppCompatActivity implements View.OnClickListener
 {
     //region 母模板 自己功能实现的代码块。
