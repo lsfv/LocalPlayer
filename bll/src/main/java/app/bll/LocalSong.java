@@ -7,9 +7,9 @@ import app.lslibrary.androidHelper.LSContentResolver;
 public class LocalSong
 {
     private app.dal.LocalSong dal;
-    public LocalSong(Context context)
+    public LocalSong()
     {
-        dal=new app.dal.LocalSong(context);
+        dal=new app.dal.LocalSong();
     }
 
     public int add(app.model.LocalSong model)

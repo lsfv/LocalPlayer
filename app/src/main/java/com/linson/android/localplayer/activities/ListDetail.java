@@ -50,8 +50,8 @@ public class ListDetail extends BaseFragment
     //region other member variable
     private int mListID=appHelper.defaultListID;
     private String mListName="";
-    private app.bll.V_List_Song mV_list_song_bll=new V_List_Song(MainActivity.appContext);
-    private app.bll.List_Song mList_song_bll=new List_Song(MainActivity.appContext);
+    private app.bll.V_List_Song mV_list_song_bll=new V_List_Song();
+    private app.bll.List_Song mList_song_bll=new List_Song();
     private MyConnection mMyConnection;
 
 

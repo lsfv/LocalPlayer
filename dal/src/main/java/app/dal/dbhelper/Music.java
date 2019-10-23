@@ -4,18 +4,45 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-
+//
 public class Music extends SQLiteOpenHelper
 {
     public static int defaultVersion=1;
     public static String dbName="music.db";
+    public static Context mContext=null;
 
-    public static Music getInstance(Context context)
+
+    private static Music mMusic;
+    public static Music getInstance()
     {
-        return new Music(context, dbName, null, defaultVersion);
+        if(mContext==null)
+        {
+            throw  new Error("please set value to mContext first");
+        }
+        else
+        {
+            if (mMusic == null)
+            {
+                mMusic = new Music(mContext, dbName, null, defaultVersion);
+            }
+            return mMusic;
+        }
     }
 
-    public Music(Context context, String name, SQLiteDatabase.CursorFactory factory, int version)
+    //可以多线程，没线程一个对象，来实现并发读数据。
+    public static SQLiteDatabase getNewInstanceForThreads()
+    {
+        if(mContext==null)
+        {
+            throw  new Error("please set value to mContext first");
+        }
+        else
+        {
+            return new Music(mContext, dbName, null, defaultVersion).getReadableDatabase();
+        }
+    }
+
+    private Music(Context context, String name, SQLiteDatabase.CursorFactory factory, int version)
     {
         super(context, name, factory, version);
     }

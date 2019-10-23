@@ -12,9 +12,9 @@ import app.dal.dbhelper.Music;
 public class LocalSong
 {
     private Music DBHelper;
-    public LocalSong(Context context)
+    public LocalSong()
     {
-        DBHelper=Music.getInstance(context);
+        DBHelper=Music.getInstance();
     }
 
     public int add(app.model.LocalSong model)

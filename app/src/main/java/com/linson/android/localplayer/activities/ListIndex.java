@@ -46,8 +46,8 @@ public class ListIndex extends BaseFragment
     //endregion
 
     //region other member variable
-    private app.bll.List mList_bll=new app.bll.List(MainActivity.appContext);
-    private app.bll.LocalSong mLocalSong_bll=new app.bll.LocalSong(MainActivity.appContext);
+    private app.bll.List mList_bll=new app.bll.List();
+    private app.bll.LocalSong mLocalSong_bll=new app.bll.LocalSong();
     //endregion
 
 

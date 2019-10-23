@@ -11,9 +11,9 @@ import app.dal.Song;
 public class List_Song
 {
     private app.dal.List_Song dal;
-    public List_Song(Context context)
+    public List_Song()
     {
-        dal=new app.dal.List_Song(context);
+        dal=new app.dal.List_Song();
     }
 
     public int add(app.model.List_Song model)

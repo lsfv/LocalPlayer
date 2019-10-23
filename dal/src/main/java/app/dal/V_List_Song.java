@@ -11,9 +11,9 @@ import app.dal.dbhelper.Music;
 public class V_List_Song
 {
     private Music DBHelper;
-    public V_List_Song(Context context)
+    public V_List_Song()
     {
-        DBHelper=Music.getInstance(context);
+        DBHelper=Music.getInstance();
     }
 
     public app.model.V_List_Song getModel(int id)

@@ -16,15 +16,13 @@ import app.lslibrary.androidHelper.LSLog;
 public class V_List_Song
 {
     private app.dal.V_List_Song dal;
-    private Context mContext;
     private static List<app.model.V_List_Song> cache_list_songs=null;//加入缓存策略，简单有效。
     public static boolean cacheIsLast=false;
     public static final int allsongid=1;
 
-    public V_List_Song(Context context)
+    public V_List_Song()
     {
-        mContext=context;
-        dal=new app.dal.V_List_Song(context);
+        dal=new app.dal.V_List_Song();
     }
 
     public app.model.V_List_Song getModel(int id)

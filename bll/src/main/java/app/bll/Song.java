@@ -10,9 +10,9 @@ public class Song
 {
     private app.dal.Song dal;
 
-    public Song(Context context)
+    public Song()
     {
-        dal=new app.dal.Song(context);
+        dal=new app.dal.Song();
     }
 
     public int add(app.model.Song model)

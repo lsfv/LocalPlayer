@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity
     private void initGlobalArgument()
     {
         appContext = getApplicationContext();//全局变量
+        app.bll.MusicDB.setDBContext(appContext);
         LSLog.Log_DBinfo();//数据库地址
     }
 

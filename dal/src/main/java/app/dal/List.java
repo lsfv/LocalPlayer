@@ -11,9 +11,9 @@ import app.dal.dbhelper.Music;
 public class List
 {
     private Music DBHelper;
-    public List(Context context)
+    public List()
     {
-        DBHelper=Music.getInstance(context);
+        DBHelper=Music.getInstance();
     }
 
     public int add(app.model.List model)

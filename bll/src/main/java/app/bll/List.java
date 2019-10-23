@@ -7,9 +7,9 @@ import java.util.LinkedList;
 public class List
 {
     private app.dal.List dal;
-    public List(Context context)
+    public List()
     {
-        dal=new app.dal.List(context);
+        dal=new app.dal.List();
     }
 
     public int add(app.model.List model)
