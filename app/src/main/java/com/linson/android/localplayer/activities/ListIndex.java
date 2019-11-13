@@ -4,18 +4,13 @@ import android.Manifest;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
@@ -23,9 +18,7 @@ import com.linson.android.localplayer.activities.Adapter.Adapter_List;
 import com.linson.android.localplayer.activities.Dialog.Dialog_addlist;
 import com.linson.android.localplayer.appHelper;
 
-import app.lslibrary.androidHelper.LSActivity;
 import app.lslibrary.androidHelper.LSContentResolver;
-import app.lslibrary.androidHelper.LSLog;
 import app.model.List;
 
 
@@ -40,14 +33,15 @@ public class ListIndex extends BaseFragment
     //region  findcontrols and bind click event.
     private void findControls()
     {   //findControls
-        mRvList = (RecyclerView) this.getActivity().findViewById(R.id.rv_list);
+        if(this.getActivity()!=null)
+        {
+            mRvList = (RecyclerView) this.getActivity().findViewById(R.id.rv_list);
+        }
     }
 
     //endregion
 
     //region other member variable
-    private app.bll.List mList_bll=new app.bll.List();
-    private app.bll.LocalSong mLocalSong_bll=new app.bll.LocalSong();
     //endregion
 
 
@@ -66,13 +60,13 @@ public class ListIndex extends BaseFragment
         super.onActivityCreated(savedInstanceState);
         findControls();
         setupRecycle();
-        getMaster().setupToolbarMenu(mList_bll.getMenuTitle(), new MenuHandler());
+        getMaster().setupToolbarMenu(app.bll.List.getMenuTitle(), new MenuHandler());
     }
 
 
     private void setupRecycle()
     {
-        java.util.List<List> res=mList_bll.getAlllList();
+        java.util.List<List> res=app.bll.List.getAlllList();
         Adapter_List adapter_list=new Adapter_List(res, new Adapter_listHandler());
         mRvList.setAdapter(adapter_list);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this.getContext());
@@ -90,7 +84,7 @@ public class ListIndex extends BaseFragment
     {
         LSContentResolver lsContentResolver=new LSContentResolver(MainActivity.appContext);
         java.util.List<LSContentResolver.SongInfo> localSongs= lsContentResolver.SearchSong(60*1000);
-        mLocalSong_bll.updateSongsFromLocal(localSongs);
+        app.bll.LocalSong.updateSongsFromLocal(localSongs);
         Toast.makeText(getContext(), "更新完毕",Toast.LENGTH_SHORT ).show();
     }
 
@@ -108,7 +102,7 @@ public class ListIndex extends BaseFragment
                 app.model.List temp = adapter_list.getitem(index);
                 if (temp.L_id != appHelper.defaultListID)
                 {
-                    mList_bll.delete(temp.L_id);//从数据库删除
+                    app.bll.List.delete(temp.L_id);//从数据库删除
                     adapter_list.deleteItem(index);//从内存删除
                 }
                 else//list 'allsongs' should't delete.
@@ -121,13 +115,17 @@ public class ListIndex extends BaseFragment
         @Override
         public void onClickItem(int index)
         {
-            app.model.List theItem= ((Adapter_List)mRvList.getAdapter()).getitem(index);
-            ListDetail fragment= new ListDetail();
-            Bundle bundle=new Bundle();
-            bundle.putInt(ListDetail.argumentname_lid, theItem.L_id);
-            bundle.putString(ListDetail.argumentname_lname, theItem.L_name);
-            fragment.setArguments(bundle);
-            appHelper.startPageWithBack(getFragmentManager(), fragment);
+            if(mRvList.getAdapter()!=null)
+            {
+                app.model.List theItem = ((Adapter_List) mRvList.getAdapter()).getitem(index);
+                ListDetail fragment= new ListDetail();
+                Bundle bundle=new Bundle();
+                bundle.putInt(ListDetail.argumentname_lid, theItem.L_id);
+                bundle.putString(ListDetail.argumentname_lname, theItem.L_name);
+                fragment.setArguments(bundle);
+                appHelper.startPageWithBack(getFragmentManager(), fragment);
+            }
+
         }
     }
 
@@ -136,11 +134,11 @@ public class ListIndex extends BaseFragment
         @Override
         public void submit(String name)
         {
-            if(name!=null && name.trim().length()!=0)
+            if(name!=null && name.trim().length()!=0 && mRvList.getAdapter()!=null)
             {
                 app.model.List temp = new List(name, "info", "pic", "ps");
-                int id = mList_bll.add(temp);
-                temp = mList_bll.getModel(id);
+                int id = app.bll.List.add(temp);
+                temp = app.bll.List.getModel(id);
                 ((Adapter_List) mRvList.getAdapter()).addItem(temp);
             }
         }
@@ -151,14 +149,14 @@ public class ListIndex extends BaseFragment
         @Override
         public boolean onMenuItemClick(MenuItem menuItem)
         {
-            if(menuItem.getTitle().toString()==app.bll.List.menu_addlist)
+            if(menuItem.getTitle().toString().equals(app.bll.List.menu_addlist))
             {
                 //popup window for add list
                 Dialog_addlist dialog_addlist=new Dialog_addlist(getContext(), new popupWindowHander());
                 dialog_addlist.show();
 
             }
-            else if(menuItem.getTitle().toString()==app.bll.List.menu_upsong)
+            else if(menuItem.getTitle().toString().equals(app.bll.List.menu_upsong))
             {
                 LSContentResolver.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new RequestHandler());
             }

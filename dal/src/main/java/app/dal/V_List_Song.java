@@ -1,7 +1,5 @@
 package app.dal;
 
-import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
@@ -43,6 +41,7 @@ public class V_List_Song
             model.S_musicName = cursor.getString(15);
 
         }
+        cursor.close();
         db.close();
         return model;
     }
@@ -81,6 +80,7 @@ public class V_List_Song
             }
         }
 
+        cursor.close();
         db.close();
         return lists;
     }

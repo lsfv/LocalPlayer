@@ -1,26 +1,21 @@
 package com.linson.android.localplayer.activities;
 
 
-import android.app.Dialog;
+import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
-import android.net.IpPrefix;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.linson.android.localplayer.AIDL.IPlayer;
 import com.linson.android.localplayer.MainActivity;
@@ -97,7 +92,6 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
 
     private int mlsid=-1;
     private int mIndex=-1;
-    private final app.bll.V_List_Song mV_list_song_bll=new app.bll.V_List_Song();
     private MyConnection mMyConnection=new MyConnection();
     private List<app.model.V_List_Song> mV_list_songs=new ArrayList<>();
     private app.model.PlayerBaseInfo mBaseInfo=new PlayerBaseInfo();
@@ -127,7 +121,7 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         return inflater.inflate(R.layout.fragment_play_song, container, false);
     }
@@ -138,18 +132,27 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
         super.onActivityCreated(savedInstanceState);
         findControls();
         initMemberVariable();
-        getMaster().setupToolbarMenu(mV_list_song_bll.getMenuPlayerTitle(), new MenuClickHandler());
+        getMaster().setupToolbarMenu(app.bll.V_List_Song.getMenuPlayerTitle(), new MenuClickHandler());
 
         //虽然onActivityCreated，每次回退都会调用。但是bind如果连接存在是不会连2此的。
         requireActivity().bindService(appHelper.getServiceIntent(), mMyConnection, Context.BIND_AUTO_CREATE);
     }
 
 
+    @SuppressLint("DefaultLocale")
     private void initMemberVariable()
     {
-        mlsid = getArguments().getInt(argumentLsid);
-        mIndex=getArguments().getInt(argumentindex);
-        mV_list_songs=mV_list_song_bll.getModelByLid(mlsid);
+        if(getArguments()!=null)
+        {
+            mlsid = getArguments().getInt(argumentLsid);
+            mIndex = getArguments().getInt(argumentindex);
+        }
+        else
+        {
+            mlsid=-1;
+            mIndex=-1;
+        }
+        mV_list_songs=app.bll.V_List_Song.getModelByLid(mlsid);
         LSLog.Log_INFO(String.format("init playsong. id:%d,index:%d",mlsid,mIndex));
     }
 
@@ -236,7 +239,7 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
         @Override
         public boolean onMenuItemClick(MenuItem menuItem)
         {
-            if(menuItem.getIntent().getStringExtra(MasterPage.FIXMENUTITLENAME)==V_List_Song.menu_IncressVolume)
+            if(menuItem.getIntent().getStringExtra(MasterPage.FIXMENUTITLENAME).equals(V_List_Song.menu_IncressVolume))
             {
                 LSSystemServices.StreamVolumeInfo info=LSSystemServices.getVolumeInfo(MainActivity.appContext, AudioManager.STREAM_MUSIC);
                 Dialog_Volume dialog=new Dialog_Volume(getContext(), info.max, info.now, new Dialog_Volume.IVolumeHander()
@@ -249,7 +252,7 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
                 });
                 dialog.show();
             }
-            else if(menuItem.getIntent().getStringExtra(MasterPage.FIXMENUTITLENAME)== V_List_Song.menu_PlayerMode)
+            else if(menuItem.getIntent().getStringExtra(MasterPage.FIXMENUTITLENAME).equals(V_List_Song.menu_PlayerMode))
             {
                 LSLog.Log_INFO("change mode!"+menuItem.getIntent());
                 if(mMyConnection.mPlayerProxy!=null)
@@ -287,6 +290,7 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
             LSLog.Log_INFO("error get null services");
         }
 
+        @SuppressLint("DefaultLocale")
         @Override
         public void onServiceConnected(ComponentName name, IBinder service)
         {
@@ -305,7 +309,7 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
                     }
                     else
                     {
-                        mPlayerProxy.playSong(mIndex, mV_list_songs);
+                        mPlayerProxy.playSong(mlsid,mIndex);
                     }
                     UpdateUi_mode(mBaseInfo);
                 } catch (Exception e)

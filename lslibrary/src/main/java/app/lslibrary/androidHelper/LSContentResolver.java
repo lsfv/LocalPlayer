@@ -10,7 +10,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
@@ -58,6 +57,7 @@ public class LSContentResolver
                 cursor.moveToNext();
             }
         }
+        cursor.close();
         return res;
     }
 
@@ -81,7 +81,7 @@ public class LSContentResolver
 
     public interface VoidHandler
     {
-        public void doit();
+        void doit();
     }
     //endregion
 
@@ -93,30 +93,23 @@ public class LSContentResolver
         Uri imageUri=intent.getData();
         if(imagePath!=null)
         {
-            if(Build.VERSION.SDK_INT>=19)
+            if(DocumentsContract.isDocumentUri(activity, imageUri))
             {
-                if(DocumentsContract.isDocumentUri(activity, imageUri))
+                String docid=DocumentsContract.getDocumentId(imageUri);
+                if("com.android.providers.media.documents".equalsIgnoreCase(imageUri.getAuthority()))
                 {
-                    String docid=DocumentsContract.getDocumentId(imageUri);
-                    if("com.android.providers.media.documents".equalsIgnoreCase(imageUri.getAuthority()))
-                    {
-                        String id=docid.split(":")[1];
-                        String selection=MediaStore.Images.Media._ID+"="+id;
-                        imagePath=getImagePaht(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection, activity);
-                    }
-                }
-                else if("content".equalsIgnoreCase(imageUri.getScheme()))
-                {
-                    imagePath=getImagePaht(imageUri, null, activity);
-                }
-                else if("file".equalsIgnoreCase(imageUri.getScheme()))
-                {
-                    imagePath=imageUri.getPath();
+                    String id=docid.split(":")[1];
+                    String selection=MediaStore.Images.Media._ID+"="+id;
+                    imagePath=getImagePaht(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection, activity);
                 }
             }
-            else
+            else if("content".equalsIgnoreCase(imageUri.getScheme()))
             {
-                imagePath = getImagePaht(imageUri, null, activity);
+                imagePath=getImagePaht(imageUri, null, activity);
+            }
+            else if("file".equalsIgnoreCase(imageUri.getScheme()))
+            {
+                imagePath=imageUri.getPath();
             }
         }
 
@@ -172,7 +165,7 @@ public class LSContentResolver
         }
         else
         {
-            Toast.makeText(context, "you deny permissions.", Toast.LENGTH_SHORT);
+            Toast.makeText(context, "you deny permissions.", Toast.LENGTH_SHORT).show();
         }
     }
     //endregion

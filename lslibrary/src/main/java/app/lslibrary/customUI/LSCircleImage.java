@@ -1,5 +1,6 @@
 package app.lslibrary.customUI;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -8,13 +9,11 @@ import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Shader;
-import android.support.annotation.IdRes;
 import android.util.AttributeSet;
 import android.view.View;
 
 import app.lslibrary.R;
 import app.lslibrary.androidHelper.LSCustomViewHelper;
-import app.lslibrary.androidHelper.LSLog;
 
 
 //获得宽高，半径。宽高从属性获得。默认为100px。 半径，从宽/2,高/2，半径中选最小的。
@@ -36,7 +35,9 @@ public class LSCircleImage extends View
         mRadius=(int)array.getDimension(R.styleable.LSCircleImage_CircleImage_radius, Integer.MAX_VALUE);
         mImgResourceID=array.getResourceId(R.styleable.LSCircleImage_CircleImage_img,0 );
         mPaint=new Paint();
+        array.recycle();
     }
+
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
@@ -46,6 +47,7 @@ public class LSCircleImage extends View
         setMeasuredDimension(suggestMeasure.width, suggestMeasure.height);
     }
 
+    @SuppressLint("DrawAllocation")
     @Override
     protected void onDraw(Canvas canvas)
     {
@@ -63,8 +65,8 @@ public class LSCircleImage extends View
             int centerX=Width/2;
             int centerY=Height/2;
 
-            Bitmap bitmap_origetation=BitmapFactory.decodeResource(getResources(), mImgResourceID);
-            Bitmap bitmap_scale=Bitmap.createScaledBitmap(bitmap_origetation, mRadius*2, mRadius*2, false);
+            @SuppressLint("DrawAllocation") Bitmap bitmap_origetation=BitmapFactory.decodeResource(getResources(), mImgResourceID);
+            @SuppressLint("DrawAllocation") Bitmap bitmap_scale=Bitmap.createScaledBitmap(bitmap_origetation, mRadius*2, mRadius*2, false);
             mPaint.setShader(new BitmapShader(bitmap_scale, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP));
             canvas.save();
             canvas.translate(centerX-mRadius, centerY-mRadius);

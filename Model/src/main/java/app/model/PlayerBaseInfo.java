@@ -1,5 +1,6 @@
 package app.model;
 
+import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -106,6 +107,7 @@ public class PlayerBaseInfo implements Parcelable
         dest.writeInt(playingSeconds);
     }
 
+    @SuppressLint("DefaultLocale")
     public String displayStatus()
     {
         return (String.format("status:%d,index:%d.mode:%s",status,index,getModeName()));

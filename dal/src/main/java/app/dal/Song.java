@@ -1,7 +1,6 @@
 package app.dal;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
@@ -33,6 +32,7 @@ public class Song
                 res = cursor.getInt(0);
             }
 
+            cursor.close();
             db.setTransactionSuccessful();
         }
         finally
@@ -48,7 +48,7 @@ public class Song
         SQLiteDatabase db=DBHelper.getWritableDatabase();
         int res=db.delete("Song", "S_id=?", new String[]{id+""});
         db.close();
-        return res==1?true:false;
+        return res==1;
     }
 
     public boolean update(app.model.Song model)
@@ -65,7 +65,7 @@ public class Song
         SQLiteDatabase db=DBHelper.getWritableDatabase();
         int res=db.update("Song", contentValues,"S_id=?" , new String[]{model.S_id+""});
         db.close();
-        return res==1?true:false;
+        return res==1;
     }
 
     public app.model.Song getModel(int id)
@@ -87,7 +87,8 @@ public class Song
             model.S_ps = cursor.getString(7);
 
         }
-db.close();
+        cursor.close();
+        db.close();
         return model;
     }
 
@@ -116,7 +117,8 @@ db.close();
                 cursor.moveToNext();
             }
         }
-db.close();
+        cursor.close();
+        db.close();
         return lists;
     }
 }

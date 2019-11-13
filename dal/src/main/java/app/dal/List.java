@@ -1,7 +1,6 @@
 package app.dal;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
@@ -34,6 +33,7 @@ public class List
             }
 
             db.setTransactionSuccessful();
+            cursor.close();
         }
         finally
         {
@@ -48,7 +48,7 @@ public class List
         SQLiteDatabase db=DBHelper.getWritableDatabase();
         int res=db.delete("List", "L_id=?", new String[]{id+""});
         db.close();
-        return res==1?true:false;
+        return res==1;
     }
 
     public boolean update(app.model.List model)
@@ -62,7 +62,7 @@ public class List
         SQLiteDatabase db=DBHelper.getWritableDatabase();
         int res=db.update("List", contentValues,"L_id=?" , new String[]{model.L_id+""});
         db.close();
-        return res==1?true:false;
+        return res==1;
     }
 
     public app.model.List getModel(int id)
@@ -81,7 +81,9 @@ public class List
             model.L_ps = cursor.getString(4);
 
         }
+        cursor.close();
         db.close();
+
         return model;
     }
 
@@ -108,6 +110,7 @@ public class List
             }
         }
 
+        cursor.close();
         db.close();
         return lists;
     }

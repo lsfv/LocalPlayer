@@ -1,22 +1,13 @@
 package com.linson.android.localplayer;
 
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.telecom.ConnectionService;
-import android.util.Log;
-import android.widget.Toast;
 
-import com.linson.android.localplayer.AIDL.IPlayer;
-import com.linson.android.localplayer.Services.PlayServices;
 import com.linson.android.localplayer.activities.MasterPage;
 
 import app.lslibrary.androidHelper.LSLog;
-import app.model.V_List_Song;
 
 //自动生成model。 dbhelper. 测试DBHELPER。 dal.
 
@@ -47,7 +38,8 @@ public class MainActivity extends AppCompatActivity
         }
         else
         {
-            //stopService(appHelper.getServiceIntent());//还是不能退出服务。服务就让用户手动关闭把。
+            app.bll.MusicDB.setDBContext(null);//把自己的context，全部收回，以免自己不能被自动回收。
+            stopService(appHelper.getServiceIntent());
             finish();
             System.exit(0);
         }

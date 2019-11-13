@@ -4,8 +4,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
-import app.lslibrary.R;
-
 public abstract class LSActivity
 {
     public static void addFragment(FragmentManager fragmentManager, boolean backStack, int holderid, Fragment fragment)

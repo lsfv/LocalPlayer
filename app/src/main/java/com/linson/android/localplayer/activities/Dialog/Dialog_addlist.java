@@ -68,6 +68,6 @@ public class Dialog_addlist extends Dialog
 
     public  interface Idialogcallback
     {
-        public void submit(String name);
+        void submit(String name);
     }
 }

@@ -9,4 +9,11 @@
     <string name="menu1">列表清单</string>
     <string name="back"><![CDATA[<]]></string>
     <string name="playing">playing</string>
+    <string name="searchlocal">查找本地</string>
+    <string name="newlist">新建歌单</string>
+    <string name="editList">编辑歌单</string>
+    <string name="ppln">请输入播放列表名字</string>
+    <string name="addlist">添加播放列表</string>
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
 </resources>

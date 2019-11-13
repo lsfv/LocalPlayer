@@ -1,8 +1,6 @@
 package app.lslibrary.androidHelper;
 
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.util.AttributeSet;
+import android.annotation.SuppressLint;
 import android.view.View;
 
 public class LSCustomViewHelper
@@ -44,6 +42,7 @@ public class LSCustomViewHelper
         }
     }
 
+    @SuppressLint("DefaultLocale")
     public static String getMeasureStr(int MeasureSpec)
     {
         int width=View.MeasureSpec.getSize(MeasureSpec);

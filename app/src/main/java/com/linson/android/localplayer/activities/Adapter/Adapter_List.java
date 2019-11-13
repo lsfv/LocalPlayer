@@ -1,6 +1,7 @@
 package com.linson.android.localplayer.activities.Adapter;
 
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
@@ -11,16 +12,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import com.linson.android.localplayer.R;
-import java.util.LinkedList;
+
 import java.util.List;
 
 
 public class Adapter_List extends RecyclerView.Adapter<Adapter_List.MyHolderView>
 {
-    private List<app.model.List> mdata=new LinkedList<>();
+    private List<app.model.List> mdata;
     private float prex=-1;
     private boolean isMove=false;
-    private int maxWidth=240;
+    private final int maxWidth=240;
     private boolean isHiden=true;
     private IAdapter_ListHander mIAdapter_listHander;
 
@@ -41,7 +42,7 @@ public class Adapter_List extends RecyclerView.Adapter<Adapter_List.MyHolderView
 
 
     @Override
-    public void onBindViewHolder(@NonNull final MyHolderView myHolderView, final int i)
+    public void onBindViewHolder(@NonNull final MyHolderView myHolderView, @SuppressLint("RecyclerView") final int i)
     {
         myHolderView.mTvItem.setText(mdata.get(i).L_name);
         myHolderView.mButton21.setOnClickListener(new View.OnClickListener()
@@ -61,6 +62,7 @@ public class Adapter_List extends RecyclerView.Adapter<Adapter_List.MyHolderView
 
         myHolderView.mView.setOnTouchListener(new View.OnTouchListener()
         {
+            @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event)
             {
@@ -97,11 +99,11 @@ public class Adapter_List extends RecyclerView.Adapter<Adapter_List.MyHolderView
                     {
 
                         final ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) myHolderView.mTvItem.getLayoutParams();
-                        boolean wantToShow = true;
+                        boolean wantToShow;
                         int currentMargin = lp.getMarginEnd();
                         if (isHiden)
                         {
-                            wantToShow = (float) currentMargin / maxWidth >= 0.5 ? true : false;//键盘判断，拖动超过一半就显示.
+                            wantToShow = (float) currentMargin / maxWidth >= 0.5;//键盘判断，拖动超过一半就显示.
                         } else
                         {
                             wantToShow = false;//显示状态，除非触碰按钮，否则无条件关闭按钮。

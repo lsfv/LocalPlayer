@@ -1,28 +1,23 @@
 package com.linson.android.localplayer.activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
 import com.linson.android.localplayer.R;
 
-import java.util.List;
-
 import app.lslibrary.androidHelper.LSActivity;
-import app.lslibrary.androidHelper.LSLog;
 
-//!todo 1.db 2.app media.3 pageview 4.panel 5.autoupdate.
+//!todo 1.db   1.5.uitest.  2.app media.3 pageview 4.panel 5.autoupdate.
 //!todo 还是需要自带的常用所有控件都过一遍。是否需要建立一个歌词服务器?
 //!todo 1，还有一个不是很完善的地方：if(fragment instanceof ISetupMaster)。 没有强制的要求接口。
 //!todo 更新歌单，可能需要一个更低耗的方法。
@@ -109,7 +104,7 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
             @Override
             public void onClick(View v)
             {
-                mDrawerMainMenu.openDrawer(Gravity.LEFT);
+                mDrawerMainMenu.openDrawer(Gravity.START);
             }
         });
     }
@@ -117,7 +112,7 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
     private void startPage(Fragment fragment)
     {
         LSActivity.replaceFragment(getSupportFragmentManager(), false, R.id.mainFragment, fragment);
-        mDrawerMainMenu.closeDrawer(Gravity.LEFT);
+        mDrawerMainMenu.closeDrawer(Gravity.START);
     }
 
 
@@ -125,7 +120,8 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
 
 
     //region 母模板public出去的方法，提供给fragment使用。统一管理.
-    public void setupToolbarMenu(java.util.List<String> menus,android.support.v7.widget.Toolbar.OnMenuItemClickListener handler)
+    @SuppressLint("AlwaysShowAction")
+    public void setupToolbarMenu(java.util.List<String> menus, android.support.v7.widget.Toolbar.OnMenuItemClickListener handler)
     {
         mToolbar.setOnMenuItemClickListener(handler);
         mToolbar.getMenu().clear();

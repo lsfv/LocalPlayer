@@ -77,7 +77,7 @@ public abstract class LSFileHelper
     }
 
     //@linson no check exception
-    public static Boolean CopyDataBaseFromResource(String dbname, Context ct,boolean overWrite)
+    public static Boolean CopyDataBaseFromResource(String dbname, Context ct, boolean overWrite)
     {
         //1.inputstream 2.outputstream 3.copy
         Boolean ret = false;

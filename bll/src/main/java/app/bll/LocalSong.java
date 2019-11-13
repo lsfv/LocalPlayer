@@ -4,35 +4,31 @@ import android.content.Context;
 
 import app.lslibrary.androidHelper.LSContentResolver;
 
-public class LocalSong
+public abstract class LocalSong
 {
-    private app.dal.LocalSong dal;
-    public LocalSong()
-    {
-        dal=new app.dal.LocalSong();
-    }
+    private static  app.dal.LocalSong dal=new app.dal.LocalSong();
 
-    public int add(app.model.LocalSong model)
+    public static int add(app.model.LocalSong model)
     {
         return dal.add(model);
     }
 
-    public boolean delete(int id)
+    public static boolean delete(int id)
     {
         return dal.delete(id);
     }
 
-    public boolean update(app.model.LocalSong model)
+    public static boolean update(app.model.LocalSong model)
     {
         return dal.update(model);
     }
 
-    public app.model.LocalSong getModel(int id)
+    public static app.model.LocalSong getModel(int id)
     {
         return dal.getModel(id);
     }
 
-    public java.util.List<app.model.LocalSong> getModelList(String where)
+    public static java.util.List<app.model.LocalSong> getModelList(String where)
     {
         return dal.getModelList(where);
     }
@@ -40,12 +36,12 @@ public class LocalSong
 
     //extend
     //extend
-    public void clear()
+    public static  void clear()
     {
         dal.clear();
     }
 
-    public boolean updateSongsFromLocal(java.util.List<LSContentResolver.SongInfo> songInfos)
+    public static  boolean updateSongsFromLocal(java.util.List<LSContentResolver.SongInfo> songInfos)
     {
         //1.获得本地歌曲。2.插入到临时表：localsong。3.更新歌曲表:song
         clear();

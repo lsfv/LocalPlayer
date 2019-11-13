@@ -8,7 +8,7 @@ import app.model.PlayerBaseInfo;
 
 interface IPlayer
 {
-    int playSong(int i,in List<app.model.V_List_Song> songs);
+    int playSong(int lid,int index);
     int playOneSong(int index);
     int pre();
     int next();

@@ -8,41 +8,37 @@ import java.util.List;
 
 import app.dal.Song;
 
-public class List_Song
+public abstract class List_Song
 {
-    private app.dal.List_Song dal;
-    public List_Song()
-    {
-        dal=new app.dal.List_Song();
-    }
+    private static app.dal.List_Song dal=new app.dal.List_Song();
 
-    public int add(app.model.List_Song model)
+    public static int add(app.model.List_Song model)
     {
         return dal.add(model);
     }
 
-    public boolean delete(int id)
+    public static boolean delete(int id)
     {
         return dal.delete(id);
     }
 
-    public boolean update(app.model.List_Song model)
+    public static boolean update(app.model.List_Song model)
     {
         return dal.update(model);
     }
 
-    public app.model.List_Song getModel(int id)
+    public static app.model.List_Song getModel(int id)
     {
         return dal.getModel(id);
     }
 
-    public java.util.List<app.model.List_Song> getModelList(String where)
+    public static java.util.List<app.model.List_Song> getModelList(String where)
     {
         return dal.getModelList(where);
     }
 
     //extend
-    public void updateBatch(int lid,@NonNull List<Integer> songid)
+    public static void updateBatch(int lid,@NonNull List<Integer> songid)
     {
         dal.updateBatch(lid, songid);
     }

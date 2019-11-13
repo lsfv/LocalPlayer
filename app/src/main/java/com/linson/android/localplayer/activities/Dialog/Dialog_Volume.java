@@ -10,8 +10,8 @@ import com.linson.android.localplayer.R;
 
 public class Dialog_Volume extends Dialog
 {
-    private int mmaxValue=100;
-    private int mcurrentValue=10;
+    private int mmaxValue;//=100;
+    private int mcurrentValue;//=10;
     private IVolumeHander mIVolumeHander;
 
     public Dialog_Volume(Context context,int maxValue,int currentValue,IVolumeHander hander)
@@ -59,7 +59,7 @@ public class Dialog_Volume extends Dialog
 
     public interface IVolumeHander
     {
-        public void onChangeValue(int value);
+        void onChangeValue(int value);
     }
 
 
@@ -69,7 +69,7 @@ public class Dialog_Volume extends Dialog
     {
         private SeekBar mSbVolume;
 
-        public MyControls()
+        MyControls()
         {
             mSbVolume = (SeekBar)  findViewById(R.id.sb_volume);
         }

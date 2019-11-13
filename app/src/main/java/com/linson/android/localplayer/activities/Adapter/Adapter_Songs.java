@@ -1,5 +1,6 @@
 package com.linson.android.localplayer.activities.Adapter;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,19 +18,15 @@ import java.util.List;
 
 public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHolder>
 {
-    private List<app.model.V_List_Song> msongs;
+    private List<app.model.V_List_Song> msongs=new LinkedList<>();
     private IItemHander mHander;
-    private int mPlayingIndex=-1;
+    private int mPlayingIndex;
 
     public Adapter_Songs(@NonNull List<app.model.V_List_Song> songs,@NonNull IItemHander hander,int playingIndex)
     {
         msongs=songs;
         mHander=hander;
         mPlayingIndex=playingIndex;
-        if(msongs==null)
-        {
-            msongs=new LinkedList<>();
-        }
     }
 
     @NonNull
@@ -42,7 +39,7 @@ public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHold
 
 
     @Override
-    public void onBindViewHolder(@NonNull final MyViewHolder myViewHolder, final int i)
+    public void onBindViewHolder(@NonNull final MyViewHolder myViewHolder, @SuppressLint("RecyclerView") final int i)
     {
         final app.model.V_List_Song tempSong=msongs.get(i);
         myViewHolder.mTvItem.setText(tempSong.getSongTitle());
@@ -77,7 +74,7 @@ public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHold
 
     public List<app.model.V_List_Song> getCloneData()
     {
-        return  new ArrayList<app.model.V_List_Song>(msongs);
+        return  new ArrayList<>(msongs);
     }
 
     public void updateData(List<app.model.V_List_Song> data,int playingIndex)

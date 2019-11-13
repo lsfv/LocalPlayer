@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.linson.android.localplayer">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.linson.android.localplayer"
+    tools:ignore="GoogleAppIndexingWarning">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -11,7 +13,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:fullBackupContent="@xml/backup_descriptor">
         <activity android:name=".MainActivity" android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,7 +24,9 @@
         </activity>
         <activity android:name=".activities.MasterPage" />
 
-        <service android:process=":playServices" android:name=".Services.PlayServices" android:enabled="true" android:exported="true" >
+        <service android:process=":playServices" android:name=".Services.PlayServices" android:enabled="true" android:exported="true"
+            tools:ignore="ExportedService,InnerclassSeparator"
+            android:permission="">
             <intent-filter>
                 <action android:name="musicService"></action>
                 <category android:name="android.intent.category.DEFAULT"></category>

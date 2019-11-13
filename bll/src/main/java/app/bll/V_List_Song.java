@@ -13,24 +13,19 @@ import java.util.Map;
 import app.dal.Song;
 import app.lslibrary.androidHelper.LSLog;
 
-public class V_List_Song
+public abstract class V_List_Song
 {
-    private app.dal.V_List_Song dal;
+    private static app.dal.V_List_Song dal=new app.dal.V_List_Song();
     private static List<app.model.V_List_Song> cache_list_songs=null;//加入缓存策略，简单有效。
     public static boolean cacheIsLast=false;
     public static final int allsongid=1;
 
-    public V_List_Song()
-    {
-        dal=new app.dal.V_List_Song();
-    }
-
-    public app.model.V_List_Song getModel(int id)
+    public  static app.model.V_List_Song getModel(int id)
     {
         return dal.getModel(id);
     }
 
-    public java.util.List<app.model.V_List_Song> getAllModel()
+    public  static java.util.List<app.model.V_List_Song> getAllModel()
     {
         return dal.getModelList("");
     }
@@ -38,7 +33,7 @@ public class V_List_Song
     //extend
     public static String menu_editlist="编辑清单";
 
-    public java.util.List<String> getMenuTitle()
+    public  static java.util.List<String> getMenuTitle()
     {
         java.util.List<String> res=new LinkedList<>();
         res.add(menu_editlist);
@@ -50,7 +45,7 @@ public class V_List_Song
     public static String menu_IncressVolume="音量";
     public static String menu_PlayerMode="播放模式";
 
-    public java.util.List<String> getMenuPlayerTitle()
+    public  static java.util.List<String> getMenuPlayerTitle()
     {
         java.util.List<String> res=new LinkedList<>();
         res.add(menu_IncressVolume);
@@ -58,7 +53,7 @@ public class V_List_Song
         return res;
     }
 
-    public java.util.List<app.model.V_List_Song> getModelByLid(int lid)
+    public  static java.util.List<app.model.V_List_Song> getModelByLid(int lid)
     {
         if(lid==allsongid)
         {
@@ -75,7 +70,7 @@ public class V_List_Song
         }
     }
 
-    public CharSequence[] getNameList(@NonNull java.util.List<app.model.V_List_Song> songs)
+    public  static CharSequence[] getNameList(@NonNull java.util.List<app.model.V_List_Song> songs)
     {
         if(songs==null)
         {
@@ -92,7 +87,7 @@ public class V_List_Song
         return res;
     }
 
-    public List<Integer> getsidList(@NonNull java.util.List<app.model.V_List_Song> songs)
+    public  static List<Integer> getsidList(@NonNull java.util.List<app.model.V_List_Song> songs)
     {
         if(songs==null)
         {
@@ -109,7 +104,7 @@ public class V_List_Song
         return res;
     }
 
-    public java.util.List<app.model.V_List_Song> getChooseList(@NonNull java.util.List<app.model.V_List_Song> songs ,boolean[] choose)
+    public  static java.util.List<app.model.V_List_Song> getChooseList(@NonNull java.util.List<app.model.V_List_Song> songs ,boolean[] choose)
     {
         java.util.List<app.model.V_List_Song> res=new ArrayList<>();
         if(songs.size()==choose.length)
@@ -125,7 +120,7 @@ public class V_List_Song
         return res;
     }
 
-    public boolean[] getIsChoose(@NonNull java.util.List<app.model.V_List_Song> songs, @NonNull List<app.model.V_List_Song> mysongs)
+    public  static boolean[] getIsChoose(@NonNull java.util.List<app.model.V_List_Song> songs, @NonNull List<app.model.V_List_Song> mysongs)
     {
         if(songs==null)
         {
