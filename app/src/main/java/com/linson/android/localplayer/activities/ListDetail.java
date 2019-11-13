@@ -28,7 +28,6 @@ import com.linson.android.localplayer.appHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-import app.bll.List_Song;
 import app.bll.V_List_Song;
 import app.lslibrary.androidHelper.LSLog;
 import app.model.PlayerBaseInfo;
