@@ -21,6 +21,8 @@ import java.util.List;
 
 import app.lslibrary.androidHelper.LSActivity;
 import app.lslibrary.androidHelper.LSLog;
+
+//!todo 1.db 2.app media.3 pageview 4.panel 5.autoupdate.
 //!todo 还是需要自带的常用所有控件都过一遍。是否需要建立一个歌词服务器?
 //!todo 1，还有一个不是很完善的地方：if(fragment instanceof ISetupMaster)。 没有强制的要求接口。
 //!todo 更新歌单，可能需要一个更低耗的方法。
@@ -33,7 +35,8 @@ import app.lslibrary.androidHelper.LSLog;
 //!todo 建立了aidl对象后实现后，无法停止service。虽然释放了播放器。不过对用户来说，已经停止了播放器，也算停止了服务。之后再看下。
 //!todo 需要模板生成器。
 //!todo getMenuTitle 并没有保证会加入所有菜单。
-//public ListDetail(int a)!todo 什么时候fragment需要从建立开始恢复？ 导致得到参数必须是通过argumentbundle。
+//!todo public ListDetail(int a) 什么时候fragment需要从建立开始恢复？ 导致得到参数必须是通过argumentbundle。
+
 public class MasterPage extends AppCompatActivity implements View.OnClickListener
 {
     //region 母模板 自己功能实现的代码块。
@@ -42,7 +45,6 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
     private ConstraintLayout mMainFragment;
     private Button mBtnPage1;
     private Button mbtn_back;
-
     private boolean loadMenu=false;
 
     public static final String FIXMENUTITLENAME="title";
@@ -146,6 +148,7 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
     //region 母模板需要每个页面实现的功能接口。
     public interface IFragmentForMaster
     {
+
     }
     //endregion
 }
