@@ -32,7 +32,7 @@ import app.model.List;
 //1.一个列表展示（带删除） 2.一个新建列表。3。一个更新歌曲。
 //3.独立模块。1.仅仅一个展示和一个删除逻辑。2.一个添加逻辑，并对2模块进行刷新。
 //以上逻辑和母模板页面没有任何交互。
-//!todo getMenuTitle 并没有保证会加入所有菜单。
+
 public class ListIndex extends BaseFragment
 {
     private RecyclerView mRvList;

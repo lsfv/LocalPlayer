@@ -29,6 +29,11 @@ import app.lslibrary.androidHelper.LSLog;
 //!todo savedInstanceState 实际工程使用范例.
 //!todo 还是需要一个模板啊。比如adapter 的大致样子都是差不多的。
 //!todo 界面更新的逻辑，根据编码的原则和2个方案的有缺点，决定还是server主动的才广播。否则还是用耦合度高的一个动作更新2个子界面的方式处理。
+//!todo 如何查看警告和设置浸膏的级别。
+//!todo 建立了aidl对象后实现后，无法停止service。虽然释放了播放器。不过对用户来说，已经停止了播放器，也算停止了服务。之后再看下。
+//!todo 需要模板生成器。
+//!todo getMenuTitle 并没有保证会加入所有菜单。
+//public ListDetail(int a)!todo 什么时候fragment需要从建立开始恢复？ 导致得到参数必须是通过argumentbundle。
 public class MasterPage extends AppCompatActivity implements View.OnClickListener
 {
     //region 母模板 自己功能实现的代码块。

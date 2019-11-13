@@ -37,10 +37,7 @@ import app.lslibrary.androidHelper.LSSystemServices;
 import app.lslibrary.customUI.LSCircleImage;
 import app.model.PlayerBaseInfo;
 
-//!todo 如何查看警告和设置浸膏的级别。
-//!todo 建立了aidl对象后实现后，无法停止service。虽然释放了播放器。不过对用户来说，已经停止了播放器，也算停止了服务。之后再看下。
-//!todo 点击歌曲。不进入详细页面。
-//!todo 需要模板生成器。
+
 public class PlaySong extends BaseFragment implements View.OnClickListener
 {
     private ConstraintLayout mContent;

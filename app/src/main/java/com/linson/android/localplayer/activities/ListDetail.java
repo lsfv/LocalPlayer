@@ -61,7 +61,7 @@ public class ListDetail extends BaseFragment
     //endregion
 
 
-    //public ListDetail(int a)!todo 什么时候fragment需要从建立开始恢复？ 导致得到参数必须是通过argumentbundle。
+
 
 
     @Override
