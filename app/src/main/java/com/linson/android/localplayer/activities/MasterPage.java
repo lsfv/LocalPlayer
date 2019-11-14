@@ -17,7 +17,7 @@ import com.linson.android.localplayer.R;
 
 import app.lslibrary.androidHelper.LSActivity;
 
-//!todo 3 pageview 4.panel 5.autoupdate.
+//!todo 2.code review 3.allsong.4.panel 5.autoupdate.
 //!todo 无法触发服务sub代理的释放.android 一般也是不完全关闭app的。所以我这里是保证服务停止播放，最多释放播放器而已。
 //!todo 还是需要自带的常用所有控件都过一遍。是否需要建立一个歌词服务器?
 //!todo 1，还有一个不是很完善的地方：if(fragment instanceof ISetupMaster)。 没有强制的要求接口。
@@ -29,33 +29,25 @@ import app.lslibrary.androidHelper.LSActivity;
 //!todo 需要模板生成器。
 //!todo getMenuTitle 并没有保证会加入所有菜单。
 //!todo public ListDetail(int a) 什么时候fragment需要从建立开始恢复？ 导致得到参数必须是通过argumentbundle。
+//!TODO 内存泄漏，那就不要使用单例模式了?
 
 public class MasterPage extends AppCompatActivity implements View.OnClickListener
 {
-    //region 母模板 自己功能实现的代码块。
-    private DrawerLayout mDrawerMainMenu;
-    private Toolbar mToolbar;
-    private ConstraintLayout mMainFragment;
-    private Button mBtnPage1;
-    private Button mbtn_back;
+    public static final String FIXMENUTITLENAME="title";
     private boolean loadMenu=false;
 
-    public static final String FIXMENUTITLENAME="title";
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_master_page);
 
-    //region  findcontrols and bind click event.
-    private void findControls()
-    {   //findControls
-        mDrawerMainMenu = (DrawerLayout) findViewById(R.id.drawerMainMenu);
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mMainFragment = (ConstraintLayout) findViewById(R.id.mainFragment);
-        mBtnPage1 = (Button) findViewById(R.id.btn_page1);
-        mbtn_back=(Button)findViewById(R.id.btn_back);
-
-        //set event handler
-        mBtnPage1.setOnClickListener(this);
-        mbtn_back.setOnClickListener(this);
+        mMyControls=new MyControls();//cut it into 'onCreate'//1.控件绑定
+        mMyControls.mBtnBack.setOnClickListener(this);
+        mMyControls.mBtnPage1.setOnClickListener(this);
+        setupDrawerMenu();//2.配置左侧滑动菜单
+        startPage(new ListIndex());//3.加载首页
     }
-
 
     @Override
     public void onClick(View v)
@@ -77,32 +69,17 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
             default: { break; }
         }
     }
-    //endregion
-
-    //region other member variable
-    //endregion
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_master_page);
-        findControls();//1.控件绑定
-        setupDrawerMenu();//2.配置左侧滑动菜单
-        startPage(new ListIndex());//3.加载首页
-    }
 
 
     private void setupDrawerMenu()
     {
-        mToolbar.setNavigationIcon(R.drawable.list);
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener()
+        mMyControls.mToolbar.setNavigationIcon(R.drawable.list);
+        mMyControls.mToolbar.setNavigationOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                mDrawerMainMenu.openDrawer(Gravity.START);
+                mMyControls.mDrawerMainMenu.openDrawer(Gravity.START);
             }
         });
     }
@@ -110,22 +87,20 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
     private void startPage(Fragment fragment)
     {
         LSActivity.replaceFragment(getSupportFragmentManager(), false, R.id.mainFragment, fragment);
-        mDrawerMainMenu.closeDrawer(Gravity.START);
+        mMyControls.mDrawerMainMenu.closeDrawer(Gravity.START);
     }
 
-
-    //endregion
 
 
     //region 母模板public出去的方法，提供给fragment使用。统一管理.
     @SuppressLint("AlwaysShowAction")
     public void setupToolbarMenu(java.util.List<String> menus, android.support.v7.widget.Toolbar.OnMenuItemClickListener handler)
     {
-        mToolbar.setOnMenuItemClickListener(handler);
-        mToolbar.getMenu().clear();
+        mMyControls.mToolbar.setOnMenuItemClickListener(handler);
+        mMyControls.mToolbar.getMenu().clear();
         for(int i=0;i<menus.size();i++)
         {
-            MenuItem tempitem= mToolbar.getMenu().add(menus.get(i));
+            MenuItem tempitem= mMyControls.mToolbar.getMenu().add(menus.get(i));
             Intent tempIntent=new Intent();
             tempIntent.putExtra(FIXMENUTITLENAME, menus.get(i));
             tempitem.setIntent(tempIntent);
@@ -135,14 +110,32 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
 
     public void changeMenuTitel(int index,String title)
     {
-        mToolbar.getMenu().getItem(1).setTitle(title);
+        mMyControls.mToolbar.getMenu().getItem(1).setTitle(title);
     }
     //endregion
 
     //region 母模板需要每个页面实现的功能接口。
-    public interface IFragmentForMaster
-    {
 
-    }
+    //endregion
+
+    //region The class of FindControls
+        private MyControls mMyControls=null;
+        public class MyControls
+        {
+            private DrawerLayout mDrawerMainMenu;
+            private Toolbar mToolbar;
+            private Button mBtnBack;
+            private ConstraintLayout mMainFragment;
+            private Button mBtnPage1;
+
+            public MyControls()
+            {
+                mDrawerMainMenu = (DrawerLayout) findViewById(R.id.drawerMainMenu);
+                mToolbar = (Toolbar) findViewById(R.id.toolbar);
+                mBtnBack = (Button) findViewById(R.id.btn_back);
+                mMainFragment = (ConstraintLayout) findViewById(R.id.mainFragment);
+                mBtnPage1 = (Button) findViewById(R.id.btn_page1);
+            }
+        }
     //endregion
 }

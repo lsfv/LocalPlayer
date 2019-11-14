@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.linson.android.localplayer.AIDL.IPlayer;
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
+import com.linson.android.localplayer.Services.PlayServices;
 import com.linson.android.localplayer.activities.Adapter.Adapter_Songs;
 import com.linson.android.localplayer.appHelper;
 
@@ -36,54 +37,38 @@ import app.model.PlayerBaseInfo;
 @SuppressWarnings("FieldCanBeLocal")
 public class ListDetail extends BaseFragment
 {
-    private TextView mTvListname;
-    private RecyclerView mRvSonglist;
-
-    //region  findcontrols and bind click event.
-    private void findControls()
-    {   //findControls
-        if(getActivity()!=null)
-        {
-            mTvListname = (TextView) getActivity().findViewById(R.id.tv_listname);
-            mRvSonglist = (RecyclerView) getActivity().findViewById(R.id.rv_songlist);
-        }
-    }
-    //endregion
-
-    //region other member variable
-    private int mListID=appHelper.defaultListID;
-    private String mListName="";
-
     public static String argumentname_lid="lid";
     public static String argumentname_lname="lname";
 
-    //endregion
-
-
-
-
+    private int mListID=appHelper.defaultListID;
+    private String mListName="";
 
     @Override
-
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         return inflater.inflate(R.layout.fragment_list_detail, container, false);
     }
-
 
     @SuppressLint("DefaultLocale")
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        findControls();
+        mMyControls=new MyControls();//cut it into 'onCreate'
         mListID=getArguments().getInt(argumentname_lid, mListID);//把类的自定义初始化禁止了，导致起不到初始化作用。糟糕的设计。
         mListName=getArguments().getString(argumentname_lname, "");
-        mTvListname.setText(mListName);
+        mMyControls.mTvListname.setText(mListName);
 
 
         setupRecyleview();
         getMaster().setupToolbarMenu(app.bll.V_List_Song.getMenuTitle(), new MenuHandler());
+
+        PlayerBaseInfo baseInfo=appHelper.getServiceBaseInfo(MainActivity.appServiceConnection);
+        if(baseInfo!=null)
+        {
+            ((Adapter_Songs) ((Adapter_Songs) mMyControls.mRvSonglist.getAdapter())).showImagePlaying(baseInfo.index);
+        }
+
         LSLog.Log_INFO(String.format("init listdetail. id:%d,name:%s",mListID,mListName));
     }
 
@@ -97,47 +82,13 @@ public class ListDetail extends BaseFragment
         }
 
         Adapter_Songs adapter_songs=new Adapter_Songs(res,new RecycleHandler(),-1);
-        mRvSonglist.setAdapter(adapter_songs);
+        mMyControls.mRvSonglist.setAdapter(adapter_songs);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getContext());
-        mRvSonglist.setLayoutManager(linearLayoutManager);
+        mMyControls.mRvSonglist.setLayoutManager(linearLayoutManager);
     }
 
 
     //region not static class: extend for top class
-
-
-    public class MyConnection implements ServiceConnection
-    {
-        private IPlayer mPlayer;
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service)
-        {
-            mPlayer=IPlayer.Stub.asInterface(service);
-            if(mPlayer!=null)
-            {
-                try
-                {
-                    PlayerBaseInfo baseInfo = mPlayer.getBaseInfo();
-                    if(baseInfo.lid==mListID && getActivity()!=null)
-                    {
-                        ((Adapter_Songs) mRvSonglist.getAdapter()).showImagePlaying(baseInfo.index);
-                    }
-                } catch (Exception e)
-                {
-                    LSLog.Log_Exception(e);
-                }
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name)
-        {
-
-        }
-    }
-
-
-
     public class MultiChoiceHandler implements DialogInterface.OnMultiChoiceClickListener
     {
         boolean[] ischooseList;
@@ -174,7 +125,7 @@ public class ListDetail extends BaseFragment
                 List<app.model.V_List_Song> newChoosed = app.bll.V_List_Song.getChooseList(allSongs, ischooseList);
                 app.bll.List_Song.updateBatch(mListID, app.bll.V_List_Song.getsidList(newChoosed));
                 newChoosed=app.bll.V_List_Song.getModelByLid(mListID);
-                ((Adapter_Songs) mRvSonglist.getAdapter()).updateData(newChoosed,-1);
+                ((Adapter_Songs) mMyControls.mRvSonglist.getAdapter()).updateData(newChoosed,-1);
 
                 dialog.dismiss();
             }
@@ -196,7 +147,7 @@ public class ListDetail extends BaseFragment
                 {
 
                     List<app.model.V_List_Song> allSongs = app.bll.V_List_Song.getModelByLid(appHelper.defaultListID);
-                    List<app.model.V_List_Song> mySongs = ((Adapter_Songs) mRvSonglist.getAdapter()).getCloneData();
+                    List<app.model.V_List_Song> mySongs = ((Adapter_Songs) mMyControls.mRvSonglist.getAdapter()).getCloneData();
                     mySongs = mySongs == null ? new ArrayList<app.model.V_List_Song>() : mySongs;
                     CharSequence[] nameList = app.bll.V_List_Song.getNameList(allSongs);
                     boolean[] ischooseList = app.bll.V_List_Song.getIsChoose(allSongs, mySongs);
@@ -236,10 +187,10 @@ public class ListDetail extends BaseFragment
                     app.model.PlayerBaseInfo info=MainActivity.appServiceConnection.mPlayerProxy.getBaseInfo();
                     if(info.lid!=mListID || info.index!=index)//点击正在播放的应该无响应。
                     {
-                        if(mRvSonglist.getAdapter()!=null)
+                        if(mMyControls.mRvSonglist.getAdapter()!=null)
                         {
                             MainActivity.appServiceConnection.mPlayerProxy.playSong(lid, index);
-                            ((Adapter_Songs) ((Adapter_Songs) mRvSonglist.getAdapter())).showImagePlaying(index);
+                            ((Adapter_Songs) ((Adapter_Songs) mMyControls.mRvSonglist.getAdapter())).showImagePlaying(index);
                         }
                     }
                     else
@@ -258,6 +209,22 @@ public class ListDetail extends BaseFragment
                     LSLog.Log_Exception(e);
                 }
             }
+        }
+    }
+    //endregion
+
+
+    //region The class of FindControls
+    private MyControls mMyControls=null;
+    public class MyControls
+    {
+        private TextView mTvListname;
+        private RecyclerView mRvSonglist;
+
+        public MyControls()
+        {
+            mTvListname = (TextView) ListDetail.this.getActivity().findViewById(R.id.tv_listname);
+            mRvSonglist = (RecyclerView) ListDetail.this.getActivity().findViewById(R.id.rv_songlist);
         }
     }
     //endregion
