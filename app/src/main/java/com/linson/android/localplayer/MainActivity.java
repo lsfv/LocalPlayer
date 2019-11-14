@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity
             app.bll.MusicDB.setDBContext(null);//把自己的context，全部收回，以免自己不能被自动回收。
             stopService(appHelper.getServiceIntent());
             finish();
-            System.exit(0);
         }
     }
 
