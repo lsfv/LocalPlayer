@@ -1,13 +1,8 @@
 package com.linson.android.localplayer.activities;
 
-
 import android.annotation.SuppressLint;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -16,22 +11,17 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.linson.android.localplayer.AIDL.IPlayer;
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Dialog.Dialog_Volume;
 import com.linson.android.localplayer.appHelper;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import app.bll.V_List_Song;
 import app.lslibrary.androidHelper.LSLog;
 import app.lslibrary.androidHelper.LSSystemServices;
 import app.lslibrary.customUI.LSCircleImage;
 import app.model.PlayerBaseInfo;
-
 
 public class PlaySong extends BaseFragment implements View.OnClickListener
 {
@@ -117,8 +107,8 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
         getMaster().setupToolbarMenu(app.bll.V_List_Song.getMenuPlayerTitle(), new MenuClickHandler());
 
         mBaseInfo=appHelper.getServiceBaseInfo(MainActivity.appServiceConnection);
+        UpdateUi_mode(mBaseInfo);
     }
-
 
     @SuppressLint("DefaultLocale")
     private void initMemberVariable()
@@ -136,7 +126,6 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
         mV_list_songs=app.bll.V_List_Song.getModelByLid(mlsid);
         LSLog.Log_INFO(String.format("init playsong. id:%d,index:%d",mlsid,mIndex));
     }
-
 
     private void pre()
     {
@@ -190,7 +179,6 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
         }
     }
 
-
     private void UpdateUi_mode(@NonNull app.model.PlayerBaseInfo baseInfo)
     {
         getMaster().changeMenuTitel(1, baseInfo.getModeName());
@@ -212,7 +200,6 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
             mBtnPlay.setImage(R.drawable.video);
         }
     }
-
 
     //region not static class: extend for top class
     public class MenuClickHandler implements Toolbar.OnMenuItemClickListener
@@ -253,4 +240,5 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
             return true;
         }
     }
+    //endregion
 }

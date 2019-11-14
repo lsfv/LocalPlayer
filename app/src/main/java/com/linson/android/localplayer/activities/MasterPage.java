@@ -17,7 +17,7 @@ import com.linson.android.localplayer.R;
 
 import app.lslibrary.androidHelper.LSActivity;
 
-//!todo 1.db   1.5.uitest.  2.app media.3 pageview 4.panel 5.autoupdate.
+//!todo 3 pageview 4.panel 5.autoupdate.
 //!todo 无法触发服务sub代理的释放.android 一般也是不完全关闭app的。所以我这里是保证服务停止播放，最多释放播放器而已。
 //!todo 还是需要自带的常用所有控件都过一遍。是否需要建立一个歌词服务器?
 //!todo 1，还有一个不是很完善的地方：if(fragment instanceof ISetupMaster)。 没有强制的要求接口。
@@ -26,8 +26,6 @@ import app.lslibrary.androidHelper.LSActivity;
 //!todo savedInstanceState 实际工程使用范例.
 //!todo 还是需要一个模板啊。比如adapter 的大致样子都是差不多的。
 //!todo 界面更新的逻辑，根据编码的原则和2个方案的有缺点，决定还是server主动的才广播。否则还是用耦合度高的一个动作更新2个子界面的方式处理。
-//!todo 如何查看警告和设置浸膏的级别。
-
 //!todo 需要模板生成器。
 //!todo getMenuTitle 并没有保证会加入所有菜单。
 //!todo public ListDetail(int a) 什么时候fragment需要从建立开始恢复？ 导致得到参数必须是通过argumentbundle。
