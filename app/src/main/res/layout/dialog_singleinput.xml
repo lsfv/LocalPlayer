@@ -28,6 +28,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
+        android:contentDescription="listnameinput"
         android:id="@+id/et_name"
         style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
         android:layout_width="0dp"

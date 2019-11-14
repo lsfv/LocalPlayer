@@ -18,6 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <android.support.v7.widget.RecyclerView
+        android:contentDescription="rv_songlist"
         android:id="@+id/rv_songlist"
         android:layout_width="0dp"
         android:layout_height="0dp"
