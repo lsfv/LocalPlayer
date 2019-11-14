@@ -92,7 +92,7 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
 
     private int mlsid=-1;
     private int mIndex=-1;
-    private MyConnection mMyConnection=new MyConnection();
+
     private List<app.model.V_List_Song> mV_list_songs=new ArrayList<>();
     private app.model.PlayerBaseInfo mBaseInfo=new PlayerBaseInfo();
 
@@ -100,24 +100,6 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
 
     public PlaySong()
     {
-    }
-
-
-    @Override
-    public void onDestroy()
-    {
-        super.onDestroy();
-        if(mMyConnection!=null && mMyConnection.mPlayerProxy!=null)
-        {
-            try
-            {
-                mMyConnection.mPlayerProxy.ondisconnected();
-            } catch (Exception e)
-            {
-                LSLog.Log_Exception(e);
-            }
-        }
-        requireActivity().unbindService(mMyConnection);
     }
 
     @Override
@@ -134,8 +116,7 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
         initMemberVariable();
         getMaster().setupToolbarMenu(app.bll.V_List_Song.getMenuPlayerTitle(), new MenuClickHandler());
 
-        //虽然onActivityCreated，每次回退都会调用。但是bind如果连接存在是不会连2此的。
-        requireActivity().bindService(appHelper.getServiceIntent(), mMyConnection, Context.BIND_AUTO_CREATE);
+        mBaseInfo=appHelper.getServiceBaseInfo(MainActivity.appServiceConnection);
     }
 
 
@@ -159,12 +140,12 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
 
     private void pre()
     {
-        if(mMyConnection.mPlayerProxy!=null)
+        if(MainActivity.appServiceConnection!=null && MainActivity.appServiceConnection.mPlayerProxy!=null)
         {
             try
             {
-                int res=mMyConnection.mPlayerProxy.pre();
-                mBaseInfo=mMyConnection.mPlayerProxy.getBaseInfo();
+                int res=MainActivity.appServiceConnection.mPlayerProxy.pre();
+                mBaseInfo=MainActivity.appServiceConnection.mPlayerProxy.getBaseInfo();
                 UpdateUi_mode(mBaseInfo);
             }
             catch (Exception e)
@@ -176,13 +157,13 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
 
     private void play()
     {
-        if(mMyConnection.mPlayerProxy!=null)
+        if(MainActivity.appServiceConnection!=null && MainActivity.appServiceConnection.mPlayerProxy!=null)
         {
             try
             {
-                int res=mMyConnection.mPlayerProxy.playOrPause();
+                int res=MainActivity.appServiceConnection.mPlayerProxy.playOrPause();
                 //直接重新获得数据，这种非网络的数据，如硬盘，数据库等，如果直接获得更简洁那么不需要优化这点效率，除非大数据和非常频繁。
-                mBaseInfo=mMyConnection.mPlayerProxy.getBaseInfo();
+                mBaseInfo=MainActivity.appServiceConnection.mPlayerProxy.getBaseInfo();
                 UpdateUi_mode(mBaseInfo);
             }
             catch (Exception e)
@@ -194,12 +175,12 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
 
     private void next()
     {
-        if(mMyConnection.mPlayerProxy!=null)
+        if(MainActivity.appServiceConnection!=null && MainActivity.appServiceConnection.mPlayerProxy!=null)
         {
             try
             {
-                int res=mMyConnection.mPlayerProxy.next();
-                mBaseInfo=mMyConnection.mPlayerProxy.getBaseInfo();
+                int res=MainActivity.appServiceConnection.mPlayerProxy.next();
+                mBaseInfo=MainActivity.appServiceConnection.mPlayerProxy.getBaseInfo();
                 UpdateUi_mode(mBaseInfo);
             }
             catch (Exception e)
@@ -255,12 +236,12 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
             else if(menuItem.getIntent().getStringExtra(MasterPage.FIXMENUTITLENAME).equals(V_List_Song.menu_PlayerMode))
             {
                 LSLog.Log_INFO("change mode!"+menuItem.getIntent());
-                if(mMyConnection.mPlayerProxy!=null)
+                if(MainActivity.appServiceConnection!=null && MainActivity.appServiceConnection.mPlayerProxy!=null)
                 {
                     try
                     {
                         mBaseInfo.changeMode();
-                        mMyConnection.mPlayerProxy.changemode(mBaseInfo.playMode);
+                        MainActivity.appServiceConnection.mPlayerProxy.changemode(mBaseInfo.playMode);
                         UpdateUi_mode(mBaseInfo);
                     }
                     catch (Exception e)
@@ -272,58 +253,4 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
             return true;
         }
     }
-
-    public class MyConnection implements ServiceConnection
-    {
-        IPlayer mPlayerProxy;
-
-
-        @Override
-        public void onBindingDied(ComponentName name)
-        {
-            LSLog.Log_INFO("error onBindingDied");
-        }
-
-        @Override
-        public void onNullBinding(ComponentName name)
-        {
-            LSLog.Log_INFO("error get null services");
-        }
-
-        @SuppressLint("DefaultLocale")
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service)
-        {
-            LSLog.Log_INFO("onServiceConnected");
-            mPlayerProxy=(IPlayer.Stub.asInterface(service));//必须用它提供的转义方法，它有一个是否是远程服务的区别。
-
-            if(mPlayerProxy!=null)
-            {
-                try
-                {
-                    mBaseInfo = mPlayerProxy.getBaseInfo();//查看基本信息，判断是查看，还是播放。
-
-                    LSLog.Log_INFO(String.format("onServiceConnected.argument lid %d,index:%d, base :lid:%d,sid:%d", mlsid, mIndex, mBaseInfo.lid, mBaseInfo.index));
-                    if (mBaseInfo.lid == mlsid && mBaseInfo.index == mIndex)
-                    {
-                    }
-                    else
-                    {
-                        mPlayerProxy.playSong(mlsid,mIndex);
-                    }
-                    UpdateUi_mode(mBaseInfo);
-                } catch (Exception e)
-                {
-                    LSLog.Log_Exception(e);
-                }
-            }
-        }
-
-
-        @Override
-        public void onServiceDisconnected(ComponentName name)
-        {
-        }
-    }
-    //endregion
 }

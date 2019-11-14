@@ -18,13 +18,11 @@ import com.linson.android.localplayer.R;
 import app.lslibrary.androidHelper.LSActivity;
 
 //!todo 1.db   1.5.uitest.  2.app media.3 pageview 4.panel 5.autoupdate.
-//!todo 建立了aidl对象后实现后，无法停止service。虽然释放了播放器。不过对用户来说，已经停止了播放器，也算停止了服务。之后再看下。
-//!todo android 一般也是不完全关闭app的。所以我这里是保证服务停止播放，最多释放播放器而已。
+//!todo 无法触发服务sub代理的释放.android 一般也是不完全关闭app的。所以我这里是保证服务停止播放，最多释放播放器而已。
 //!todo 还是需要自带的常用所有控件都过一遍。是否需要建立一个歌词服务器?
 //!todo 1，还有一个不是很完善的地方：if(fragment instanceof ISetupMaster)。 没有强制的要求接口。
 //!todo 更新歌单，可能需要一个更低耗的方法。
 //!todo 左侧菜单栏目没有清空回退的功能。
-//!todo ,返回到首页，有时候No adapter attached; skipping layout
 //!todo savedInstanceState 实际工程使用范例.
 //!todo 还是需要一个模板啊。比如adapter 的大致样子都是差不多的。
 //!todo 界面更新的逻辑，根据编码的原则和2个方案的有缺点，决定还是server主动的才广播。否则还是用耦合度高的一个动作更新2个子界面的方式处理。

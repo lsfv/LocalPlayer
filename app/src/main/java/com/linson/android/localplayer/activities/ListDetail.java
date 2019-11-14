@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.linson.android.localplayer.AIDL.IPlayer;
+import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Adapter.Adapter_Songs;
 import com.linson.android.localplayer.appHelper;
@@ -52,8 +53,6 @@ public class ListDetail extends BaseFragment
     //region other member variable
     private int mListID=appHelper.defaultListID;
     private String mListName="";
-    private MyConnection mMyConnection;
-
 
     public static String argumentname_lid="lid";
     public static String argumentname_lname="lname";
@@ -81,11 +80,7 @@ public class ListDetail extends BaseFragment
         mListID=getArguments().getInt(argumentname_lid, mListID);//把类的自定义初始化禁止了，导致起不到初始化作用。糟糕的设计。
         mListName=getArguments().getString(argumentname_lname, "");
         mTvListname.setText(mListName);
-        mMyConnection=new MyConnection();
-        if(getActivity()!=null)
-        {
-            getActivity().bindService(appHelper.getServiceIntent(), mMyConnection, Context.BIND_AUTO_CREATE);
-        }
+
 
         setupRecyleview();
         getMaster().setupToolbarMenu(app.bll.V_List_Song.getMenuTitle(), new MenuHandler());
@@ -234,15 +229,18 @@ public class ListDetail extends BaseFragment
         public void onClick(int lid,int index)
         {
             //连接服务，播放歌曲。
-            if(mMyConnection!=null && mMyConnection.mPlayer!=null)
+            if(MainActivity.appServiceConnection !=null && MainActivity.appServiceConnection.mPlayerProxy!=null)
             {
                 try
                 {
-                    app.model.PlayerBaseInfo info=mMyConnection.mPlayer.getBaseInfo();
-                    if(info.lid!=mListID || info.index!=index && mRvSonglist.getAdapter()!=null)//点击正在播放的应该无响应。
+                    app.model.PlayerBaseInfo info=MainActivity.appServiceConnection.mPlayerProxy.getBaseInfo();
+                    if(info.lid!=mListID || info.index!=index)//点击正在播放的应该无响应。
                     {
-                        mMyConnection.mPlayer.playSong(lid,index);
-                        ((Adapter_Songs) ((Adapter_Songs) mRvSonglist.getAdapter())).showImagePlaying(index);
+                        if(mRvSonglist.getAdapter()!=null)
+                        {
+                            MainActivity.appServiceConnection.mPlayerProxy.playSong(lid, index);
+                            ((Adapter_Songs) ((Adapter_Songs) mRvSonglist.getAdapter())).showImagePlaying(index);
+                        }
                     }
                     else
                     {

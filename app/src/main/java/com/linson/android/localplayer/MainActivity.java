@@ -1,10 +1,15 @@
 package com.linson.android.localplayer;
 
+import android.annotation.SuppressLint;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.linson.android.localplayer.AIDL.IPlayer;
 import com.linson.android.localplayer.activities.MasterPage;
 
 import app.lslibrary.androidHelper.LSLog;
@@ -14,7 +19,7 @@ import app.lslibrary.androidHelper.LSLog;
 public class MainActivity extends AppCompatActivity
 {
     public static Context appContext;
-    //private myConnection mm;
+    public static MyConnection appServiceConnection;
     private boolean isFirstLoad=true;
 
     @Override
@@ -38,7 +43,8 @@ public class MainActivity extends AppCompatActivity
         }
         else
         {
-            app.bll.MusicDB.setDBContext(null);//把自己的context，全部收回，以免自己不能被自动回收。
+            app.bll.MusicDB.setDBContext(null);//把引用了自己的静态变量也先清掉。
+            unbindService(appServiceConnection);
             stopService(appHelper.getServiceIntent());
             finish();
         }
@@ -61,6 +67,53 @@ public class MainActivity extends AppCompatActivity
     private boolean StartServicesabc()
     {
         startService(appHelper.getServiceIntent());
+        appServiceConnection=new MyConnection();
+        bindService(appHelper.getServiceIntent(), appServiceConnection, Context.BIND_AUTO_CREATE);
+
         return true;
     }
+
+
+    //region serverConneciton
+    public static class MyConnection implements ServiceConnection
+    {
+        public IPlayer mPlayerProxy;
+
+        @Override
+        public void onBindingDied(ComponentName name)
+        {
+            LSLog.Log_INFO("");
+        }
+
+        @Override
+        public void onNullBinding(ComponentName name)
+        {
+            LSLog.Log_INFO("");
+        }
+
+        @SuppressLint("DefaultLocale")
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service)
+        {
+            mPlayerProxy=(IPlayer.Stub.asInterface(service));//必须用它提供的转义方法，它有一个是否是远程服务的区别。
+
+            if(mPlayerProxy==null)
+            {
+                LSLog.Log_INFO("onServiceConnected. result :failed");
+            }
+            else
+            {
+                LSLog.Log_INFO("onServiceConnected. result :success");
+            }
+        }
+
+
+        @Override
+        public void onServiceDisconnected(ComponentName name)
+        {
+            LSLog.Log_INFO("");
+        }
+    }
+
+    //endregion
 }

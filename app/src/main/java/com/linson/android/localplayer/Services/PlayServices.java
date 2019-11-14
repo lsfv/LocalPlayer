@@ -40,9 +40,16 @@ public class PlayServices extends Service
     public void onDestroy()
     {
         LSLog.Log_INFO("");
-        mRemoteServiceProxy.ReasePlayer();//先手动调用释放播放器。
-        app.bll.MusicDB.setDBContext(null);
         super.onDestroy();
+        app.bll.MusicDB.setDBContext(null);//把引用了自己的静态变量也先清掉。
+        mRemoteServiceProxy.ReasePlayer();//
+    }
+
+    @Override
+    protected void finalize() throws Throwable
+    {
+        LSLog.Log_INFO("");
+        super.finalize();
     }
 
     public static class RemoteServiceProxy extends IPlayer.Stub
@@ -59,6 +66,13 @@ public class PlayServices extends Service
             mMediaPlayer.setOnCompletionListener(new OnComplete());
         }
 
+        @Override
+        protected void finalize() throws Throwable
+        {
+            LSLog.Log_INFO("");
+            ReasePlayer();
+            super.finalize();
+        }
 
         @SuppressLint("DefaultLocale")
         private String displayStatus()

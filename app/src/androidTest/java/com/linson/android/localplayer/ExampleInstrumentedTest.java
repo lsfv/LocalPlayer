@@ -143,7 +143,6 @@ public class ExampleInstrumentedTest
 
             UiObject item_delete= item.getChild(new UiSelector().text("Delete"));
             item_delete.click();
-
         }
         catch (UiObjectNotFoundException e)
         {
@@ -172,7 +171,8 @@ public class ExampleInstrumentedTest
             UiObject song_item= rv_song.getChild(new UiSelector().index(1));
             assertTrue(song_item.exists());
             song_item.click();
-            mDevice.wait(Until.findObjects(By.textStartsWith("noway")),5000);
+            song_item.click();
+            mDevice.wait(Until.findObjects(By.textStartsWith("noway")),9000);
         }
         catch (UiObjectNotFoundException e)
         {
