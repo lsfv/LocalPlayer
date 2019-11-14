@@ -17,7 +17,8 @@ import com.linson.android.localplayer.R;
 
 import app.lslibrary.androidHelper.LSActivity;
 
-//!todo 3 pageview 4.panel 5.autoupdate.
+//!todo 3 pageview！ 4.panel 5.autoupdate.
+//!todo viewpager 1，参数页。2分部门页都有后续页。
 //!todo 无法触发服务sub代理的释放.android 一般也是不完全关闭app的。所以我这里是保证服务停止播放，最多释放播放器而已。
 //!todo 还是需要自带的常用所有控件都过一遍。是否需要建立一个歌词服务器?
 //!todo 1，还有一个不是很完善的地方：if(fragment instanceof ISetupMaster)。 没有强制的要求接口。
