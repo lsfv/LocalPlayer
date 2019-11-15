@@ -64,7 +64,7 @@ public class ListDetail extends BaseFragment
         getMaster().setupToolbarMenu(app.bll.V_List_Song.getMenuTitle(), new MenuHandler());
 
         PlayerBaseInfo baseInfo=appHelper.getServiceBaseInfo(MainActivity.appServiceConnection);
-        if(baseInfo!=null)
+        if(baseInfo!=null && baseInfo.lid==mListID)
         {
             ((Adapter_Songs) ((Adapter_Songs) mMyControls.mRvSonglist.getAdapter())).showImagePlaying(baseInfo.index);
         }
