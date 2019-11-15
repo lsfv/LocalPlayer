@@ -1,15 +1,12 @@
 package com.linson.android.localplayer.activities;
 
 import android.annotation.SuppressLint;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,28 +17,38 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.linson.android.localplayer.AIDL.IPlayer;
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
-import com.linson.android.localplayer.Services.PlayServices;
 import com.linson.android.localplayer.activities.Adapter.Adapter_Songs;
 import com.linson.android.localplayer.appHelper;
 
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
 import app.bll.V_List_Song;
 import app.lslibrary.androidHelper.LSLog;
+import app.lslibrary.androidHelper.LSUI;
 import app.model.PlayerBaseInfo;
 
-@SuppressWarnings("FieldCanBeLocal")
+//功能。1获得参数。2初始化列表。3实现菜单功能。 通过内部类对activity顶级类功能的划分，发挥了内部类的分担职责的职能。
 public class ListDetail extends BaseFragment
 {
-    public static String argumentname_lid="lid";
-    public static String argumentname_lname="lname";
+    public static final String STRLID="lid";
+    public static final String STRLNAME="LNAME";
 
     private int mListID=appHelper.defaultListID;
     private String mListName="";
+
+    public static void StartMe(FragmentManager fragmentManager, int lid,String lname)
+    {
+        ListDetail fragment= new ListDetail();
+        Bundle bundle=new Bundle();
+        bundle.putInt(STRLID, lid);
+        bundle.putString(STRLNAME, lname);
+        fragment.setArguments(bundle);
+        appHelper.startPageWithBack(fragmentManager, fragment);
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -55,23 +62,24 @@ public class ListDetail extends BaseFragment
     {
         super.onActivityCreated(savedInstanceState);
         mMyControls=new MyControls();//cut it into 'onCreate'
-        mListID=getArguments().getInt(argumentname_lid, mListID);//把类的自定义初始化禁止了，导致起不到初始化作用。糟糕的设计。
-        mListName=getArguments().getString(argumentname_lname, "");
-        mMyControls.mTvListname.setText(mListName);
-
-
+        initParameter();
+        setupWidget();
         setupRecyleview();
         getMaster().setupToolbarMenu(app.bll.V_List_Song.getMenuTitle(), new MenuHandler());
-
-        PlayerBaseInfo baseInfo=appHelper.getServiceBaseInfo(MainActivity.appServiceConnection);
-        if(baseInfo!=null && baseInfo.lid==mListID)
-        {
-            ((Adapter_Songs) ((Adapter_Songs) mMyControls.mRvSonglist.getAdapter())).showImagePlaying(baseInfo.index);
-        }
-
-        LSLog.Log_INFO(String.format("init listdetail. id:%d,name:%s",mListID,mListName));
+        LSLog.Log_INFO(String.format("id:%d,name:%s",mListID,mListName));
     }
 
+    //region private functions
+    private void setupWidget()
+    {
+        mMyControls.mTvListname.setText(mListName);
+    }
+
+    private void initParameter()
+    {
+        mListID=getArguments().getInt(STRLID, mListID);//把类的自定义初始化禁止了，导致起不到初始化作用。糟糕的设计。
+        mListName=getArguments().getString(STRLNAME, "");
+    }
 
     private void setupRecyleview()
     {
@@ -81,99 +89,21 @@ public class ListDetail extends BaseFragment
             res=new ArrayList<>();
         }
 
-        Adapter_Songs adapter_songs=new Adapter_Songs(res,new RecycleHandler(),-1);
+        int playingIndex=-1;
+        PlayerBaseInfo baseInfo=appHelper.getServiceBaseInfo(MainActivity.appServiceConnection);
+        if(baseInfo!=null && baseInfo.lid==mListID)
+        {
+            playingIndex=baseInfo.index;
+        }
+
+        Adapter_Songs adapter_songs=new Adapter_Songs(res,new RecycleHandler(),playingIndex);
         mMyControls.mRvSonglist.setAdapter(adapter_songs);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getContext());
         mMyControls.mRvSonglist.setLayoutManager(linearLayoutManager);
     }
+    //endregions
 
-
-    //region not static class: extend for top class
-    public class MultiChoiceHandler implements DialogInterface.OnMultiChoiceClickListener
-    {
-        boolean[] ischooseList;
-
-        public MultiChoiceHandler(boolean[] choose)
-        {
-            ischooseList=choose;
-        }
-        @Override
-        public void onClick(DialogInterface dialog, int which, boolean isChecked)
-        {
-            ischooseList[which] = isChecked;
-        }
-    }
-
-    public class MultiChoiceClick implements DialogInterface.OnClickListener
-    {
-        List<app.model.V_List_Song> allSongs;
-        boolean[] ischooseList;
-
-        public MultiChoiceClick(List<app.model.V_List_Song> Songs,boolean[] ischoose)
-        {
-            allSongs=Songs;
-            ischooseList=ischoose;
-        }
-
-        @Override
-        public void onClick(DialogInterface dialog, int which)
-        {
-            if(which==dialog.BUTTON_POSITIVE && getActivity()!=null)
-            {
-                //逻辑是硬伤，这里获得是默认清单的数据，包含了清单数据,如lid，其实还是应该用song这种更正确的类。导致最初直接给list来显示，用了错lid.
-                //那就只用list的song id。重新读一次数据库把。这个逻辑才是正确，避免以后又添加了什么新数据，手工是避免不了错误的。
-                List<app.model.V_List_Song> newChoosed = app.bll.V_List_Song.getChooseList(allSongs, ischooseList);
-                app.bll.List_Song.updateBatch(mListID, app.bll.V_List_Song.getsidList(newChoosed));
-                newChoosed=app.bll.V_List_Song.getModelByLid(mListID);
-                ((Adapter_Songs) mMyControls.mRvSonglist.getAdapter()).updateData(newChoosed,-1);
-
-                dialog.dismiss();
-            }
-            else if(which==dialog.BUTTON_NEGATIVE)
-            {
-                dialog.dismiss();
-            }
-        }
-    }
-
-    public class MenuHandler implements android.support.v7.widget.Toolbar.OnMenuItemClickListener
-    {
-        @Override
-        public boolean onMenuItemClick(MenuItem menuItem)
-        {
-            if(menuItem.getTitle().toString().equals(V_List_Song.menu_editlist))
-            {
-                if(mListID>1 && getActivity()!=null)
-                {
-
-                    List<app.model.V_List_Song> allSongs = app.bll.V_List_Song.getModelByLid(appHelper.defaultListID);
-                    List<app.model.V_List_Song> mySongs = ((Adapter_Songs) mMyControls.mRvSonglist.getAdapter()).getCloneData();
-                    mySongs = mySongs == null ? new ArrayList<app.model.V_List_Song>() : mySongs;
-                    CharSequence[] nameList = app.bll.V_List_Song.getNameList(allSongs);
-                    boolean[] ischooseList = app.bll.V_List_Song.getIsChoose(allSongs, mySongs);
-
-                    //数据检测,正常就弹出系统api，多选对话窗口。
-                    //实时修改 是否选中的局部数据,确定按钮后才把局部数据更新到adapter和数据库。
-                    if (allSongs != null && mySongs != null && getActivity()!=null)
-                    {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(ListDetail.this.getContext());
-                        builder.setMultiChoiceItems(nameList, ischooseList, new MultiChoiceHandler(ischooseList));
-
-                        builder.setPositiveButton("确定", new MultiChoiceClick(allSongs,ischooseList ));
-                        builder.setNegativeButton("取消", new MultiChoiceClick(allSongs,ischooseList ));
-                        builder.show();
-                    }
-                }
-                else
-                {
-                    Toast.makeText(getContext(), "'所有歌曲'不需要编辑!", Toast.LENGTH_SHORT).show();
-                }
-            }
-            return true;
-        }
-    }
-
-
+    //region recycleView's handler
     public class RecycleHandler implements Adapter_Songs.IItemHander
     {
         @Override
@@ -195,13 +125,7 @@ public class ListDetail extends BaseFragment
                     }
                     else
                     {
-                        Fragment fragment=new PlaySong();
-                        Bundle bundle=new Bundle();
-                        bundle.putInt(PlaySong.argumentLsid, lid);
-                        bundle.putInt(PlaySong.argumentindex, index);
-                        fragment.setArguments(bundle);
-
-                        appHelper.startPageWithBack(getFragmentManager(),fragment);
+                        PlaySong.StartMe(getFragmentManager(), lid, index);
                     }
                 }
                 catch (Exception e)
@@ -213,6 +137,105 @@ public class ListDetail extends BaseFragment
     }
     //endregion
 
+    //region Menu's Handler
+    public class MenuHandler implements android.support.v7.widget.Toolbar.OnMenuItemClickListener
+    {
+        @Override
+        public boolean onMenuItemClick(MenuItem menuItem)
+        {
+            if(LSUI.getToolbarItemKeyID(menuItem).equals(V_List_Song.menu_editlist))
+            {
+                if(mListID>1 && getActivity()!=null)
+                {
+
+                    List<app.model.V_List_Song> allSongs = app.bll.V_List_Song.getModelByLid(appHelper.defaultListID);
+                    List<app.model.V_List_Song> mySongs = ((Adapter_Songs) mMyControls.mRvSonglist.getAdapter()).getCloneData();
+                    mySongs = mySongs == null ? new ArrayList<app.model.V_List_Song>() : mySongs;
+                    CharSequence[] nameList = app.bll.V_List_Song.getNameList(allSongs);
+                    boolean[] ischooseList = app.bll.V_List_Song.getIsChoose(allSongs, mySongs);
+
+                    //数据检测,正常就弹出系统api，多选对话窗口。
+                    //实时修改 是否选中的局部数据,确定按钮后才把局部数据更新到adapter和数据库。
+                    if (allSongs != null && mySongs != null && getActivity()!=null)
+                    {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ListDetail.this.getContext());
+                        builder.setMultiChoiceItems(nameList, ischooseList, new MultiChoiceHandler(ischooseList));
+
+                        builder.setPositiveButton("确定", new MultiChoiceClick(allSongs,ischooseList ));
+                        builder.setNegativeButton("取消", new MultiChoiceClickCancel());
+                        builder.show();
+                    }
+                }
+                else
+                {
+                    Toast.makeText(getContext(), "'所有歌曲'不需要编辑!", Toast.LENGTH_SHORT).show();
+                }
+            }
+            return true;
+        }
+    }
+    //endregion
+
+    //region MultiChoiceListener onchoose's handler
+    public class MultiChoiceHandler implements DialogInterface.OnMultiChoiceClickListener
+    {
+        boolean[] ischooseList;
+
+        public MultiChoiceHandler(boolean[] choose)
+        {
+            ischooseList=choose;
+        }
+        @Override
+        public void onClick(DialogInterface dialog, int which, boolean isChecked)
+        {
+            ischooseList[which] = isChecked;
+        }
+    }
+    //endregion
+
+    //region MultiChoiceListener onclick's handler
+    public class MultiChoiceClick implements DialogInterface.OnClickListener
+    {
+        List<app.model.V_List_Song> allSongs;
+        boolean[] ischooseList;
+
+        public MultiChoiceClick(List<app.model.V_List_Song> Songs,boolean[] ischoose)
+        {
+            allSongs=Songs;
+            ischooseList=ischoose;
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which)
+        {
+            if(which==dialog.BUTTON_POSITIVE && getActivity()!=null)
+            {
+                //逻辑是硬伤，这里获得是默认清单的数据，包含了清单数据,如lid，其实还是应该用song这种更正确的类。
+                List<app.model.V_List_Song> newChoosed = app.bll.V_List_Song.getChooseList(allSongs, ischooseList);
+                app.bll.List_Song.updateBatch(mListID, app.bll.V_List_Song.getsidList(newChoosed));
+                newChoosed=app.bll.V_List_Song.getModelByLid(mListID);
+                ((Adapter_Songs) mMyControls.mRvSonglist.getAdapter()).updateData(newChoosed,-1);
+
+                dialog.dismiss();
+            }
+            else if(which==dialog.BUTTON_NEGATIVE)
+            {
+                dialog.dismiss();
+            }
+        }
+    }
+    //endregion
+
+    //region MultiChoiceListener onclick cancel's handler
+    public class MultiChoiceClickCancel implements DialogInterface.OnClickListener
+    {
+        @Override
+        public void onClick(DialogInterface dialog, int which)
+        {
+            dialog.dismiss();
+        }
+    }
+    //endregion
 
     //region The class of FindControls
     private MyControls mMyControls=null;

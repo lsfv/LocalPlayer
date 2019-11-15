@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -17,12 +19,16 @@ import com.linson.android.localplayer.activities.Dialog.Dialog_Volume;
 import com.linson.android.localplayer.appHelper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import app.bll.V_List_Song;
 import app.lslibrary.androidHelper.LSLog;
 import app.lslibrary.androidHelper.LSSystemServices;
+import app.lslibrary.androidHelper.LSUI;
 import app.lslibrary.customUI.LSCircleImage;
 import app.model.PlayerBaseInfo;
 
+//功能：1.显示播放歌曲的信息。2。实现基本操作面板。3实现菜单功能。
 public class PlaySong extends BaseFragment implements View.OnClickListener
 {
     public static final String argumentLsid = "lid";
@@ -31,11 +37,15 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
     private int mlsid=-1;
     private int mIndex=-1;
 
-    private List<app.model.V_List_Song> mV_list_songs=new ArrayList<>();
-    private app.model.PlayerBaseInfo mBaseInfo=new PlayerBaseInfo();
 
-    public PlaySong()
+    public static void StartMe(FragmentManager fragmentManager, int lid, int index)
     {
+        Fragment fragment=new PlaySong();
+        Bundle bundle=new Bundle();
+        bundle.putInt(PlaySong.argumentLsid, lid);
+        bundle.putInt(PlaySong.argumentindex, index);
+        fragment.setArguments(bundle);
+        appHelper.startPageWithBack(fragmentManager,fragment);
     }
 
     @Override
@@ -76,17 +86,22 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
     {
         super.onActivityCreated(savedInstanceState);
         mMyControls=new MyControls();//cut it into 'onCreate'
+        controlsEvent();
+        initParameter();
+        getMaster().setupToolbarMenu(app.bll.V_List_Song.getMenuPlayerTitle(), new MenuClickHandler());
+        setupWidget();
+    }
+
+    //region private funcions
+    private void controlsEvent()
+    {
         mMyControls.mBtnNext.setOnClickListener(this);
         mMyControls.mBtnPlay.setOnClickListener(this);
         mMyControls.mBtnPre.setOnClickListener(this);
-        initMemberVariable();
-        getMaster().setupToolbarMenu(app.bll.V_List_Song.getMenuPlayerTitle(), new MenuClickHandler());
-        mBaseInfo=appHelper.getServiceBaseInfo(MainActivity.appServiceConnection);
-        UpdateUi_mode(mBaseInfo);
     }
 
     @SuppressLint("DefaultLocale")
-    private void initMemberVariable()
+    private void initParameter()
     {
         if(getArguments()!=null)
         {
@@ -98,7 +113,6 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
             mlsid=-1;
             mIndex=-1;
         }
-        mV_list_songs=app.bll.V_List_Song.getModelByLid(mlsid);
         LSLog.Log_INFO(String.format("init playsong. id:%d,index:%d",mlsid,mIndex));
     }
 
@@ -109,8 +123,7 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
             try
             {
                 int res=MainActivity.appServiceConnection.mPlayerProxy.pre();
-                mBaseInfo=MainActivity.appServiceConnection.mPlayerProxy.getBaseInfo();
-                UpdateUi_mode(mBaseInfo);
+                setupWidget();
             }
             catch (Exception e)
             {
@@ -123,13 +136,10 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
     {
         if(MainActivity.appServiceConnection!=null && MainActivity.appServiceConnection.mPlayerProxy!=null)
         {
-            LSLog.Log_INFO("pause!!!!!!!!!!!");
             try
             {
                 int res=MainActivity.appServiceConnection.mPlayerProxy.playOrPause();
-                //直接重新获得数据，这种非网络的数据，如硬盘，数据库等，如果直接获得更简洁那么不需要优化这点效率，除非大数据和非常频繁。
-                mBaseInfo=MainActivity.appServiceConnection.mPlayerProxy.getBaseInfo();
-                UpdateUi_mode(mBaseInfo);
+                setupWidget();
             }
             catch (Exception e)
             {
@@ -145,8 +155,7 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
             try
             {
                 int res=MainActivity.appServiceConnection.mPlayerProxy.next();
-                mBaseInfo=MainActivity.appServiceConnection.mPlayerProxy.getBaseInfo();
-                UpdateUi_mode(mBaseInfo);
+                setupWidget();
             }
             catch (Exception e)
             {
@@ -155,35 +164,39 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
         }
     }
 
-    private void UpdateUi_mode(@NonNull app.model.PlayerBaseInfo baseInfo)
+    private void setupWidget()
     {
-        getMaster().changeMenuTitel(1, baseInfo.getModeName());
+        PlayerBaseInfo baseInfo=appHelper.getServiceBaseInfo(MainActivity.appServiceConnection);
+        if(baseInfo!=null)
+        {
+            getMaster().changeMenuTitel(1, baseInfo.getModeName());
 
-        boolean IsPlaying=false;
-        if(baseInfo.status==PlayerBaseInfo.status_playing)
-        {
-            IsPlaying=true;
-        }
+            boolean IsPlaying=false;
+            if(baseInfo.status==PlayerBaseInfo.status_playing)
+            {
+                IsPlaying=true;
+            }
 
-        String imgpath= mMyControls.mBtnPlay.getImage()==R.drawable.video?"play":"pause";
-        LSLog.Log_INFO("server mode IsPlaying:"+IsPlaying+". img:"+imgpath+"."+baseInfo.displayStatus());
-        if(IsPlaying==true && mMyControls.mBtnPlay.getImage()==R.drawable.video)
-        {
-            mMyControls.mBtnPlay.setImage(R.drawable.pause);
-        }
-        else if(IsPlaying==false && mMyControls.mBtnPlay.getImage()==R.drawable.pause)
-        {
-            mMyControls.mBtnPlay.setImage(R.drawable.video);
+            if(IsPlaying==true)
+            {
+                mMyControls.mBtnPlay.setImage(R.drawable.pause);
+            }
+            else if(IsPlaying==false)
+            {
+                mMyControls.mBtnPlay.setImage(R.drawable.video);
+            }
         }
     }
+    //endregion
 
-    //region not static class: extend for top class
+    //region menu's handler
     public class MenuClickHandler implements Toolbar.OnMenuItemClickListener
     {
         @Override
         public boolean onMenuItemClick(MenuItem menuItem)
         {
-            if(menuItem.getIntent().getStringExtra(MasterPage.FIXMENUTITLENAME).equals(V_List_Song.menu_IncressVolume))
+            LSLog.Log_INFO("");
+            if(LSUI.getToolbarItemKeyID(menuItem).equals(V_List_Song.menu_IncressVolume))
             {
                 LSSystemServices.StreamVolumeInfo info=LSSystemServices.getVolumeInfo(MainActivity.appContext, AudioManager.STREAM_MUSIC);
                 Dialog_Volume dialog=new Dialog_Volume(getContext(), info.max, info.now, new Dialog_Volume.IVolumeHander()
@@ -191,21 +204,25 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
                     @Override
                     public void onChangeValue(int value)
                     {
+                        LSLog.Log_INFO("");
                         LSSystemServices.setVolume(AudioManager.STREAM_MUSIC, MainActivity.appContext, value);
                     }
                 });
                 dialog.show();
             }
-            else if(menuItem.getIntent().getStringExtra(MasterPage.FIXMENUTITLENAME).equals(V_List_Song.menu_PlayerMode))
+            else if(LSUI.getToolbarItemKeyID(menuItem).equals(V_List_Song.menu_PlayerMode))
             {
-                LSLog.Log_INFO("change mode!"+menuItem.getIntent());
                 if(MainActivity.appServiceConnection!=null && MainActivity.appServiceConnection.mPlayerProxy!=null)
                 {
                     try
                     {
-                        mBaseInfo.changeMode();
-                        MainActivity.appServiceConnection.mPlayerProxy.changemode(mBaseInfo.playMode);
-                        UpdateUi_mode(mBaseInfo);
+                        PlayerBaseInfo info= appHelper.getServiceBaseInfo(MainActivity.appServiceConnection);
+                        if(info!=null)
+                        {
+                            info.changeMode();
+                            MainActivity.appServiceConnection.mPlayerProxy.changemode(info.playMode);
+                            setupWidget();
+                        }
                     }
                     catch (Exception e)
                     {

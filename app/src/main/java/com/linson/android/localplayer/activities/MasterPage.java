@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,8 +15,10 @@ import android.view.View;
 import android.widget.Button;
 
 import com.linson.android.localplayer.R;
+import com.linson.android.localplayer.appHelper;
 
 import app.lslibrary.androidHelper.LSActivity;
+import app.lslibrary.androidHelper.LSUI;
 
 //!todo 3 codereview！ 4.panel 5.autoupdate.
 //!todo viewpager 1，参数页。2分部门页都有后续页。
@@ -31,11 +34,12 @@ import app.lslibrary.androidHelper.LSActivity;
 //!todo 需要模板生成器。
 //!todo getMenuTitle 并没有保证会加入所有菜单。
 //!todo public ListDetail(int a) 什么时候fragment需要从建立开始恢复？ 导致得到参数必须是通过argumentbundle。
-//!TODO 内存泄漏，那就不要使用单例模式了?
+//!TODO 内存泄漏要注意静态变量和单例模式.单例对象在初始化后将在 JVM 的整个生命周期中存在（以静态变量的方式），如果单例对象持有外部的引用，那么这个外部对象在程序关闭之前都不能被回收。
 
+
+//功能:母模板实现大框架功能。并提供public方法让fragment访问。
 public class MasterPage extends AppCompatActivity implements View.OnClickListener
 {
-    public static final String FIXMENUTITLENAME="title";
     private boolean loadMenu=false;
 
     @Override
@@ -45,10 +49,9 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
         setContentView(R.layout.activity_master_page);
 
         mMyControls=new MyControls();//cut it into 'onCreate'//1.控件绑定
-        mMyControls.mBtnBack.setOnClickListener(this);
-        mMyControls.mBtnPage1.setOnClickListener(this);
+        controlsEvent();
         setupDrawerMenu();//2.配置左侧滑动菜单
-        startPage(new ListIndex());//3.加载首页
+        CleanStackAndReplaceFragment(new ListIndex());//3.加载首页
     }
 
     @Override
@@ -58,7 +61,8 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
         {
             case R.id.btn_page1:
             {
-                startPage(new ListIndex());
+                CleanStackAndReplaceFragment(new ListIndex());
+                mMyControls.mDrawerMainMenu.closeDrawer(Gravity.START);
                 break;
             }
             case R.id.btn_back:
@@ -72,6 +76,12 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
         }
     }
 
+    //region private function
+    private void controlsEvent()
+    {
+        mMyControls.mBtnBack.setOnClickListener(this);
+        mMyControls.mBtnPage1.setOnClickListener(this);
+    }
 
     private void setupDrawerMenu()
     {
@@ -86,38 +96,23 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
         });
     }
 
-    private void startPage(Fragment fragment)
+    private void CleanStackAndReplaceFragment(Fragment fragment)
     {
-        LSActivity.replaceFragment(getSupportFragmentManager(), false, R.id.mainFragment, fragment);
-        mMyControls.mDrawerMainMenu.closeDrawer(Gravity.START);
-    }
-
-
-
-    //region 母模板public出去的方法，提供给fragment使用。统一管理.
-    @SuppressLint("AlwaysShowAction")
-    public void setupToolbarMenu(java.util.List<String> menus, android.support.v7.widget.Toolbar.OnMenuItemClickListener handler)
-    {
-        mMyControls.mToolbar.setOnMenuItemClickListener(handler);
-        mMyControls.mToolbar.getMenu().clear();
-        for(int i=0;i<menus.size();i++)
-        {
-            MenuItem tempitem= mMyControls.mToolbar.getMenu().add(menus.get(i));
-            Intent tempIntent=new Intent();
-            tempIntent.putExtra(FIXMENUTITLENAME, menus.get(i));
-            tempitem.setIntent(tempIntent);
-            tempitem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        }
-    }
-
-    public void changeMenuTitel(int index,String title)
-    {
-        mMyControls.mToolbar.getMenu().getItem(1).setTitle(title);
+        getSupportFragmentManager().popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        appHelper.startPageNoBack(getSupportFragmentManager(), fragment);
     }
     //endregion
 
-    //region 母模板需要每个页面实现的功能接口。
+    //region 提供给fragment访问的功能
+    public void changeMenuTitel(int index,String title)
+    {
+        mMyControls.mToolbar.getMenu().getItem(index).setTitle(title);
+    }
 
+    public void setupToolbarMenu(java.util.List<String> menus, android.support.v7.widget.Toolbar.OnMenuItemClickListener handler)
+    {
+        LSUI.setupToolbarMenu(mMyControls.mToolbar, menus, handler);
+    }
     //endregion
 
     //region The class of FindControls

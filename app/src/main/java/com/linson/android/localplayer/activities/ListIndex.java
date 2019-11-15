@@ -19,22 +19,18 @@ import com.linson.android.localplayer.activities.Dialog.Dialog_addlist;
 import com.linson.android.localplayer.appHelper;
 
 import app.lslibrary.androidHelper.LSContentResolver;
+import app.lslibrary.androidHelper.LSUI;
 import app.model.List;
 
 
-//1.一个列表展示（带删除） 2.一个新建列表。3。一个更新歌曲。
-//3.独立模块。1.仅仅一个展示和一个删除逻辑。2.一个添加逻辑，并对2模块进行刷新。
-//以上逻辑和母模板页面没有任何交互。
-
+//功能：展示列表。实现母模板的菜单功能。
 public class ListIndex extends BaseFragment
 {
-    //固定的加载视图的地方,初始和回退都会触发.不明白为什么google要如此设计？
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         return inflater.inflate(R.layout.fragment_list_index, container, false);
     }
-
 
     //一般绑定事件,和处理逻辑的地方.
     @Override
@@ -46,7 +42,14 @@ public class ListIndex extends BaseFragment
         getMaster().setupToolbarMenu(app.bll.List.getMenuTitle(), new MenuHandler());
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        LSContentResolver.progressCheck(getActivity(), requestCode, grantResults, 1, new RequestHandler());
+    }
 
+    //region private functions
     private void setupRecycle()
     {
         java.util.List<List> res=app.bll.List.getAlllList();
@@ -56,12 +59,6 @@ public class ListIndex extends BaseFragment
         mMyControls.mRvList.setLayoutManager(linearLayoutManager);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-    {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        LSContentResolver.progressCheck(getActivity(), requestCode, grantResults, 1, new RequestHandler());
-    }
 
     private void realUpdataLocalSongs()
     {
@@ -70,9 +67,9 @@ public class ListIndex extends BaseFragment
         app.bll.LocalSong.updateSongsFromLocal(localSongs);
         Toast.makeText(getContext(), "更新完毕",Toast.LENGTH_SHORT ).show();
     }
+    //endregion
 
-
-    //region no static class :class's extend.
+    //region recycle's handler
     public class Adapter_listHandler implements Adapter_List.IAdapter_ListHander
     {
         @Override
@@ -101,16 +98,14 @@ public class ListIndex extends BaseFragment
             if(mMyControls.mRvList.getAdapter()!=null)
             {
                 app.model.List theItem = ((Adapter_List) mMyControls.mRvList.getAdapter()).getitem(index);
-                ListDetail fragment= new ListDetail();
-                Bundle bundle=new Bundle();
-                bundle.putInt(ListDetail.argumentname_lid, theItem.L_id);
-                bundle.putString(ListDetail.argumentname_lname, theItem.L_name);
-                fragment.setArguments(bundle);
-                appHelper.startPageWithBack(getFragmentManager(), fragment);
+                ListDetail.StartMe(getFragmentManager(), theItem.L_id, theItem.L_name);
             }
         }
-    }
 
+    }
+    //endregion
+
+    //region menu's  dialog callback handler
     public class popupWindowHander implements Dialog_addlist.Idialogcallback
     {
         @Override
@@ -125,27 +120,31 @@ public class ListIndex extends BaseFragment
             }
         }
     }
+    //endregion
 
+    //region menu's  dialog click handler
     public class MenuHandler implements android.support.v7.widget.Toolbar.OnMenuItemClickListener
     {
         @Override
         public boolean onMenuItemClick(MenuItem menuItem)
         {
-            if(menuItem.getTitle().toString().equals(app.bll.List.menu_addlist))
+            if(LSUI.getToolbarItemKeyID(menuItem).equals(app.bll.List.menu_addlist))
             {
                 //popup window for add list
                 Dialog_addlist dialog_addlist=new Dialog_addlist(getContext(), new popupWindowHander());
                 dialog_addlist.show();
 
             }
-            else if(menuItem.getTitle().toString().equals(app.bll.List.menu_upsong))
+            else if(LSUI.getToolbarItemKeyID(menuItem).equals(app.bll.List.menu_upsong))
             {
                 LSContentResolver.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new RequestHandler());
             }
             return true;
         }
     }
+    //endregion
 
+    //region permisson's handler
     public class RequestHandler implements LSContentResolver.VoidHandler
     {
         @Override
@@ -155,7 +154,6 @@ public class ListIndex extends BaseFragment
         }
     }
     //endregion
-
 
     //region The class of FindControls
     private MyControls mMyControls=null;

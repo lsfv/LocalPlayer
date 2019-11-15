@@ -172,6 +172,7 @@ public class ExampleInstrumentedTest
             assertTrue(song_item.exists());
             song_item.click();
             song_item.click();
+            mDevice.pressBack();
             mDevice.wait(Until.findObjects(By.textStartsWith("noway")),9000);
         }
         catch (UiObjectNotFoundException e)

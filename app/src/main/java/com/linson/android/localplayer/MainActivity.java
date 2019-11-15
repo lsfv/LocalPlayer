@@ -14,8 +14,8 @@ import com.linson.android.localplayer.activities.MasterPage;
 
 import app.lslibrary.androidHelper.LSLog;
 
-//自动生成model。 dbhelper. 测试DBHELPER。 dal.
 
+//功能：初始化全局变量:context.serviceConnection.  并释放全局全局变量（引用了外部对象）
 public class MainActivity extends AppCompatActivity
 {
     public static Context appContext;
@@ -43,13 +43,15 @@ public class MainActivity extends AppCompatActivity
         }
         else
         {
+            //把静态变量(引用了外部对象)先清空掉。以免外部对象无法释放。
+            //服务也解绑和停止。
             app.bll.MusicDB.setDBContext(null);//把引用了自己的静态变量也先清掉。
+            appContext=null;
             unbindService(appServiceConnection);
             stopService(appHelper.getServiceIntent());
             finish();
         }
     }
-
 
     private void startIndex()
     {

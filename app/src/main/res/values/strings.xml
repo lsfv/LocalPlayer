@@ -15,4 +15,5 @@
     <string name="addlist">添加播放列表</string>
     <string name="ok">确定</string>
     <string name="cancel">取消</string>
+    <string name="ActivityDetail_lid">lid</string>
 </resources>
