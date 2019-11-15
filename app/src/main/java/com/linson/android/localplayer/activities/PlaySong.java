@@ -25,27 +25,24 @@ import app.model.PlayerBaseInfo;
 
 public class PlaySong extends BaseFragment implements View.OnClickListener
 {
-    private ConstraintLayout mContent;
-    private ConstraintLayout mBottonMenu;
-    private LSCircleImage mBtnPre;
-    private LSCircleImage mBtnPlay;
-    private LSCircleImage mBtnNext;
+    public static final String argumentLsid = "lid";
+    public static final String argumentindex="index";
 
-    //region  findcontrols and bind click event.
-    private void findControls()
-    {   //findControls
-        mContent = (ConstraintLayout) getMaster().findViewById(R.id.content);
-        mBottonMenu = (ConstraintLayout) getMaster().findViewById(R.id.botton_menu);
-        mBtnPre = (LSCircleImage) getMaster().findViewById(R.id.btn_pre);
-        mBtnPlay = (LSCircleImage) getMaster().findViewById(R.id.btn_play);
-        mBtnNext = (LSCircleImage) getMaster().findViewById(R.id.btn_next);
+    private int mlsid=-1;
+    private int mIndex=-1;
 
-        //set event handler
-        mBtnPre.setOnClickListener(this);
-        mBtnPlay.setOnClickListener(this);
-        mBtnNext.setOnClickListener(this);
+    private List<app.model.V_List_Song> mV_list_songs=new ArrayList<>();
+    private app.model.PlayerBaseInfo mBaseInfo=new PlayerBaseInfo();
+
+    public PlaySong()
+    {
     }
 
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
+        return inflater.inflate(R.layout.fragment_play_song, container, false);
+    }
 
     @Override
     public void onClick(View v)
@@ -73,39 +70,17 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
             }
         }
     }
-    //endregion
-
-    //region other member variable
-    public static final String argumentLsid = "lid";
-    public static final String argumentindex="index";
-
-
-    private int mlsid=-1;
-    private int mIndex=-1;
-
-    private List<app.model.V_List_Song> mV_list_songs=new ArrayList<>();
-    private app.model.PlayerBaseInfo mBaseInfo=new PlayerBaseInfo();
-
-    //endregion
-
-    public PlaySong()
-    {
-    }
-
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
-        return inflater.inflate(R.layout.fragment_play_song, container, false);
-    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        findControls();
+        mMyControls=new MyControls();//cut it into 'onCreate'
+        mMyControls.mBtnNext.setOnClickListener(this);
+        mMyControls.mBtnPlay.setOnClickListener(this);
+        mMyControls.mBtnPre.setOnClickListener(this);
         initMemberVariable();
         getMaster().setupToolbarMenu(app.bll.V_List_Song.getMenuPlayerTitle(), new MenuClickHandler());
-
         mBaseInfo=appHelper.getServiceBaseInfo(MainActivity.appServiceConnection);
         UpdateUi_mode(mBaseInfo);
     }
@@ -148,6 +123,7 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
     {
         if(MainActivity.appServiceConnection!=null && MainActivity.appServiceConnection.mPlayerProxy!=null)
         {
+            LSLog.Log_INFO("pause!!!!!!!!!!!");
             try
             {
                 int res=MainActivity.appServiceConnection.mPlayerProxy.playOrPause();
@@ -189,15 +165,15 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
             IsPlaying=true;
         }
 
-        String imgpath=mBtnPlay.getImage()==R.drawable.video?"play":"pause";
+        String imgpath= mMyControls.mBtnPlay.getImage()==R.drawable.video?"play":"pause";
         LSLog.Log_INFO("server mode IsPlaying:"+IsPlaying+". img:"+imgpath+"."+baseInfo.displayStatus());
-        if(IsPlaying==true && mBtnPlay.getImage()==R.drawable.video)
+        if(IsPlaying==true && mMyControls.mBtnPlay.getImage()==R.drawable.video)
         {
-            mBtnPlay.setImage(R.drawable.pause);
+            mMyControls.mBtnPlay.setImage(R.drawable.pause);
         }
-        else if(IsPlaying==false && mBtnPlay.getImage()==R.drawable.pause)
+        else if(IsPlaying==false && mMyControls.mBtnPlay.getImage()==R.drawable.pause)
         {
-            mBtnPlay.setImage(R.drawable.video);
+            mMyControls.mBtnPlay.setImage(R.drawable.video);
         }
     }
 
@@ -238,6 +214,27 @@ public class PlaySong extends BaseFragment implements View.OnClickListener
                 }
             }
             return true;
+        }
+    }
+    //endregion
+
+    //region The class of FindControls
+    private MyControls mMyControls=null;
+    public class MyControls
+    {
+        private ConstraintLayout mContent;
+        private ConstraintLayout mBottonMenu;
+        private LSCircleImage mBtnPre;
+        private LSCircleImage mBtnPlay;
+        private LSCircleImage mBtnNext;
+
+        public MyControls()
+        {
+            mContent = (ConstraintLayout)  PlaySong.this.getActivity().findViewById(R.id.content);
+            mBottonMenu = (ConstraintLayout) PlaySong.this.getActivity().findViewById(R.id.botton_menu);
+            mBtnPre = (LSCircleImage) PlaySong.this.getActivity().findViewById(R.id.btn_pre);
+            mBtnPlay = (LSCircleImage) PlaySong.this.getActivity().findViewById(R.id.btn_play);
+            mBtnNext = (LSCircleImage) PlaySong.this.getActivity().findViewById(R.id.btn_next);
         }
     }
     //endregion

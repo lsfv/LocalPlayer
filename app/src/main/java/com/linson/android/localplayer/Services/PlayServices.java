@@ -7,7 +7,9 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+
 import com.linson.android.localplayer.AIDL.IPlayer;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
@@ -273,12 +275,15 @@ public class PlayServices extends Service
 
         public void ReasePlayer()
         {
-            if (mMediaPlayer.isPlaying())
+            if (mMediaPlayer!=null && mMediaPlayer.isPlaying())
             {
                 mMediaPlayer.stop();
             }
-            mMediaPlayer.reset();
-            mMediaPlayer.release();
+            if(mMediaPlayer!=null)
+            {
+                mMediaPlayer.reset();
+                mMediaPlayer.release();
+            }
         }
 
         //region onsongOver auto...
@@ -321,4 +326,10 @@ public class PlayServices extends Service
         }
         //endregion
     }
+
+
+
+
+
+
 }

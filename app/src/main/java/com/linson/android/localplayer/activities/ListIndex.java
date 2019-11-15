@@ -28,23 +28,6 @@ import app.model.List;
 
 public class ListIndex extends BaseFragment
 {
-    private RecyclerView mRvList;
-
-    //region  findcontrols and bind click event.
-    private void findControls()
-    {   //findControls
-        if(this.getActivity()!=null)
-        {
-            mRvList = (RecyclerView) this.getActivity().findViewById(R.id.rv_list);
-        }
-    }
-
-    //endregion
-
-    //region other member variable
-    //endregion
-
-
     //固定的加载视图的地方,初始和回退都会触发.不明白为什么google要如此设计？
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -58,7 +41,7 @@ public class ListIndex extends BaseFragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        findControls();
+        mMyControls=new MyControls();//cut it into 'onCreate'
         setupRecycle();
         getMaster().setupToolbarMenu(app.bll.List.getMenuTitle(), new MenuHandler());
     }
@@ -68,9 +51,9 @@ public class ListIndex extends BaseFragment
     {
         java.util.List<List> res=app.bll.List.getAlllList();
         Adapter_List adapter_list=new Adapter_List(res, new Adapter_listHandler());
-        mRvList.setAdapter(adapter_list);
+        mMyControls.mRvList.setAdapter(adapter_list);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this.getContext());
-        mRvList.setLayoutManager(linearLayoutManager);
+        mMyControls.mRvList.setLayoutManager(linearLayoutManager);
     }
 
     @Override
@@ -95,7 +78,7 @@ public class ListIndex extends BaseFragment
         @Override
         public void onClickDelete(int index)
         {
-            RecyclerView.Adapter adapter = mRvList.getAdapter();
+            RecyclerView.Adapter adapter = mMyControls.mRvList.getAdapter();
             if (adapter instanceof Adapter_List)
             {
                 Adapter_List adapter_list = (Adapter_List) adapter;
@@ -115,9 +98,9 @@ public class ListIndex extends BaseFragment
         @Override
         public void onClickItem(int index)
         {
-            if(mRvList.getAdapter()!=null)
+            if(mMyControls.mRvList.getAdapter()!=null)
             {
-                app.model.List theItem = ((Adapter_List) mRvList.getAdapter()).getitem(index);
+                app.model.List theItem = ((Adapter_List) mMyControls.mRvList.getAdapter()).getitem(index);
                 ListDetail fragment= new ListDetail();
                 Bundle bundle=new Bundle();
                 bundle.putInt(ListDetail.argumentname_lid, theItem.L_id);
@@ -125,7 +108,6 @@ public class ListIndex extends BaseFragment
                 fragment.setArguments(bundle);
                 appHelper.startPageWithBack(getFragmentManager(), fragment);
             }
-
         }
     }
 
@@ -134,12 +116,12 @@ public class ListIndex extends BaseFragment
         @Override
         public void submit(String name)
         {
-            if(name!=null && name.trim().length()!=0 && mRvList.getAdapter()!=null)
+            if(name!=null && name.trim().length()!=0 && mMyControls.mRvList.getAdapter()!=null)
             {
                 app.model.List temp = new List(name, "info", "pic", "ps");
                 int id = app.bll.List.add(temp);
                 temp = app.bll.List.getModel(id);
-                ((Adapter_List) mRvList.getAdapter()).addItem(temp);
+                ((Adapter_List) mMyControls.mRvList.getAdapter()).addItem(temp);
             }
         }
     }
@@ -174,7 +156,17 @@ public class ListIndex extends BaseFragment
     }
     //endregion
 
-    //region static class : class's helper
 
+    //region The class of FindControls
+    private MyControls mMyControls=null;
+    public class MyControls
+    {
+        private RecyclerView mRvList;
+
+        public MyControls()
+        {
+            mRvList = (RecyclerView)ListIndex.this.getActivity().findViewById(R.id.rv_list);
+        }
+    }
     //endregion
 }
