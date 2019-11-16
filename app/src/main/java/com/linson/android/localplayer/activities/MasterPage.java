@@ -1,7 +1,5 @@
 package com.linson.android.localplayer.activities;
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -10,29 +8,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.appHelper;
-
-import app.lslibrary.androidHelper.LSActivity;
 import app.lslibrary.androidHelper.LSUI;
 
-//!todo 3 codereview！ 4.panel 5.autoupdate.
-//!todo viewpager 1，参数页。2分部门页都有后续页。
-//!todo 2.code review 3.allsong.4.panel 5.autoupdate.
-//!todo 无法触发服务sub代理的释放.android 一般也是不完全关闭app的。所以我这里是保证服务停止播放，最多释放播放器而已。
+
+//!todo  4.panel 5.autoupdate.自动更新。
+//!todo 界面更新的逻辑，根据编码的原则和2个方案的有缺点，决定还是server主动的才广播。否则还是用耦合度高的一个动作更新2个子界面的方式处理。最后考虑mvvm的方式。
+//!todo 无法触发服务sub代理的释放.android 一般也是不完全关闭app的。所以我这里是保证服务停止播放，最多释放播放器而已。单元测试好像会提示哪个activity没有释放。
 //!todo 还是需要自带的常用所有控件都过一遍。是否需要建立一个歌词服务器?
-//!todo 1，还有一个不是很完善的地方：if(fragment instanceof ISetupMaster)。 没有强制的要求接口。
-//!todo 更新歌单，可能需要一个更低耗的方法。
-//!todo 左侧菜单栏目没有清空回退的功能。
 //!todo savedInstanceState 实际工程使用范例.
 //!todo 还是需要一个模板啊。比如adapter 的大致样子都是差不多的。
-//!todo 界面更新的逻辑，根据编码的原则和2个方案的有缺点，决定还是server主动的才广播。否则还是用耦合度高的一个动作更新2个子界面的方式处理。
-//!todo 需要模板生成器。
-//!todo getMenuTitle 并没有保证会加入所有菜单。
 //!todo public ListDetail(int a) 什么时候fragment需要从建立开始恢复？ 导致得到参数必须是通过argumentbundle。
 //!TODO 内存泄漏要注意静态变量和单例模式.单例对象在初始化后将在 JVM 的整个生命周期中存在（以静态变量的方式），如果单例对象持有外部的引用，那么这个外部对象在程序关闭之前都不能被回收。
 
