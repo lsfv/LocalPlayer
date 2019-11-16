@@ -10,11 +10,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+
+import com.linson.android.localplayer.CustomUI.PlayPanel;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.appHelper;
 import app.lslibrary.androidHelper.LSUI;
-
-
 //!todo  4.panel 5.autoupdate.自动更新。
 //!todo 界面更新的逻辑，根据编码的原则和2个方案的有缺点，决定还是server主动的才广播。否则还是用耦合度高的一个动作更新2个子界面的方式处理。最后考虑mvvm的方式。
 //!todo 无法触发服务sub代理的释放.android 一般也是不完全关闭app的。所以我这里是保证服务停止播放，最多释放播放器而已。单元测试好像会提示哪个activity没有释放。
@@ -101,26 +101,33 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
     {
         LSUI.setupToolbarMenu(mMyControls.mToolbar, menus, handler);
     }
+
+    public void onBaseinfoChange()
+    {
+        mMyControls.mPlaypanel.setupUI();
+    }
     //endregion
 
     //region The class of FindControls
-        private MyControls mMyControls=null;
-        public class MyControls
-        {
-            private DrawerLayout mDrawerMainMenu;
-            private Toolbar mToolbar;
-            private Button mBtnBack;
-            private ConstraintLayout mMainFragment;
-            private Button mBtnPage1;
+    private MyControls mMyControls=null;
+    public class MyControls
+    {
+        private DrawerLayout mDrawerMainMenu;
+        private Toolbar mToolbar;
+        private Button mBtnBack;
+        private ConstraintLayout mMainFragment;
+        private Button mBtnPage1;
+        private PlayPanel mPlaypanel;
 
-            public MyControls()
-            {
-                mDrawerMainMenu = (DrawerLayout) findViewById(R.id.drawerMainMenu);
-                mToolbar = (Toolbar) findViewById(R.id.toolbar);
-                mBtnBack = (Button) findViewById(R.id.btn_back);
-                mMainFragment = (ConstraintLayout) findViewById(R.id.mainFragment);
-                mBtnPage1 = (Button) findViewById(R.id.btn_page1);
-            }
+        public MyControls()
+        {
+            mDrawerMainMenu = (DrawerLayout) findViewById(R.id.drawerMainMenu);
+            mToolbar = (Toolbar) findViewById(R.id.toolbar);
+            mBtnBack = (Button) findViewById(R.id.btn_back);
+            mMainFragment = (ConstraintLayout) findViewById(R.id.mainFragment);
+            mBtnPage1 = (Button) findViewById(R.id.btn_page1);
+            mPlaypanel = (PlayPanel) findViewById(R.id.playpanel);
         }
+    }
     //endregion
 }

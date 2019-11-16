@@ -121,6 +121,7 @@ public class ListDetail extends BaseFragment
                         {
                             MainActivity.appServiceConnection.mPlayerProxy.playSong(lid, index);
                             ((Adapter_Songs) ((Adapter_Songs) mMyControls.mRvSonglist.getAdapter())).showImagePlaying(index);
+                            getMaster().onBaseinfoChange();
                         }
                     }
                     else
