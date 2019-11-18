@@ -15,26 +15,39 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-
+//对于非常简单的布局，需要2中不同风格，还是可以复用下adapter的。稍微复杂一点还是分开。基本上如果2种风格，稍有不慎，以后就会发展为2种布局，而不单单是2种风格。那么要一个
+//adapter来满足2个布局。方法就冗余，杂乱的太多了。很多不能服用。
 public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHolder>
 {
     private List<app.model.V_List_Song> msongs=new LinkedList<>();
     private IItemHander mHander;
     private int mPlayingIndex;
+    private int mlayout=0;
 
-    public Adapter_Songs(@NonNull List<app.model.V_List_Song> songs,@NonNull IItemHander hander,int playingIndex)
+
+    public Adapter_Songs(@NonNull List<app.model.V_List_Song> songs,@NonNull IItemHander hander,int playingIndex,int layouttype)
     {
         msongs=songs;
         mHander=hander;
         mPlayingIndex=playingIndex;
+        mlayout=layouttype;
     }
+
 
     @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i)
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup,int i)
     {
-        View view=LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_onetextview, viewGroup, false);
-        return new MyViewHolder(view);
+        if(mlayout==0)
+        {
+            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_onetextview, viewGroup, false);
+            return new MyViewHolder(view);
+        }
+        else
+        {
+            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_onetextviewsmall, viewGroup, false);
+            return new MyViewHolder(view);
+        }
     }
 
 
@@ -84,6 +97,7 @@ public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHold
         this.notifyDataSetChanged();
     }
 
+
     public void showImagePlaying(int playingIndex)
     {
         mPlayingIndex=playingIndex;
@@ -107,9 +121,9 @@ public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHold
         }
     }
 
+
     public interface IItemHander
     {
         void onClick(int ls_id,int index);
     }
-
 }

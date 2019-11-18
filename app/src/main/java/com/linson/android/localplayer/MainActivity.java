@@ -46,9 +46,11 @@ public class MainActivity extends AppCompatActivity
             //把静态变量(引用了外部对象)先清空掉。以免外部对象无法释放。
             //服务也解绑和停止。
             app.bll.MusicDB.setDBContext(null);//把引用了自己的静态变量也先清掉。
-            appContext=null;
             unbindService(appServiceConnection);
             stopService(appHelper.getServiceIntent());
+
+            appContext=null;
+            appServiceConnection=null;
             finish();
         }
     }

@@ -16,16 +16,19 @@ public class PlayerBaseInfo implements Parcelable
     public static final int lid_empty=-1;
     public static final int index_empty=-1;
 
-    public static final int playModel_singleRepeat=1;
-    public static final int playModel_single=2;
-    public static final int playModel_all=3;
-    public static final int playModel_random=4;
+    public static final int playModel_singleRepeat=0;
+    public static final int playModel_single=1;
+    public static final int playModel_all=2;
+    public static final int playModel_random=3;
+
+    public static String[] playmodestr={"播放一首","单曲循环","随机","顺序全部"};
 
     public static final int status_init=-1;
     public static final int status_playing=1;
     public static final int status_pause=0;
     public static final int status_error_nofile=-2;
     public static final int status_error_other=-3;
+
 
     public PlayerBaseInfo()
     {
@@ -53,27 +56,7 @@ public class PlayerBaseInfo implements Parcelable
 
     public String getModeName()
     {
-        String res="";
-        switch (playMode)
-        {
-            case playModel_single:
-            {
-                res="播放一首";break;
-            }
-            case playModel_singleRepeat:
-            {
-                res="单曲循环";break;
-            }
-            case playModel_random:
-            {
-                res="随机播放";break;
-            }
-            case playModel_all:
-            {
-                res="顺序全部";break;
-            }
-        }
-        return res;
+        return playmodestr[playMode];
     }
 
     public static final Creator<PlayerBaseInfo> CREATOR = new Creator<PlayerBaseInfo>()

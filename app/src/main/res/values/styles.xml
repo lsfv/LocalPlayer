@@ -8,4 +8,18 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!--最简洁的全屏，只需要这个样式，代码不需要任何改动-->
+    <style name="Fullscreen">
+        <item name="android:windowFullscreen">true</item>
+        <!--window是页面最底层，必须透明，之后页面本身也需要透明，并且设置允许玻璃模糊，并设置模糊比例，系统默认0.5,这样的话，必须设置要显示的部分的group为一个颜色，才不会透明。-->
+
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.5</item>
+
+        <!--唯一的问题就是这个设置无效，但是后退键可以。实在需要，可以设置一个透明textview来触发点击关闭事件-->
+        <item name="android:windowCloseOnTouchOutside">true</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
 </resources>

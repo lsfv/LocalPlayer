@@ -11,6 +11,8 @@ import android.widget.TextView;
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.Services.PlayServices;
+import com.linson.android.localplayer.activities.Adapter.Adapter_Songs;
+import com.linson.android.localplayer.activities.Dialog.Dialog_panelmenu;
 import com.linson.android.localplayer.appHelper;
 
 import java.util.List;
@@ -25,15 +27,37 @@ import app.model.V_List_Song;
 //1.布局页。2.测试初始和加载后，动作都必须合理。3.观察者的实现。
 public class PlayPanel extends ConstraintLayout implements View.OnClickListener
 {
+    private Context mContext;
+
     public PlayPanel(Context context, AttributeSet attrs)
     {
         super(context, attrs);
+        mContext=context;
         LayoutInflater.from(context).inflate(R.layout.custom_panel, this, true);
         mMyControls=new MyControls();//cut it into 'onCreate'
         setupUI();
         mMyControls.mPanelGroup.setOnTouchListener(new GroupTouchListener());
-
         mMyControls.mIconPlay.setOnClickListener(this);
+        mMyControls.mIconMenu.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        if (v.getId() == R.id.icon_play)
+        {
+            ClickPlay();
+        }
+        else if(v.getId()==R.id.icon_menu)
+        {
+            clickMenu();
+        }
+    }
+
+    private void clickMenu()
+    {
+        Dialog_panelmenu dialog_panelmenu=new Dialog_panelmenu(mContext);
+        dialog_panelmenu.show();
     }
 
     public  void setupUI()
@@ -73,25 +97,20 @@ public class PlayPanel extends ConstraintLayout implements View.OnClickListener
         }
     }
 
-    @Override
-    public void onClick(View v)
+    private void ClickPlay()
     {
-        if (v.getId() == R.id.icon_play)
+        if (MainActivity.appServiceConnection != null && MainActivity.appServiceConnection.mPlayerProxy != null)
         {
-            if (MainActivity.appServiceConnection != null && MainActivity.appServiceConnection.mPlayerProxy != null)
+            try
             {
-                try
-                {
-                    MainActivity.appServiceConnection.mPlayerProxy.playOrPause();
-                    setupUI();
-                } catch (Exception e)
-                {
-                    LSLog.Log_Exception(e);
-                }
+                MainActivity.appServiceConnection.mPlayerProxy.playOrPause();
+                setupUI();
+            } catch (Exception e)
+            {
+                LSLog.Log_Exception(e);
             }
         }
     }
-
 
     //region groupTouch
     public class GroupTouchListener implements OnTouchListener

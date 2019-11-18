@@ -96,7 +96,7 @@ public class ListDetail extends BaseFragment
             playingIndex=baseInfo.index;
         }
 
-        Adapter_Songs adapter_songs=new Adapter_Songs(res,new RecycleHandler(),playingIndex);
+        Adapter_Songs adapter_songs=new Adapter_Songs(res,new RecycleHandler(),playingIndex,0);
         mMyControls.mRvSonglist.setAdapter(adapter_songs);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getContext());
         mMyControls.mRvSonglist.setLayoutManager(linearLayoutManager);
