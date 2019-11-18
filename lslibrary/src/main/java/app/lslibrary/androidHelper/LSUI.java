@@ -68,13 +68,16 @@ public abstract class LSUI
     {
         toolbar.setOnMenuItemClickListener(handler);
         toolbar.getMenu().clear();
-        for(int i=0;i<menus.size();i++)
+        if(menus!=null)
         {
-            MenuItem tempitem= toolbar.getMenu().add(menus.get(i));
-            Intent tempIntent=new Intent();
-            tempIntent.putExtra(TOOLBARITEMVARIABLENAME, menus.get(i));
-            tempitem.setIntent(tempIntent);
-            tempitem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            for (int i = 0; i < menus.size(); i++)
+            {
+                MenuItem tempitem = toolbar.getMenu().add(menus.get(i));
+                Intent tempIntent = new Intent();
+                tempIntent.putExtra(TOOLBARITEMVARIABLENAME, menus.get(i));
+                tempitem.setIntent(tempIntent);
+                tempitem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            }
         }
     }
 

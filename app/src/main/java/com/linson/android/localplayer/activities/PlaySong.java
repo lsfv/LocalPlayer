@@ -59,6 +59,7 @@ public class PlaySong extends BaseFragment
         super.onActivityCreated(savedInstanceState);
         mMyControls=new MyControls();//cut it into 'onCreate'
         initParameter();
+        getMaster().setupToolbarMenu(null, null);
     }
 
     //region private funcions

@@ -15,8 +15,8 @@ import com.linson.android.localplayer.CustomUI.PlayPanel;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.appHelper;
 import app.lslibrary.androidHelper.LSUI;
-//!todo  4.panel 5.autoupdate.自动更新。 services 的广播。
-//!todo fullscreen dialog.
+//!todo 5.autoupdate.自动更新。 services 的广播。
+//!todo fullscreen dialog 的提起。
 //!todo 界面更新的逻辑，根据编码的原则和2个方案的有缺点，决定还是server主动的才广播。否则还是用耦合度高的一个动作更新2个子界面的方式处理。最后考虑mvvm的方式。
 //!todo 无法触发服务sub代理的释放.android 一般也是不完全关闭app的。所以我这里是保证服务停止播放，最多释放播放器而已。单元测试好像会提示哪个activity没有释放。
 //!todo 还是需要自带的常用所有控件都过一遍。是否需要建立一个歌词服务器?
