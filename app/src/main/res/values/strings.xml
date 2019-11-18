@@ -17,4 +17,6 @@
     <string name="cancel">取消</string>
     <string name="ActivityDetail_lid">lid</string>
     <string name="playmode">播放模式</string>
+    <string name="error">error</string>
+    <string name="nofile">no file</string>
 </resources>

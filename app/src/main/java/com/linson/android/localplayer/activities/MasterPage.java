@@ -1,7 +1,6 @@
 package com.linson.android.localplayer.activities;
 
 import android.Manifest;
-import android.content.Context;
 import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Handler;

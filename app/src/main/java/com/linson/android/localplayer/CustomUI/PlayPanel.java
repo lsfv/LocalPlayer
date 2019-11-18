@@ -10,8 +10,6 @@ import android.widget.TextView;
 
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
-import com.linson.android.localplayer.Services.PlayServices;
-import com.linson.android.localplayer.activities.Adapter.Adapter_Songs;
 import com.linson.android.localplayer.activities.Dialog.Dialog_panelmenu;
 import com.linson.android.localplayer.appHelper;
 
@@ -86,12 +84,12 @@ public class PlayPanel extends ConstraintLayout implements View.OnClickListener
             }
             else if(info.status==PlayerBaseInfo.status_error_other)
             {
-                mMyControls.mTvSongname.setText("error");
+                mMyControls.mTvSongname.setText(mContext.getString(R.string.error));
                 mMyControls.mIconPlay.setImage(R.drawable.play);
             }
             else if(info.status==PlayerBaseInfo.status_error_nofile)
             {
-                mMyControls.mTvSongname.setText("no file");
+                mMyControls.mTvSongname.setText(mContext.getString(R.string.nofile));
                 mMyControls.mIconPlay.setImage(R.drawable.play);
             }
         }

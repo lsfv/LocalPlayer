@@ -1,32 +1,20 @@
 package com.linson.android.localplayer.activities;
 
 import android.annotation.SuppressLint;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import com.linson.android.localplayer.MainActivity;
-import com.linson.android.localplayer.R;
-import com.linson.android.localplayer.activities.Dialog.Dialog_Volume;
-import com.linson.android.localplayer.appHelper;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
-import app.bll.V_List_Song;
+import com.linson.android.localplayer.R;
+import com.linson.android.localplayer.appHelper;
+
 import app.lslibrary.androidHelper.LSLog;
-import app.lslibrary.androidHelper.LSSystemServices;
-import app.lslibrary.androidHelper.LSUI;
-import app.lslibrary.customUI.LSCircleImage;
-import app.model.PlayerBaseInfo;
 
 //功能：1.显示播放歌曲的信息。2。实现基本操作面板。3实现菜单功能。
 public class PlaySong extends BaseFragment
