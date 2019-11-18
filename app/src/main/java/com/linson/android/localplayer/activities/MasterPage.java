@@ -1,5 +1,11 @@
 package com.linson.android.localplayer.activities;
 
+import android.Manifest;
+import android.content.Context;
+import android.database.ContentObserver;
+import android.net.Uri;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,6 +20,9 @@ import android.widget.Button;
 import com.linson.android.localplayer.CustomUI.PlayPanel;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.appHelper;
+
+import app.lslibrary.androidHelper.LSContentResolver;
+import app.lslibrary.androidHelper.LSLog;
 import app.lslibrary.androidHelper.LSUI;
 //!todo 5.autoupdate.自动更新。 services 的广播。
 //!todo fullscreen dialog 的提起。
@@ -25,6 +34,7 @@ import app.lslibrary.androidHelper.LSUI;
 //!todo public ListDetail(int a) 什么时候fragment需要从建立开始恢复？ 导致得到参数必须是通过argumentbundle。
 //!TODO 内存泄漏要注意静态变量和单例模式.单例对象在初始化后将在 JVM 的整个生命周期中存在（以静态变量的方式），如果单例对象持有外部的引用，那么这个外部对象在程序关闭之前都不能被回收。
 
+//!todo autoUpdate:启动app。检查一次。 监听媒体数据库的变化。
 
 //功能:母模板实现大框架功能。并提供public方法让fragment访问。
 public class MasterPage extends AppCompatActivity implements View.OnClickListener
@@ -41,6 +51,8 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
         controlsEvent();
         setupDrawerMenu();//2.配置左侧滑动菜单
         CleanStackAndReplaceFragment(new ListIndex());//3.加载首页
+        LSContentResolver.checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new appHelper.UpdateDB_Songs());//4.自动跟新歌曲
+        this.getContentResolver().registerContentObserver(LSContentResolver.uri_audio_external, false, new MyAudioObserver(null));//5.监听歌曲变化
     }
 
     @Override
@@ -64,6 +76,34 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
             default: { break; }
         }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        LSContentResolver.progressCheck(this, requestCode, grantResults, 1, new appHelper.UpdateDB_Songs());
+    }
+
+    //region audio's observer
+    public class MyAudioObserver extends ContentObserver
+    {
+        public MyAudioObserver(Handler handler)
+        {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri)
+        {
+            super.onChange(selfChange, uri);
+            LSLog.Log_INFO();
+            if(uri.equals(LSContentResolver.uri_audio_external))
+            {
+                LSContentResolver.checkPermission(MasterPage.this, Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new appHelper.UpdateDB_Songs());
+            }
+        }
+    }
+    //endregion
 
     //region private function
     private void controlsEvent()

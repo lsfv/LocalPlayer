@@ -6,10 +6,12 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Handler;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
@@ -22,6 +24,7 @@ import java.util.List;
 public class LSContentResolver
 {
     private Context mContext;
+    public static final Uri uri_audio_external=MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
     public LSContentResolver(Context context)
     {
@@ -33,14 +36,13 @@ public class LSContentResolver
     {
         List<SongInfo> res=new ArrayList<>();
         ContentResolver contentResolver=mContext.getContentResolver();
-        Uri uri= MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         StringBuffer searchsql=new StringBuffer();
         searchsql.append(" 1=1 ");
         searchsql.append(" and " +MediaStore.Audio.Media.DURATION+" > " +duration);
         searchsql.append(" and " +MediaStore.Audio.Media.DURATION+" < 1000*60*20");//应该要小于20分钟，要不太占内存。
         String[] paras={MediaStore.Audio.Media._ID,MediaStore.Audio.Media.TITLE,MediaStore.Audio.Media.ARTIST,MediaStore.Audio.Media.DATA,MediaStore.Audio.Media.DURATION};
 
-        Cursor cursor = contentResolver.query(uri, paras, searchsql.toString(), null, "");
+        Cursor cursor = contentResolver.query(uri_audio_external, paras, searchsql.toString(), null, "");
 
         if(cursor.moveToFirst())
         {
@@ -151,7 +153,7 @@ public class LSContentResolver
         }
         else
         {
-            ActivityCompat.requestPermissions(context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, requestcode);
+            ActivityCompat.requestPermissions(context, new String[]{permission}, requestcode);
         }
     }
     public static void progressCheck(Activity context,int requestCode_iget,int[] grantResults,int requestCode_iset,VoidHandler voidHandler)
@@ -165,7 +167,24 @@ public class LSContentResolver
         }
         else
         {
-            Toast.makeText(context, "you deny permissions.", Toast.LENGTH_SHORT).show();
+            LSLog.Log_INFO("you deny permissions.");
+            //Toast.makeText(context, "you deny permissions.", Toast.LENGTH_SHORT).show();
+        }
+    }
+    //endregion
+
+    //region music observer
+    public class SongFileObserver extends ContentObserver
+    {
+        public SongFileObserver(Handler handler)
+        {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(boolean selfChange)
+        {
+            super.onChange(selfChange);
         }
     }
     //endregion

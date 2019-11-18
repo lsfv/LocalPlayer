@@ -46,12 +46,10 @@ public abstract class List
 
 
     //extend
-    public static String menu_upsong="更新歌曲";
     public static String menu_addlist="添加列表";
     public static java.util.List<String> getMenuTitle()
     {
         java.util.List<String> res=new LinkedList<>();
-        res.add(menu_upsong);
         res.add(menu_addlist);
         return res;
     }

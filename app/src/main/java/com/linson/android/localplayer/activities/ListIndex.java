@@ -19,6 +19,7 @@ import com.linson.android.localplayer.activities.Dialog.Dialog_addlist;
 import com.linson.android.localplayer.appHelper;
 
 import app.lslibrary.androidHelper.LSContentResolver;
+import app.lslibrary.androidHelper.LSLog;
 import app.lslibrary.androidHelper.LSUI;
 import app.model.List;
 
@@ -42,13 +43,6 @@ public class ListIndex extends BaseFragment
         getMaster().setupToolbarMenu(app.bll.List.getMenuTitle(), new MenuHandler());
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-    {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        LSContentResolver.progressCheck(getActivity(), requestCode, grantResults, 1, new RequestHandler());
-    }
-
     //region private functions
     private void setupRecycle()
     {
@@ -57,15 +51,6 @@ public class ListIndex extends BaseFragment
         mMyControls.mRvList.setAdapter(adapter_list);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this.getContext());
         mMyControls.mRvList.setLayoutManager(linearLayoutManager);
-    }
-
-
-    private void realUpdataLocalSongs()
-    {
-        LSContentResolver lsContentResolver=new LSContentResolver(MainActivity.appContext);
-        java.util.List<LSContentResolver.SongInfo> localSongs= lsContentResolver.SearchSong(60*1000);
-        app.bll.LocalSong.updateSongsFromLocal(localSongs);
-        Toast.makeText(getContext(), "更新完毕",Toast.LENGTH_SHORT ).show();
     }
     //endregion
 
@@ -122,7 +107,7 @@ public class ListIndex extends BaseFragment
     }
     //endregion
 
-    //region menu's  dialog click handler
+    //region menu's  click handler
     public class MenuHandler implements android.support.v7.widget.Toolbar.OnMenuItemClickListener
     {
         @Override
@@ -133,24 +118,8 @@ public class ListIndex extends BaseFragment
                 //popup window for add list
                 Dialog_addlist dialog_addlist=new Dialog_addlist(getContext(), new popupWindowHander());
                 dialog_addlist.show();
-
-            }
-            else if(LSUI.getToolbarItemKeyID(menuItem).equals(app.bll.List.menu_upsong))
-            {
-                LSContentResolver.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new RequestHandler());
             }
             return true;
-        }
-    }
-    //endregion
-
-    //region permisson's handler
-    public class RequestHandler implements LSContentResolver.VoidHandler
-    {
-        @Override
-        public void doit()
-        {
-            realUpdataLocalSongs();
         }
     }
     //endregion

@@ -7,6 +7,10 @@ import com.amitshekhar.DebugDB;
 public class LSLog
 {
     public static String LOGTAG="MYCUSTOM~!@";
+    public static void Log_INFO()
+    {
+        Log.i(LOGTAG, getAutoJumpLogInfos());
+    }
     public static void Log_INFO(String msg)
     {
         Log.i(LOGTAG, getAutoJumpLogInfos()+" : "+msg);
