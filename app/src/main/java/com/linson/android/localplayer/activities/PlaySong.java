@@ -37,7 +37,6 @@ public class PlaySong extends BaseFragment
     private int mlsid=-1;
     private int mIndex=-1;
 
-
     public static void StartMe(FragmentManager fragmentManager, int lid, int index)
     {
         Fragment fragment=new PlaySong();
@@ -53,8 +52,6 @@ public class PlaySong extends BaseFragment
     {
         return inflater.inflate(R.layout.fragment_play_song, container, false);
     }
-
-
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
