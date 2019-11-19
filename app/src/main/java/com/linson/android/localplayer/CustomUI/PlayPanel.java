@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Dialog.Dialog_panelmenu;
-import com.linson.android.localplayer.appHelper;
+import com.linson.android.localplayer.appHelper.Common;
 
 import java.util.List;
 
@@ -20,6 +20,8 @@ import app.lslibrary.androidHelper.LSTouch;
 import app.lslibrary.customUI.LSCircleImage;
 import app.model.PlayerBaseInfo;
 import app.model.V_List_Song;
+
+import static com.linson.android.localplayer.appHelper.PlayerBaseInfo.*;
 
 //功能 。1连接server。展示信息。2提供 播放，暂停。 上下首。 音量，模式等功能。3.并提供订阅者模式。转给master。master作为中转的观察者。
 //1.布局页。2.测试初始和加载后，动作都必须合理。3.观察者的实现。
@@ -60,7 +62,7 @@ public class PlayPanel extends ConstraintLayout implements View.OnClickListener
 
     public  void setupUI()
     {
-        PlayerBaseInfo info= appHelper.PlayerBaseInfo.getServiceBaseInfo(MainActivity.appServiceConnection);
+        PlayerBaseInfo info= getServiceBaseInfo(MainActivity.appServiceConnection);
         if(info!=null)
         {
             if(info.status==PlayerBaseInfo.status_init)

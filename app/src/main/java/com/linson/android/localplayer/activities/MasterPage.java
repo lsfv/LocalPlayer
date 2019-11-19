@@ -18,7 +18,7 @@ import android.widget.Button;
 
 import com.linson.android.localplayer.CustomUI.PlayPanel;
 import com.linson.android.localplayer.R;
-import com.linson.android.localplayer.appHelper;
+import com.linson.android.localplayer.appHelper.Common;
 
 import app.lslibrary.androidHelper.LSContentResolver;
 import app.lslibrary.androidHelper.LSLog;
@@ -49,7 +49,7 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
         controlsEvent();
         setupDrawerMenu();//2.配置左侧滑动菜单
         CleanStackAndReplaceFragment(new ListIndex());//3.加载首页
-        LSContentResolver.checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new appHelper.UpdateDB_Songs());//4.自动跟新歌曲
+        LSContentResolver.checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new Common.UpdateDB_Songs());//4.自动跟新歌曲
         this.getContentResolver().registerContentObserver(LSContentResolver.uri_audio_external, false, new MyAudioObserver(null));//5.监听歌曲变化
     }
 
@@ -79,7 +79,7 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        LSContentResolver.progressCheck(this, requestCode, grantResults, 1, new appHelper.UpdateDB_Songs());
+        LSContentResolver.progressCheck(this, requestCode, grantResults, 1, new Common.UpdateDB_Songs());
     }
 
     //region audio's observer
@@ -97,7 +97,7 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
             LSLog.Log_INFO();
             if(uri.equals(LSContentResolver.uri_audio_external))
             {
-                LSContentResolver.checkPermission(MasterPage.this, Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new appHelper.UpdateDB_Songs());
+                LSContentResolver.checkPermission(MasterPage.this, Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new Common.UpdateDB_Songs());
             }
         }
     }
@@ -126,7 +126,7 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
     private void CleanStackAndReplaceFragment(Fragment fragment)
     {
         getSupportFragmentManager().popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        appHelper.startPageNoBack(getSupportFragmentManager(), fragment);
+        Common.startPageNoBack(getSupportFragmentManager(), fragment);
     }
     //endregion
 

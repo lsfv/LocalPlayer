@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.linson.android.localplayer.R;
-import com.linson.android.localplayer.appHelper;
+import com.linson.android.localplayer.appHelper.Common;
 
 import app.lslibrary.androidHelper.LSLog;
 
@@ -32,7 +32,7 @@ public class PlaySong extends BaseFragment
         bundle.putInt(PlaySong.argumentLsid, lid);
         bundle.putInt(PlaySong.argumentindex, index);
         fragment.setArguments(bundle);
-        appHelper.startPageWithBack(fragmentManager,fragment);
+        Common.startPageWithBack(fragmentManager,fragment);
     }
 
     @Override

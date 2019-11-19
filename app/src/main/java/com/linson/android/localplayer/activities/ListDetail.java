@@ -19,7 +19,7 @@ import android.widget.Toast;
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Adapter.Adapter_Songs;
-import com.linson.android.localplayer.appHelper;
+import com.linson.android.localplayer.appHelper.Common;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +29,15 @@ import app.lslibrary.androidHelper.LSLog;
 import app.lslibrary.androidHelper.LSUI;
 import app.model.PlayerBaseInfo;
 
+import static com.linson.android.localplayer.appHelper.PlayerBaseInfo.getServiceBaseInfo;
+
 //功能。1获得参数。2初始化列表。3实现菜单功能。 通过内部类对activity顶级类功能的划分，发挥了内部类的分担职责的职能。
 public class ListDetail extends BaseFragment
 {
     public static final String STRLID="lid";
     public static final String STRLNAME="LNAME";
 
-    private int mListID=appHelper.defaultListID;
+    private int mListID=Common.defaultListID;
     private String mListName="";
 
     public static void StartMe(FragmentManager fragmentManager, int lid,String lname)
@@ -45,7 +47,7 @@ public class ListDetail extends BaseFragment
         bundle.putInt(STRLID, lid);
         bundle.putString(STRLNAME, lname);
         fragment.setArguments(bundle);
-        appHelper.startPageWithBack(fragmentManager, fragment);
+        Common.startPageWithBack(fragmentManager, fragment);
     }
 
     @Override
@@ -88,7 +90,7 @@ public class ListDetail extends BaseFragment
         }
 
         int playingIndex=-1;
-        PlayerBaseInfo baseInfo=appHelper.PlayerBaseInfo.getServiceBaseInfo(MainActivity.appServiceConnection);
+        PlayerBaseInfo baseInfo=getServiceBaseInfo(MainActivity.appServiceConnection);
         if(baseInfo!=null && baseInfo.lid==mListID)
         {
             playingIndex=baseInfo.index;
@@ -147,7 +149,7 @@ public class ListDetail extends BaseFragment
                 if(mListID>1 && getActivity()!=null)
                 {
 
-                    List<app.model.V_List_Song> allSongs = app.bll.V_List_Song.getModelByLid(appHelper.defaultListID);
+                    List<app.model.V_List_Song> allSongs = app.bll.V_List_Song.getModelByLid(Common.defaultListID);
                     List<app.model.V_List_Song> mySongs = ((Adapter_Songs) mMyControls.mRvSonglist.getAdapter()).getCloneData();
                     mySongs = mySongs == null ? new ArrayList<app.model.V_List_Song>() : mySongs;
                     CharSequence[] nameList = app.bll.V_List_Song.getNameList(allSongs);

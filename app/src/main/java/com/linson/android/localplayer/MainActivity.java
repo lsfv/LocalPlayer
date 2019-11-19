@@ -11,6 +11,7 @@ import android.os.Bundle;
 
 import com.linson.android.localplayer.AIDL.IPlayer;
 import com.linson.android.localplayer.activities.MasterPage;
+import com.linson.android.localplayer.appHelper.Common;
 
 import app.lslibrary.androidHelper.LSLog;
 
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity
             //服务也解绑和停止。
             app.bll.MusicDB.setDBContext(null);//把引用了自己的静态变量也先清掉。
             unbindService(appServiceConnection);
-            stopService(appHelper.getServiceIntent());
+            stopService(Common.getServiceIntent());
 
             appContext=null;
             appServiceConnection=null;
@@ -70,9 +71,9 @@ public class MainActivity extends AppCompatActivity
     //start and test services
     private boolean StartServicesabc()
     {
-        startService(appHelper.getServiceIntent());
+        startService(Common.getServiceIntent());
         appServiceConnection=new MyConnection();
-        bindService(appHelper.getServiceIntent(), appServiceConnection, Context.BIND_AUTO_CREATE);
+        bindService(Common.getServiceIntent(), appServiceConnection, Context.BIND_AUTO_CREATE);
 
         return true;
     }

@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Adapter.Adapter_Songs;
-import com.linson.android.localplayer.appHelper;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,6 +24,8 @@ import app.lslibrary.androidHelper.LSSystemServices;
 import app.lslibrary.customUI.Adapter.Adapter_RadioButton;
 import app.model.PlayerBaseInfo;
 import app.model.V_List_Song;
+
+import static com.linson.android.localplayer.appHelper.PlayerBaseInfo.getServiceBaseInfo;
 
 public class Dialog_panelmenu extends Dialog
 {
@@ -59,7 +61,7 @@ public class Dialog_panelmenu extends Dialog
     //region private funtion
     private void setupSongsList()
     {
-        PlayerBaseInfo baseInfo=appHelper.PlayerBaseInfo.getServiceBaseInfo(MainActivity.appServiceConnection);
+        PlayerBaseInfo baseInfo=getServiceBaseInfo(MainActivity.appServiceConnection);
         if(baseInfo!=null)
         {
             List<V_List_Song> songs=app.bll.V_List_Song.getModelByLid(baseInfo.lid);
@@ -95,7 +97,7 @@ public class Dialog_panelmenu extends Dialog
     private void setupPlayModes()
     {
         List<String> playmodes= Arrays.asList(PlayerBaseInfo.playmodestr);
-        PlayerBaseInfo info= appHelper.PlayerBaseInfo.getServiceBaseInfo(MainActivity.appServiceConnection);
+        PlayerBaseInfo info= getServiceBaseInfo(MainActivity.appServiceConnection);
         int mode=0;
         if(info!=null)
         {
