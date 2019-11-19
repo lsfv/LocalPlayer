@@ -19,7 +19,8 @@ import android.widget.Toast;
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Adapter.Adapter_Songs;
-import com.linson.android.localplayer.appHelper.Common;
+import com.linson.android.localplayer.appHelper.appHelperCommon;
+import com.linson.android.localplayer.appHelper.appHelperPlayerBaseInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +31,8 @@ import app.lslibrary.androidHelper.LSUI;
 import app.lslibrary.pattern.LSObserver;
 import app.model.PlayerBaseInfo;
 
-import static com.linson.android.localplayer.appHelper.PlayerBaseInfo.*;
-import static com.linson.android.localplayer.appHelper.PlayerBaseInfo.getServiceBaseInfo;
+import static com.linson.android.localplayer.appHelper.appHelperPlayerBaseInfo.*;
+import static com.linson.android.localplayer.appHelper.appHelperPlayerBaseInfo.getServiceBaseInfo;
 
 //功能。1获得参数。2初始化列表。3实现菜单功能。 通过内部类对activity顶级类功能的划分，发挥了内部类的分担职责的职能。
 public class ListDetail extends BaseFragment
@@ -39,7 +40,7 @@ public class ListDetail extends BaseFragment
     public static final String STRLID="lid";
     public static final String STRLNAME="LNAME";
 
-    private int mListID=Common.defaultListID;
+    private int mListID=appHelperCommon.defaultListID;
     private String mListName="";
 
     private LSObserver.IObserverListener<app.model.PlayerBaseInfo> mObserverListener;
@@ -51,7 +52,7 @@ public class ListDetail extends BaseFragment
         bundle.putInt(STRLID, lid);
         bundle.putString(STRLNAME, lname);
         fragment.setArguments(bundle);
-        Common.startPageWithBack(fragmentManager, fragment);
+        appHelperCommon.startPageWithBack(fragmentManager, fragment);
     }
 
     @Override
@@ -72,8 +73,7 @@ public class ListDetail extends BaseFragment
         getMaster().setupToolbarMenu(app.bll.V_List_Song.getMenuTitle(), new MenuHandler());
 
         mObserverListener=new oob();
-        baseInfoLSObserver.registerObserver(mObserverListener);
-
+        appHelperPlayerBaseInfo.baseInfoLSObserver.registerObserver(mObserverListener);
         LSLog.Log_INFO(String.format("id:%d,name:%s",mListID,mListName));
     }
 
@@ -173,7 +173,7 @@ public class ListDetail extends BaseFragment
                 if(mListID>1 && getActivity()!=null)
                 {
 
-                    List<app.model.V_List_Song> allSongs = app.bll.V_List_Song.getModelByLid(Common.defaultListID);
+                    List<app.model.V_List_Song> allSongs = app.bll.V_List_Song.getModelByLid(appHelperCommon.defaultListID);
                     List<app.model.V_List_Song> mySongs = ((Adapter_Songs) mMyControls.mRvSonglist.getAdapter()).getCloneData();
                     mySongs = mySongs == null ? new ArrayList<app.model.V_List_Song>() : mySongs;
                     CharSequence[] nameList = app.bll.V_List_Song.getNameList(allSongs);

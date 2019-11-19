@@ -2,6 +2,7 @@ package com.linson.android.localplayer.Services;
 
 import android.annotation.SuppressLint;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -27,7 +28,7 @@ public class PlayServices extends Service
         LSLog.Log_INFO("");
         super.onCreate();
         app.bll.MusicDB.setDBContext(getApplicationContext());
-        mRemoteServiceProxy = new RemoteServiceProxy();
+        mRemoteServiceProxy = new RemoteServiceProxy(this);
     }
 
     @Nullable
@@ -60,12 +61,14 @@ public class PlayServices extends Service
 
         public MediaPlayer mMediaPlayer;
         private app.model.PlayerBaseInfo mBaseInfo;
+        private Context mContext;
 
-        public RemoteServiceProxy()
+        public RemoteServiceProxy(Context context)
         {
             mBaseInfo = new PlayerBaseInfo();
             mMediaPlayer = new MediaPlayer();
             mMediaPlayer.setOnCompletionListener(new OnComplete());
+            mContext=context;
         }
 
         @Override
@@ -303,6 +306,7 @@ public class PlayServices extends Service
                     try
                     {
                         next();
+                        mContext.sendBroadcast(new Intent(PlayerBaseInfo.BROADCASTNAME));
                     } catch (Exception e)
                     {
                         LSLog.Log_Exception(e);
@@ -316,6 +320,7 @@ public class PlayServices extends Service
                         int a = random.nextInt(songs.size());
                         a = a % songs.size() - 1;
                         playOneSong(a);
+                        mContext.sendBroadcast(new Intent(PlayerBaseInfo.BROADCASTNAME));
                     }
                     catch (Exception e)
                     {
@@ -326,10 +331,4 @@ public class PlayServices extends Service
         }
         //endregion
     }
-
-
-
-
-
-
 }

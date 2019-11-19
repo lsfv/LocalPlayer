@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Adapter.Adapter_Songs;
+import com.linson.android.localplayer.appHelper.appHelperPlayerBaseInfo;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +27,7 @@ import app.lslibrary.pattern.LSObserver;
 import app.model.PlayerBaseInfo;
 import app.model.V_List_Song;
 
-import static com.linson.android.localplayer.appHelper.PlayerBaseInfo.getServiceBaseInfo;
+import static com.linson.android.localplayer.appHelper.appHelperPlayerBaseInfo.getServiceBaseInfo;
 
 public class Dialog_panelmenu extends Dialog
 {
@@ -60,14 +61,14 @@ public class Dialog_panelmenu extends Dialog
         setupSongsList();
 
         mListener=new BaseInfoListener();
-        com.linson.android.localplayer.appHelper.PlayerBaseInfo.baseInfoLSObserver.registerObserver(mListener);
+        appHelperPlayerBaseInfo.baseInfoLSObserver.registerObserver(mListener);
     }
 
     @Override
     public void dismiss()
     {
         super.dismiss();
-        com.linson.android.localplayer.appHelper.PlayerBaseInfo.baseInfoLSObserver.unRegisterObserver(mListener);
+        appHelperPlayerBaseInfo.baseInfoLSObserver.unRegisterObserver(mListener);
     }
 
     //region baseinfo listener
@@ -171,7 +172,7 @@ public class Dialog_panelmenu extends Dialog
                         {
                             MainActivity.appServiceConnection.mPlayerProxy.playSong(ls_id, index);
                             info=MainActivity.appServiceConnection.mPlayerProxy.getBaseInfo();
-                            com.linson.android.localplayer.appHelper.PlayerBaseInfo.baseInfoLSObserver.NoticeObsserver(info);
+                            appHelperPlayerBaseInfo.baseInfoLSObserver.NoticeObsserver(info);
                         }
                     }
                 }

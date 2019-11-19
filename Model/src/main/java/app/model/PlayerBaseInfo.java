@@ -16,19 +16,20 @@ public class PlayerBaseInfo implements Parcelable
     public static final int lid_empty=-1;
     public static final int index_empty=-1;
 
+    public static final String BROADCASTNAME="ServiceBroadcast";
+    public static final String BROADCAST_BASEINFO="baseinfo";
+
     public static final int playModel_singleRepeat=0;
     public static final int playModel_single=1;
     public static final int playModel_all=2;
     public static final int playModel_random=3;
-
-    public static String[] playmodestr={"播放一首","单曲循环","随机","顺序全部"};
+    public static String[] playmodestr={"单曲循环","播放一首","顺序全部","随机播放"};
 
     public static final int status_init=-1;
     public static final int status_playing=1;
     public static final int status_pause=0;
     public static final int status_error_nofile=-2;
     public static final int status_error_other=-3;
-
 
     public PlayerBaseInfo()
     {

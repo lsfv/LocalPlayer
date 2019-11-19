@@ -15,16 +15,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
-
 import com.linson.android.localplayer.CustomUI.PlayPanel;
 import com.linson.android.localplayer.R;
-import com.linson.android.localplayer.appHelper.Common;
-
+import com.linson.android.localplayer.appHelper.appHelperCommon;
 import app.lslibrary.androidHelper.LSContentResolver;
 import app.lslibrary.androidHelper.LSLog;
 import app.lslibrary.androidHelper.LSUI;
-//!todo services 的广播以及更新的关联。ui的美化。歌词问题。
-//!todo mvvm. iplaye需要放入到bll层面？
+//!todo ui的美化。歌词问题。
+//!todo mvvm. iplaye需要放入到bll层面？ 观察者模式，命名空间稍微不清晰。
 //!todo fullscreen dialog 的提起。
 //!todo 界面更新的逻辑，根据编码的原则和2个方案的有缺点，决定还是server主动的才广播。否则还是用耦合度高的一个动作更新2个子界面的方式处理。最后考虑mvvm的方式。
 //!todo 无法触发服务sub代理的释放.android 一般也是不完全关闭app的。所以我这里是保证服务停止播放，最多释放播放器而已。单元测试好像会提示哪个activity没有释放。
@@ -49,9 +47,11 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
         controlsEvent();
         setupDrawerMenu();//2.配置左侧滑动菜单
         CleanStackAndReplaceFragment(new ListIndex());//3.加载首页
-        LSContentResolver.checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new Common.UpdateDB_Songs());//4.自动跟新歌曲
+        LSContentResolver.checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new appHelperCommon.UpdateDB_Songs());//4.自动跟新歌曲
         this.getContentResolver().registerContentObserver(LSContentResolver.uri_audio_external, false, new MyAudioObserver(null));//5.监听歌曲变化
+
     }
+
 
     @Override
     public void onClick(View v)
@@ -79,7 +79,7 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        LSContentResolver.progressCheck(this, requestCode, grantResults, 1, new Common.UpdateDB_Songs());
+        LSContentResolver.progressCheck(this, requestCode, grantResults, 1, new appHelperCommon.UpdateDB_Songs());
     }
 
     //region audio's observer
@@ -97,7 +97,7 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
             LSLog.Log_INFO();
             if(uri.equals(LSContentResolver.uri_audio_external))
             {
-                LSContentResolver.checkPermission(MasterPage.this, Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new Common.UpdateDB_Songs());
+                LSContentResolver.checkPermission(MasterPage.this, Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new appHelperCommon.UpdateDB_Songs());
             }
         }
     }
@@ -126,7 +126,7 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
     private void CleanStackAndReplaceFragment(Fragment fragment)
     {
         getSupportFragmentManager().popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        Common.startPageNoBack(getSupportFragmentManager(), fragment);
+        appHelperCommon.startPageNoBack(getSupportFragmentManager(), fragment);
     }
     //endregion
 

@@ -10,7 +10,7 @@ import com.linson.android.localplayer.R;
 import app.lslibrary.androidHelper.LSActivity;
 import app.lslibrary.androidHelper.LSContentResolver;
 
-public abstract class Common
+public abstract class appHelperCommon
 {
     public static final int defaultListID=1;
 
