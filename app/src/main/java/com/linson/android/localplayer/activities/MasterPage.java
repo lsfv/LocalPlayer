@@ -23,7 +23,8 @@ import com.linson.android.localplayer.appHelper;
 import app.lslibrary.androidHelper.LSContentResolver;
 import app.lslibrary.androidHelper.LSLog;
 import app.lslibrary.androidHelper.LSUI;
-//!todo 5.autoupdate.自动更新。 services 的广播。
+//!todo services 的广播以及更新的关联。ui的美化。歌词问题。
+//!todo mvvm.
 //!todo fullscreen dialog 的提起。
 //!todo 界面更新的逻辑，根据编码的原则和2个方案的有缺点，决定还是server主动的才广播。否则还是用耦合度高的一个动作更新2个子界面的方式处理。最后考虑mvvm的方式。
 //!todo 无法触发服务sub代理的释放.android 一般也是不完全关闭app的。所以我这里是保证服务停止播放，最多释放播放器而已。单元测试好像会提示哪个activity没有释放。
@@ -32,8 +33,6 @@ import app.lslibrary.androidHelper.LSUI;
 //!todo 还是需要一个模板啊。比如adapter 的大致样子都是差不多的。
 //!todo public ListDetail(int a) 什么时候fragment需要从建立开始恢复？ 导致得到参数必须是通过argumentbundle。
 //!TODO 内存泄漏要注意静态变量和单例模式.单例对象在初始化后将在 JVM 的整个生命周期中存在（以静态变量的方式），如果单例对象持有外部的引用，那么这个外部对象在程序关闭之前都不能被回收。
-
-//!todo autoUpdate:启动app。检查一次。 监听媒体数据库的变化。
 
 //功能:母模板实现大框架功能。并提供public方法让fragment访问。
 public class MasterPage extends AppCompatActivity implements View.OnClickListener
