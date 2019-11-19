@@ -27,8 +27,10 @@ import java.util.List;
 import app.bll.V_List_Song;
 import app.lslibrary.androidHelper.LSLog;
 import app.lslibrary.androidHelper.LSUI;
+import app.lslibrary.pattern.LSObserver;
 import app.model.PlayerBaseInfo;
 
+import static com.linson.android.localplayer.appHelper.PlayerBaseInfo.*;
 import static com.linson.android.localplayer.appHelper.PlayerBaseInfo.getServiceBaseInfo;
 
 //功能。1获得参数。2初始化列表。3实现菜单功能。 通过内部类对activity顶级类功能的划分，发挥了内部类的分担职责的职能。
@@ -39,6 +41,8 @@ public class ListDetail extends BaseFragment
 
     private int mListID=Common.defaultListID;
     private String mListName="";
+
+    private LSObserver.IObserverListener<app.model.PlayerBaseInfo> mObserverListener;
 
     public static void StartMe(FragmentManager fragmentManager, int lid,String lname)
     {
@@ -66,7 +70,18 @@ public class ListDetail extends BaseFragment
         setupWidget();
         setupRecyleview();
         getMaster().setupToolbarMenu(app.bll.V_List_Song.getMenuTitle(), new MenuHandler());
+
+        mObserverListener=new oob();
+        baseInfoLSObserver.registerObserver(mObserverListener);
+
         LSLog.Log_INFO(String.format("id:%d,name:%s",mListID,mListName));
+    }
+
+    @Override
+    public void onDestroyView()
+    {
+        super.onDestroyView();
+        baseInfoLSObserver.unRegisterObserver(mObserverListener);
     }
 
     //region private functions
@@ -103,6 +118,18 @@ public class ListDetail extends BaseFragment
     }
     //endregions
 
+    //region infoobserver
+    public class oob implements LSObserver.IObserverListener<app.model.PlayerBaseInfo>
+    {
+
+        @Override
+        public void onHappen(app.model.PlayerBaseInfo p)
+        {
+            ((Adapter_Songs) ((Adapter_Songs) mMyControls.mRvSonglist.getAdapter())).showImagePlaying(p.index);
+        }
+    }
+    //endregion
+
     //region recycleView's handler
     public class RecycleHandler implements Adapter_Songs.IItemHander
     {
@@ -115,14 +142,11 @@ public class ListDetail extends BaseFragment
                 try
                 {
                     app.model.PlayerBaseInfo info=MainActivity.appServiceConnection.mPlayerProxy.getBaseInfo();
-                    if(info.lid!=mListID || info.index!=index)//点击正在播放的应该无响应。
+                    if(info!=null && info.lid!=mListID || info.index!=index)//点击正在播放的应该无响应。
                     {
-                        if(mMyControls.mRvSonglist.getAdapter()!=null)
-                        {
-                            MainActivity.appServiceConnection.mPlayerProxy.playSong(lid, index);
-                            ((Adapter_Songs) ((Adapter_Songs) mMyControls.mRvSonglist.getAdapter())).showImagePlaying(index);
-                            getMaster().onBaseinfoChange();
-                        }
+                        MainActivity.appServiceConnection.mPlayerProxy.playSong(lid, index);
+                        info=MainActivity.appServiceConnection.mPlayerProxy.getBaseInfo();
+                        baseInfoLSObserver.NoticeObsserver(info);
                     }
                     else
                     {

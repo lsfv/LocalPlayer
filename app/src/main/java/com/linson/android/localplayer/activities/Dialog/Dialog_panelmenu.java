@@ -22,6 +22,7 @@ import java.util.List;
 import app.lslibrary.androidHelper.LSLog;
 import app.lslibrary.androidHelper.LSSystemServices;
 import app.lslibrary.customUI.Adapter.Adapter_RadioButton;
+import app.lslibrary.pattern.LSObserver;
 import app.model.PlayerBaseInfo;
 import app.model.V_List_Song;
 
@@ -31,6 +32,7 @@ public class Dialog_panelmenu extends Dialog
 {
     private boolean hasdown=false;
     private boolean hasmove=false;
+    private LSObserver.IObserverListener<app.model.PlayerBaseInfo> mListener;
 
     public Dialog_panelmenu(Context context)
     {
@@ -56,7 +58,28 @@ public class Dialog_panelmenu extends Dialog
         setupPlayModes();
         setupVolumeSeekBar();
         setupSongsList();
+
+        mListener=new BaseInfoListener();
+        com.linson.android.localplayer.appHelper.PlayerBaseInfo.baseInfoLSObserver.registerObserver(mListener);
     }
+
+    @Override
+    public void dismiss()
+    {
+        super.dismiss();
+        com.linson.android.localplayer.appHelper.PlayerBaseInfo.baseInfoLSObserver.unRegisterObserver(mListener);
+    }
+
+    //region baseinfo listener
+    public class BaseInfoListener implements LSObserver.IObserverListener<app.model.PlayerBaseInfo>
+    {
+        @Override
+        public void onHappen(PlayerBaseInfo p)
+        {
+            ((Adapter_Songs) ((Adapter_Songs) mMyControls.mRvList.getAdapter())).showImagePlaying(p.index);
+        }
+    }
+    //endregion
 
     //region private funtion
     private void setupSongsList()
@@ -147,7 +170,8 @@ public class Dialog_panelmenu extends Dialog
                         if(mMyControls.mRvList.getAdapter()!=null)
                         {
                             MainActivity.appServiceConnection.mPlayerProxy.playSong(ls_id, index);
-                            ((Adapter_Songs) ((Adapter_Songs) mMyControls.mRvList.getAdapter())).showImagePlaying(index);
+                            info=MainActivity.appServiceConnection.mPlayerProxy.getBaseInfo();
+                            com.linson.android.localplayer.appHelper.PlayerBaseInfo.baseInfoLSObserver.NoticeObsserver(info);
                         }
                     }
                 }

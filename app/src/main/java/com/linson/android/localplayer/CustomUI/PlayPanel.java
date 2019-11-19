@@ -18,6 +18,7 @@ import java.util.List;
 import app.lslibrary.androidHelper.LSLog;
 import app.lslibrary.androidHelper.LSTouch;
 import app.lslibrary.customUI.LSCircleImage;
+import app.lslibrary.pattern.LSObserver;
 import app.model.PlayerBaseInfo;
 import app.model.V_List_Song;
 
@@ -28,6 +29,7 @@ import static com.linson.android.localplayer.appHelper.PlayerBaseInfo.*;
 public class PlayPanel extends ConstraintLayout implements View.OnClickListener
 {
     private Context mContext;
+    private LSObserver.IObserverListener<app.model.PlayerBaseInfo> mObserver;
 
     public PlayPanel(Context context, AttributeSet attrs)
     {
@@ -39,6 +41,16 @@ public class PlayPanel extends ConstraintLayout implements View.OnClickListener
         mMyControls.mPanelGroup.setOnTouchListener(new GroupTouchListener());
         mMyControls.mIconPlay.setOnClickListener(this);
         mMyControls.mIconMenu.setOnClickListener(this);
+
+        mObserver=new InfoObserver();
+        com.linson.android.localplayer.appHelper.PlayerBaseInfo.baseInfoLSObserver.registerObserver(mObserver);
+    }
+
+    @Override
+    protected void finalize() throws Throwable
+    {
+        super.finalize();
+        com.linson.android.localplayer.appHelper.PlayerBaseInfo.baseInfoLSObserver.unRegisterObserver(mObserver);
     }
 
     @Override
@@ -112,6 +124,17 @@ public class PlayPanel extends ConstraintLayout implements View.OnClickListener
         }
     }
 
+    //region infoobserver
+    public class  InfoObserver implements LSObserver.IObserverListener<PlayerBaseInfo>
+    {
+        @Override
+        public void onHappen(PlayerBaseInfo p)
+        {
+            setupUI();
+        }
+    }
+    //endregion
+
     //region groupTouch
     public class GroupTouchListener implements OnTouchListener
     {
@@ -149,12 +172,14 @@ public class PlayPanel extends ConstraintLayout implements View.OnClickListener
                         if(left==1)
                         {
                             MainActivity.appServiceConnection.mPlayerProxy.pre();
-                            setupUI();
+                            PlayerBaseInfo info= getServiceBaseInfo(MainActivity.appServiceConnection);
+                            com.linson.android.localplayer.appHelper.PlayerBaseInfo.baseInfoLSObserver.NoticeObsserver(info);
                         }
                         else if(left==0)
                         {
+                            PlayerBaseInfo info= getServiceBaseInfo(MainActivity.appServiceConnection);
+                            com.linson.android.localplayer.appHelper.PlayerBaseInfo.baseInfoLSObserver.NoticeObsserver(info);
                             MainActivity.appServiceConnection.mPlayerProxy.next();
-                            setupUI();
                         }
                     }
                     catch (Exception e)
