@@ -59,7 +59,7 @@ public class Dialog_panelmenu extends Dialog
     //region private funtion
     private void setupSongsList()
     {
-        PlayerBaseInfo baseInfo=appHelper.getServiceBaseInfo(MainActivity.appServiceConnection);
+        PlayerBaseInfo baseInfo=appHelper.PlayerBaseInfo.getServiceBaseInfo(MainActivity.appServiceConnection);
         if(baseInfo!=null)
         {
             List<V_List_Song> songs=app.bll.V_List_Song.getModelByLid(baseInfo.lid);
@@ -95,7 +95,7 @@ public class Dialog_panelmenu extends Dialog
     private void setupPlayModes()
     {
         List<String> playmodes= Arrays.asList(PlayerBaseInfo.playmodestr);
-        PlayerBaseInfo info= appHelper.getServiceBaseInfo(MainActivity.appServiceConnection);
+        PlayerBaseInfo info= appHelper.PlayerBaseInfo.getServiceBaseInfo(MainActivity.appServiceConnection);
         int mode=0;
         if(info!=null)
         {

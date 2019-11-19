@@ -24,7 +24,7 @@ import app.lslibrary.androidHelper.LSContentResolver;
 import app.lslibrary.androidHelper.LSLog;
 import app.lslibrary.androidHelper.LSUI;
 //!todo services 的广播以及更新的关联。ui的美化。歌词问题。
-//!todo mvvm.
+//!todo mvvm. iplaye需要放入到bll层面？
 //!todo fullscreen dialog 的提起。
 //!todo 界面更新的逻辑，根据编码的原则和2个方案的有缺点，决定还是server主动的才广播。否则还是用耦合度高的一个动作更新2个子界面的方式处理。最后考虑mvvm的方式。
 //!todo 无法触发服务sub代理的释放.android 一般也是不完全关闭app的。所以我这里是保证服务停止播放，最多释放播放器而已。单元测试好像会提示哪个activity没有释放。

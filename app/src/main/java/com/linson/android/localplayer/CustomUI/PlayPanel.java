@@ -60,7 +60,7 @@ public class PlayPanel extends ConstraintLayout implements View.OnClickListener
 
     public  void setupUI()
     {
-        PlayerBaseInfo info= appHelper.getServiceBaseInfo(MainActivity.appServiceConnection);
+        PlayerBaseInfo info= appHelper.PlayerBaseInfo.getServiceBaseInfo(MainActivity.appServiceConnection);
         if(info!=null)
         {
             if(info.status==PlayerBaseInfo.status_init)

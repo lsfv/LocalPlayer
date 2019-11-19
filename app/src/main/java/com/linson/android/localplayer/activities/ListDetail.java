@@ -88,7 +88,7 @@ public class ListDetail extends BaseFragment
         }
 
         int playingIndex=-1;
-        PlayerBaseInfo baseInfo=appHelper.getServiceBaseInfo(MainActivity.appServiceConnection);
+        PlayerBaseInfo baseInfo=appHelper.PlayerBaseInfo.getServiceBaseInfo(MainActivity.appServiceConnection);
         if(baseInfo!=null && baseInfo.lid==mListID)
         {
             playingIndex=baseInfo.index;
