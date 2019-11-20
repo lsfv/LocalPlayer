@@ -22,6 +22,7 @@ import com.linson.android.localplayer.appHelperCommon;
 import app.lslibrary.androidHelper.LSContentResolver;
 import app.lslibrary.androidHelper.LSLog;
 import app.lslibrary.androidHelper.LSUI;
+import app.model.PlayerBaseInfo;
 
 //!todo 进度条：主动新线程。每秒一次询问，再通知主线程更新seekbar。 通知的方法中需要一个是否正在监听事件的boolean 判断值。
 //!todo ui的美化。歌词问题。
@@ -50,6 +51,7 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
         CleanStackAndReplaceFragment(new ListIndex());//3.加载首页
         LSContentResolver.checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new app.bll.LocalSong.UpdateDB_Songs(MainActivity.appContext));//4.自动跟新歌曲
         this.getContentResolver().registerContentObserver(LSContentResolver.uri_audio_external, false, new MyAudioObserver(null));//5.监听歌曲变化
+        mMyControls.mPlaypanel.setLisener(new PanelListener());
     }
 
 
@@ -81,6 +83,25 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         LSContentResolver.progressCheck(this, requestCode, grantResults, 1, new app.bll.LocalSong.UpdateDB_Songs(MainActivity.appContext));
     }
+
+    //region panel's listener
+    public class PanelListener implements PlayPanel.IPanelLisener
+    {
+        @Override
+        public void onStartActivity_PlayingSong()
+        {
+            LSLog.Log_INFO();
+            PlayerBaseInfo info=appHelperCommon.getServiceBaseInfo(MainActivity.appServiceConnection);
+            if(app.bll.MusicServices.canSeeSongDetail(info))
+            {
+                if(getSupportFragmentManager().findFragmentById(R.id.mainFragment) instanceof PlaySong==false)
+                {
+                    PlaySong.StartMe(getSupportFragmentManager(), info.lid, info.index);
+                }
+            }
+        }
+    }
+    //endregion
 
     //region audio's observer
     public class MyAudioObserver extends ContentObserver

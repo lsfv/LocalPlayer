@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Dialog.Dialog_panelmenu;
+import com.linson.android.localplayer.appHelperCommon;
 
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class PlayPanel extends ConstraintLayout implements View.OnClickListener
 {
     private Context mContext;
     private LSObserver.IObserverListener<app.model.PlayerBaseInfo> mObserver;
+    private IPanelLisener mLisener;
 
     public PlayPanel(Context context, AttributeSet attrs)
     {
@@ -63,6 +65,11 @@ public class PlayPanel extends ConstraintLayout implements View.OnClickListener
         {
             clickMenu();
         }
+    }
+
+    public void setLisener(IPanelLisener lisener)
+    {
+        mLisener=lisener;
     }
 
     private void clickMenu()
@@ -123,7 +130,15 @@ public class PlayPanel extends ConstraintLayout implements View.OnClickListener
         }
     }
 
-    //region infoobserver
+    //region mylistener
+    public interface IPanelLisener
+    {
+        public void onStartActivity_PlayingSong();
+    }
+
+    //endregion
+
+    //region info observer
     public class  InfoObserver implements LSObserver.IObserverListener<PlayerBaseInfo>
     {
         @Override
@@ -164,7 +179,7 @@ public class PlayPanel extends ConstraintLayout implements View.OnClickListener
             }
             else if(event.getAction()==MotionEvent.ACTION_CANCEL || event.getAction()==MotionEvent.ACTION_UP)
             {
-                if(MainActivity.appServiceConnection!=null && MainActivity.appServiceConnection.mPlayerProxy!=null && left!=-1)
+                if(MainActivity.appServiceConnection!=null && MainActivity.appServiceConnection.mPlayerProxy!=null)
                 {
                     try
                     {
@@ -179,6 +194,14 @@ public class PlayPanel extends ConstraintLayout implements View.OnClickListener
                             MainActivity.appServiceConnection.mPlayerProxy.next();
                             PlayerBaseInfo info= getServiceBaseInfo(MainActivity.appServiceConnection);
                             MainActivity.baseInfoLSObserver.NoticeObsserver(info);
+                        }
+                        else if(mFirstMove==null)//click
+                        {
+                            LSLog.Log_INFO();
+                            if(mLisener!=null)
+                            {
+                                mLisener.onStartActivity_PlayingSong();
+                            }
                         }
                     }
                     catch (Exception e)
