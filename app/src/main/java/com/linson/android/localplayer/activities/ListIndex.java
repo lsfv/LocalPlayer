@@ -14,8 +14,8 @@ import android.widget.Toast;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Adapter.Adapter_List;
 import com.linson.android.localplayer.activities.Dialog.Dialog_addlist;
-import com.linson.android.localplayer.appHelper.appHelperCommon;
 
+import app.bll.V_List_Song;
 import app.lslibrary.androidHelper.LSUI;
 import app.model.List;
 
@@ -61,7 +61,7 @@ public class ListIndex extends BaseFragment
             {
                 Adapter_List adapter_list = (Adapter_List) adapter;
                 app.model.List temp = adapter_list.getitem(index);
-                if (temp.L_id != appHelperCommon.defaultListID)
+                if (temp.L_id != V_List_Song.defaultListID)
                 {
                     app.bll.List.delete(temp.L_id);//从数据库删除
                     adapter_list.deleteItem(index);//从内存删除

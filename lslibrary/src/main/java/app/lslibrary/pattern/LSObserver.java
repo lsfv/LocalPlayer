@@ -3,7 +3,6 @@ package app.lslibrary.pattern;
 import java.util.ArrayList;
 import java.util.List;
 
-//!todo 这里最好把IObserverListener单独分开。好处理？
 public class LSObserver<T>
 {
     public interface IObserverListener<T>

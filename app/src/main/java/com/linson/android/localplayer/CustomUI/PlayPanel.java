@@ -11,7 +11,6 @@ import android.widget.TextView;
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Dialog.Dialog_panelmenu;
-import com.linson.android.localplayer.appHelper.appHelperPlayerBaseInfo;
 
 import java.util.List;
 
@@ -22,7 +21,7 @@ import app.lslibrary.pattern.LSObserver;
 import app.model.PlayerBaseInfo;
 import app.model.V_List_Song;
 
-import static com.linson.android.localplayer.appHelper.appHelperPlayerBaseInfo.*;
+import static com.linson.android.localplayer.appHelperCommon.getServiceBaseInfo;
 
 //功能 。1连接server。展示信息。2提供 播放，暂停。 上下首。 音量，模式等功能。3.并提供订阅者模式。转给master。master作为中转的观察者。
 //1.布局页。2.测试初始和加载后，动作都必须合理。3.观察者的实现。
@@ -43,14 +42,14 @@ public class PlayPanel extends ConstraintLayout implements View.OnClickListener
         mMyControls.mIconMenu.setOnClickListener(this);
 
         mObserver=new InfoObserver();
-        appHelperPlayerBaseInfo.baseInfoLSObserver.registerObserver(mObserver);
+        MainActivity.baseInfoLSObserver.registerObserver(mObserver);
     }
 
     @Override
     protected void finalize() throws Throwable
     {
         super.finalize();
-        appHelperPlayerBaseInfo.baseInfoLSObserver.unRegisterObserver(mObserver);
+        MainActivity.baseInfoLSObserver.unRegisterObserver(mObserver);
     }
 
     @Override
@@ -173,13 +172,13 @@ public class PlayPanel extends ConstraintLayout implements View.OnClickListener
                         {
                             MainActivity.appServiceConnection.mPlayerProxy.pre();
                             PlayerBaseInfo info= getServiceBaseInfo(MainActivity.appServiceConnection);
-                            appHelperPlayerBaseInfo.baseInfoLSObserver.NoticeObsserver(info);
+                            MainActivity.baseInfoLSObserver.NoticeObsserver(info);
                         }
                         else if(left==0)
                         {
-                            PlayerBaseInfo info= getServiceBaseInfo(MainActivity.appServiceConnection);
-                            appHelperPlayerBaseInfo.baseInfoLSObserver.NoticeObsserver(info);
                             MainActivity.appServiceConnection.mPlayerProxy.next();
+                            PlayerBaseInfo info= getServiceBaseInfo(MainActivity.appServiceConnection);
+                            MainActivity.baseInfoLSObserver.NoticeObsserver(info);
                         }
                     }
                     catch (Exception e)

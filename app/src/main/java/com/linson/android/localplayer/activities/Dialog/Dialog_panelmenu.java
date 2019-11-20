@@ -15,7 +15,6 @@ import android.widget.TextView;
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Adapter.Adapter_Songs;
-import com.linson.android.localplayer.appHelper.appHelperPlayerBaseInfo;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,17 +22,18 @@ import java.util.List;
 import app.lslibrary.androidHelper.LSLog;
 import app.lslibrary.androidHelper.LSSystemServices;
 import app.lslibrary.customUI.Adapter.Adapter_RadioButton;
-import app.lslibrary.pattern.LSObserver;
+import app.lslibrary.pattern.LSObserver.IObserverListener;
 import app.model.PlayerBaseInfo;
 import app.model.V_List_Song;
 
-import static com.linson.android.localplayer.appHelper.appHelperPlayerBaseInfo.getServiceBaseInfo;
+import static com.linson.android.localplayer.appHelperCommon.getServiceBaseInfo;
+
 
 public class Dialog_panelmenu extends Dialog
 {
     private boolean hasdown=false;
     private boolean hasmove=false;
-    private LSObserver.IObserverListener<app.model.PlayerBaseInfo> mListener;
+    private IObserverListener<app.model.PlayerBaseInfo> mListener;
 
     public Dialog_panelmenu(Context context)
     {
@@ -61,18 +61,18 @@ public class Dialog_panelmenu extends Dialog
         setupSongsList();
 
         mListener=new BaseInfoListener();
-        appHelperPlayerBaseInfo.baseInfoLSObserver.registerObserver(mListener);
+        MainActivity.baseInfoLSObserver.registerObserver(mListener);
     }
 
     @Override
     public void dismiss()
     {
         super.dismiss();
-        appHelperPlayerBaseInfo.baseInfoLSObserver.unRegisterObserver(mListener);
+        MainActivity.baseInfoLSObserver.unRegisterObserver(mListener);
     }
 
     //region baseinfo listener
-    public class BaseInfoListener implements LSObserver.IObserverListener<app.model.PlayerBaseInfo>
+    public class BaseInfoListener implements IObserverListener<app.model.PlayerBaseInfo>
     {
         @Override
         public void onHappen(PlayerBaseInfo p)
@@ -172,7 +172,7 @@ public class Dialog_panelmenu extends Dialog
                         {
                             MainActivity.appServiceConnection.mPlayerProxy.playSong(ls_id, index);
                             info=MainActivity.appServiceConnection.mPlayerProxy.getBaseInfo();
-                            appHelperPlayerBaseInfo.baseInfoLSObserver.NoticeObsserver(info);
+                            MainActivity.baseInfoLSObserver.NoticeObsserver(info);
                         }
                     }
                 }

@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".activities.ListDetail">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
         android:id="@+id/tv_listname"
         android:layout_width="0dp"

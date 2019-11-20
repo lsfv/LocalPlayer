@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.linson.android.localplayer.R;
-import com.linson.android.localplayer.appHelper.appHelperCommon;
+import com.linson.android.localplayer.appHelperCommon;
 
 import app.lslibrary.androidHelper.LSLog;
 

@@ -35,7 +35,24 @@ public abstract class LocalSong
 
 
     //extend
-    //extend
+    //region what will do after permission is ok.
+    public static class  UpdateDB_Songs implements LSContentResolver.VoidHandler
+    {
+        private Context mContext;
+        public UpdateDB_Songs(Context context)
+        {
+            mContext=context;
+        }
+        @Override
+        public void doit()
+        {
+            LSContentResolver lsContentResolver=new LSContentResolver(mContext);
+            java.util.List<LSContentResolver.SongInfo> localSongs= lsContentResolver.SearchSong(60*1000);
+            app.bll.LocalSong.updateSongsFromLocal(localSongs);
+        }
+    }
+    //endregion
+
     public static  void clear()
     {
         dal.clear();
