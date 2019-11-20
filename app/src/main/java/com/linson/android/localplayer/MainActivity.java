@@ -29,12 +29,15 @@ public class MainActivity extends AppCompatActivity
     private boolean isFirstLoad=true;
     public BroadcastReceiver serverReceiver=new BroadcastServiceReceiver();
 
+    public final boolean ExistNotBackground=false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
         initGlobalArgument();//初始化全局变量
+
         StartServicesabc();//启动服务，并在这里关闭服务。其他页面，绑动服务就ok了。
         registerServicesBroadcast();//注册广播
     }
@@ -54,13 +57,20 @@ public class MainActivity extends AppCompatActivity
             //把静态变量(引用了外部对象)先清空掉。以免外部对象无法释放。
             //服务也解绑和停止。
             app.bll.MusicDB.setDBContext(null);//把引用了自己的静态变量也先清掉。
-            unbindService(appServiceConnection);
-            stopService(app.bll.MusicServices.getServiceIntent());
-
+            if(ExistNotBackground)
+            {
+                unbindService(appServiceConnection);
+                stopService(app.bll.MusicServices.getServiceIntent());
+            }
+            else
+            {
+                unbindService(appServiceConnection);
+            }
             appContext=null;
             appServiceConnection=null;
 
             UnRegisterServicesBroadcast();//注销广播
+            isFirstLoad=true;
             finish();
         }
     }
@@ -81,7 +91,7 @@ public class MainActivity extends AppCompatActivity
     private boolean StartServicesabc()
     {
         startService(app.bll.MusicServices.getServiceIntent());
-        appServiceConnection=new MyConnection();
+        appServiceConnection = new MyConnection();
         bindService(app.bll.MusicServices.getServiceIntent(), appServiceConnection, Context.BIND_AUTO_CREATE);
 
         return true;

@@ -24,15 +24,12 @@ import app.lslibrary.androidHelper.LSLog;
 import app.lslibrary.androidHelper.LSUI;
 import app.model.PlayerBaseInfo;
 
-//!todo 进度条：主动新线程。每秒一次询问，再通知主线程更新seekbar。 通知的方法中需要一个是否正在监听事件的boolean 判断值。
-//!todo ui的美化。歌词问题。
+//!todo ui的美化。歌词先不需要，用一个动态的cd代替就ok。
 //!todo mvvm？测试发现用观察者模式，非常简洁清晰有效。    可以开新分支测试mvvm.
 //!todo fullscreen dialog 的提起。
-//!todo 无法触发服务sub代理的释放.android 一般也是不完全关闭app的。所以我这里是保证服务停止播放，最多释放播放器而已。单元测试好像会提示哪个activity没有释放。
 //!todo 还是需要自带的常用所有控件都过一遍
-//!todo savedInstanceState 实际工程使用范例.
+//!todo savedInstanceState 实际工程使用范例.public ListDetail(int a) 什么时候fragment需要从建立开始恢复？ 导致得到参数必须是通过argumentbundle。
 //!todo 还是需要一个模板啊。比如adapter 的大致样子都是差不多的。
-//!todo public ListDetail(int a) 什么时候fragment需要从建立开始恢复？ 导致得到参数必须是通过argumentbundle。
 
 //功能:母模板实现大框架功能。并提供public方法让fragment访问。
 public class MasterPage extends AppCompatActivity implements View.OnClickListener

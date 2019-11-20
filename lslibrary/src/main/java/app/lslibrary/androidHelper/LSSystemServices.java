@@ -1,7 +1,10 @@
 package app.lslibrary.androidHelper;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.media.AudioManager;
+
+import java.util.List;
 
 public abstract class LSSystemServices
 {
@@ -34,6 +37,24 @@ public abstract class LSSystemServices
         StreamVolumeInfo streamVolumeInfo=new StreamVolumeInfo();
         AudioManager audioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
         audioManager.setStreamVolume(type, value, AudioManager.FLAG_PLAY_SOUND);
+    }
+
+
+    public static boolean isServiceRunning(Context mContext,String className) {
+        boolean isRunning = false;
+        ActivityManager activityManager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningServiceInfo> serviceList = activityManager.getRunningServices(30);
+        if (!(serviceList.size()>0))
+        {
+            return false;
+        }
+        for (int i=0; i<serviceList.size(); i++) {
+            if (serviceList.get(i).service.getClassName().equals(className) == true) {
+                isRunning = true;
+                break;
+            }
+        }
+        return isRunning;
     }
 
 
