@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.annotation.Nullable;
 
 import com.linson.android.localplayer.AIDL.IPlayer;
@@ -265,7 +266,14 @@ public class PlayServices extends Service
         @Override
         public app.model.PlayerBaseInfo getBaseInfo()
         {
+            mBaseInfo.playingSeconds= mMediaPlayer.getCurrentPosition();
             return mBaseInfo;
+        }
+
+        @Override
+        public void setPosition(int position)
+        {
+            mMediaPlayer.seekTo(position);
         }
 
 
