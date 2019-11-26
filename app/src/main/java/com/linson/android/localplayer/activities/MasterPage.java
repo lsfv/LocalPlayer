@@ -39,13 +39,12 @@ import app.lslibrary.androidHelper.LSUI;
 import app.lslibrary.customUI.LSCircleImage;
 import app.model.PlayerBaseInfo;
 
-//!todo 后期的歌词。
-//!todo 适配的总结。dp。
 //!todo mvvm？测试发现用观察者模式，非常简洁清晰有效。    可以开新分支测试mvvm.
-//!todo fullscreen dialog 的提起。
-//!todo 还是需要自带的常用所有控件都过一遍
 //!todo savedInstanceState 实际工程使用范例.public ListDetail(int a) 什么时候fragment需要从建立开始恢复？ 导致得到参数必须是通过argumentbundle。
-//!todo 还是需要一个模板啊。比如adapter 的大致样子都是差不多的。
+//!todo 测试不同的屏幕的适配。
+//!todo 还是需要一个代码模板啊。比如adapter 的大致样子都是差不多的。
+//!todo iplaye需要放入到bll层面?可能可以试下。这里？？ok.最后开一个分支测试下。
+//!todo 反射
 
 //功能:母模板实现大框架功能。并提供public方法让fragment访问。
 public class MasterPage extends AppCompatActivity implements View.OnClickListener

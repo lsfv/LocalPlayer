@@ -33,6 +33,8 @@ import app.model.PlayerBaseInfo;
 
 import static com.linson.android.localplayer.appHelperCommon.getServiceBaseInfo;
 
+
+
 //功能。1获得参数。2初始化列表。3实现菜单功能。 通过内部类对activity顶级类功能的划分，发挥了内部类的分担职责的职能。
 public class ListDetail extends BaseFragment
 {
@@ -82,8 +84,6 @@ public class ListDetail extends BaseFragment
         LSLog.Log_INFO(String.format("id:%d,name:%s",mListID,mListName));
     }
 
-
-
     @Override
     public void onDestroyView()
     {
@@ -116,7 +116,7 @@ public class ListDetail extends BaseFragment
                     //实时修改 是否选中的局部数据,确定按钮后才把局部数据更新到adapter和数据库。
                     if (allSongs != null && mySongs != null && getActivity()!=null)
                     {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(ListDetail.this.getContext());
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ListDetail.this.getContext(),R.style.mydialog);
                         builder.setMultiChoiceItems(nameList, ischooseList, new MultiChoiceHandler(ischooseList));
 
                         builder.setPositiveButton("确定", new MultiChoiceClick(allSongs,ischooseList ));

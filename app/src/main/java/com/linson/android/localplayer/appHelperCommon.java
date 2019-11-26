@@ -19,7 +19,6 @@ public abstract class appHelperCommon
         LSActivity.replaceFragment(fragmentManager, true, R.id.mainFragment, fragment);
     }
 
-    //!todo iplaye需要放入到bll层面?可能可以试下。这里？？ok.最后开一个分支测试下。
     public static app.model.PlayerBaseInfo getServiceBaseInfo(MainActivity.MyConnection conn)
     {
         app.model.PlayerBaseInfo res=null;

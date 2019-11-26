@@ -22,4 +22,11 @@
         <item name="android:windowCloseOnTouchOutside">true</item>
         <item name="android:windowNoTitle">true</item>
     </style>
+
+    <style name="mydialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:textSize">14dp</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
 </resources>
