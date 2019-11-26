@@ -30,7 +30,8 @@ dependencies
 
             testImplementation 'junit:junit:4.12'//uitest
             androidTestImplementation 'com.android.support.test:runner:1.0.2'//base of ui test
-            androidTestImplementation 'com.android.support.test.uiautomator:uiautomator-v18:2.1.1'//ui test api.
+            androidTestImplementation 'com.android.support.test.uiautomator:uiautomator-v18:2.1.1'
+//ui test api.
 
 
             implementation project(path: ':lslibrary')

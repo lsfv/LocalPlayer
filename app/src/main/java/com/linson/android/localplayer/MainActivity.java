@@ -14,6 +14,7 @@ import android.os.Bundle;
 import com.linson.android.localplayer.AIDL.IPlayer;
 import com.linson.android.localplayer.activities.MasterPage;
 
+import app.bll.MusicServices;
 import app.lslibrary.androidHelper.LSLog;
 import app.lslibrary.pattern.LSObserver;
 import app.model.PlayerBaseInfo;
@@ -37,9 +38,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         initGlobalArgument();//初始化全局变量
-
         StartServicesabc();//启动服务，并在这里关闭服务。其他页面，绑动服务就ok了。
-        registerServicesBroadcast();//注册广播
     }
 
 
@@ -47,10 +46,30 @@ public class MainActivity extends AppCompatActivity
     protected void onStart()
     {
         super.onStart();
+        int waitSum=0;
         if(isFirstLoad)
         {
-            startIndex();//跳转首页
-            isFirstLoad=false;
+            while (appContext==null && waitSum<50)//必须连接上server才能跳转。除非5秒都连接不上。
+            {
+                try
+                {
+                    Thread.sleep(100);
+                    waitSum++;
+                } catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            if(appContext!=null)
+            {
+                startIndex();//跳转首页
+                isFirstLoad = false;
+            }
+            else
+            {
+                finish();
+            }
+
         }
         else
         {
@@ -90,9 +109,15 @@ public class MainActivity extends AppCompatActivity
     //start and test services
     private boolean StartServicesabc()
     {
-        startService(app.bll.MusicServices.getServiceIntent());
-        appServiceConnection = new MyConnection();
-        bindService(app.bll.MusicServices.getServiceIntent(), appServiceConnection, Context.BIND_AUTO_CREATE);
+        try
+        {
+            startService(MusicServices.getServiceIntent());
+            appServiceConnection = new MyConnection();
+            bindService(MusicServices.getServiceIntent(), appServiceConnection, Context.BIND_AUTO_CREATE);
+        } catch (Exception e)
+        {
+            LSLog.Log_Exception(e);
+        }
 
         return true;
     }
@@ -117,7 +142,7 @@ public class MainActivity extends AppCompatActivity
 
 
     //region serverConneciton
-    public static class MyConnection implements ServiceConnection
+    public  class MyConnection implements ServiceConnection
     {
         public IPlayer mPlayerProxy;
 
@@ -133,7 +158,6 @@ public class MainActivity extends AppCompatActivity
             LSLog.Log_INFO("");
         }
 
-        @SuppressLint("DefaultLocale")
         @Override
         public void onServiceConnected(ComponentName name, IBinder service)
         {
@@ -146,6 +170,7 @@ public class MainActivity extends AppCompatActivity
             else
             {
                 LSLog.Log_INFO("onServiceConnected. result :success");
+                registerServicesBroadcast();//注册广播
             }
         }
 

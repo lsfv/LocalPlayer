@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="230dp"
+    android:layout_height="match_parent"
+    android:layout_gravity="start"
+    android:background="@color/playerpanel">
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:text="关于软件"
+        android:textColor="@android:color/background_light"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_pageabout"
+        app:layout_constraintStart_toEndOf="@+id/btn_pageabout"
+        app:layout_constraintTop_toTopOf="@+id/btn_pageabout" />
+
+    <Button
+        android:id="@+id/btn_pageabout"
+        android:layout_width="66dp"
+        android:layout_height="66dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/icon_about"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_pagesetting" />
+
+    <Button
+        android:id="@+id/btn_pagesetting"
+        android:layout_width="66dp"
+        android:layout_height="66dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/icon_settingmain"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_page1" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:text="系统设置"
+        android:textColor="@android:color/background_light"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_pagesetting"
+        app:layout_constraintStart_toEndOf="@+id/btn_pagesetting"
+        app:layout_constraintTop_toTopOf="@+id/btn_pagesetting" />
+
+    <Button
+        android:id="@+id/btn_page1"
+        android:layout_width="66dp"
+        android:layout_height="66dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/icon_menu"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:text="播放列表"
+        android:textColor="@android:color/background_light"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_page1"
+        app:layout_constraintStart_toEndOf="@+id/btn_page1"
+        app:layout_constraintTop_toTopOf="@+id/btn_page1" />
+
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:text="TextView"
+        android:textColor="@android:color/background_light"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</android.support.constraint.ConstraintLayout>

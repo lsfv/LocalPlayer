@@ -6,6 +6,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.linson.android.localplayer.MainActivity;
@@ -31,6 +32,8 @@ public class PlayPanel extends ConstraintLayout implements View.OnClickListener
     private Context mContext;
     private LSObserver.IObserverListener<app.model.PlayerBaseInfo> mObserver;
     private IPanelLisener mLisener;
+    private int resplay=R.drawable.icon_play;
+    private int resPause=R.drawable.icon_pause;
 
     public PlayPanel(Context context, AttributeSet attrs)
     {
@@ -38,13 +41,19 @@ public class PlayPanel extends ConstraintLayout implements View.OnClickListener
         mContext=context;
         LayoutInflater.from(context).inflate(R.layout.custom_panel, this, true);
         mMyControls=new MyControls();//cut it into 'onCreate'
+
         setupUI();
-        mMyControls.mPanelGroup.setOnTouchListener(new GroupTouchListener());
-        mMyControls.mIconPlay.setOnClickListener(this);
-        mMyControls.mIconMenu.setOnClickListener(this);
+        setupUITouch();
 
         mObserver=new InfoObserver();
         MainActivity.baseInfoLSObserver.registerObserver(mObserver);
+    }
+
+    private void setupUITouch()
+    {
+        mMyControls.mPanelGroup.setOnTouchListener(new GroupTouchListener());
+        mMyControls.mIconPlay.setOnClickListener(this);
+        mMyControls.mIconSetting.setOnClickListener(this);
     }
 
     @Override
@@ -61,7 +70,7 @@ public class PlayPanel extends ConstraintLayout implements View.OnClickListener
         {
             ClickPlay();
         }
-        else if(v.getId()==R.id.icon_menu)
+        else if(v.getId()==R.id.icon_setting)
         {
             clickMenu();
         }
@@ -86,31 +95,31 @@ public class PlayPanel extends ConstraintLayout implements View.OnClickListener
             if(info.status==PlayerBaseInfo.status_init)
             {
                 mMyControls.mTvSongname.setText("等待播放");
-                mMyControls.mIconPlay.setImage(R.drawable.play);
+                mMyControls.mIconPlay.setImageResource(resplay);
             }
             else if(info.status==PlayerBaseInfo.status_playing)
             {
                 List<V_List_Song> songs=app.bll.V_List_Song.getModelByLid(info.lid);
                 V_List_Song thesong=songs.get(info.index);
                 mMyControls.mTvSongname.setText(thesong.S_musicName);
-                mMyControls.mIconPlay.setImage(R.drawable.pause);
+                mMyControls.mIconPlay.setImageResource(resPause);
             }
             else if(info.status==PlayerBaseInfo.status_pause)
             {
                 List<V_List_Song> songs=app.bll.V_List_Song.getModelByLid(info.lid);
                 V_List_Song thesong=songs.get(info.index);
                 mMyControls.mTvSongname.setText(thesong.S_musicName);
-                mMyControls.mIconPlay.setImage(R.drawable.play);
+                mMyControls.mIconPlay.setImageResource(resplay);
             }
             else if(info.status==PlayerBaseInfo.status_error_other)
             {
                 mMyControls.mTvSongname.setText(mContext.getString(R.string.error));
-                mMyControls.mIconPlay.setImage(R.drawable.play);
+                mMyControls.mIconPlay.setImageResource(resplay);
             }
             else if(info.status==PlayerBaseInfo.status_error_nofile)
             {
                 mMyControls.mTvSongname.setText(mContext.getString(R.string.nofile));
-                mMyControls.mIconPlay.setImage(R.drawable.play);
+                mMyControls.mIconPlay.setImageResource(resplay);
             }
         }
     }
@@ -224,15 +233,15 @@ public class PlayPanel extends ConstraintLayout implements View.OnClickListener
     {
         private ConstraintLayout mPanelGroup;
         private TextView mTvSongname;
-        private LSCircleImage mIconPlay;
-        private LSCircleImage mIconMenu;
+        private ImageView mIconPlay;
+        private ImageView mIconSetting;
 
         public MyControls()
         {
             mPanelGroup = (ConstraintLayout) findViewById(R.id.panel_group);
             mTvSongname = (TextView) findViewById(R.id.tv_songname);
-            mIconPlay = (LSCircleImage) findViewById(R.id.icon_play);
-            mIconMenu = (LSCircleImage) findViewById(R.id.icon_menu);
+            mIconPlay = (ImageView) findViewById(R.id.icon_play);
+            mIconSetting = (ImageView) findViewById(R.id.icon_setting);
         }
     }
     //endregion

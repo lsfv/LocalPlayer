@@ -2,6 +2,8 @@ package com.linson.android.localplayer.activities.Adapter;
 
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.content.res.Resources;
+import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
@@ -10,10 +12,15 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 
 import java.util.List;
+
+import app.lslibrary.androidHelper.LSLog;
 
 
 public class Adapter_List extends RecyclerView.Adapter<Adapter_List.MyHolderView>
@@ -24,11 +31,13 @@ public class Adapter_List extends RecyclerView.Adapter<Adapter_List.MyHolderView
     private final int maxWidth=240;
     private boolean isHiden=true;
     private IAdapter_ListHander mIAdapter_listHander;
+    private int mplayingLID=-1;
 
-    public Adapter_List(@NonNull List<app.model.List> data,@NonNull IAdapter_ListHander IAdapter_listHander)
+    public Adapter_List(@NonNull List<app.model.List> data,@NonNull IAdapter_ListHander IAdapter_listHander,int LID)
     {
         mdata=data;
         mIAdapter_listHander=IAdapter_listHander;
+        mplayingLID=LID;
     }
 
 
@@ -45,6 +54,8 @@ public class Adapter_List extends RecyclerView.Adapter<Adapter_List.MyHolderView
     public void onBindViewHolder(@NonNull final MyHolderView myHolderView, @SuppressLint("RecyclerView") final int i)
     {
         myHolderView.mTvItem.setText(mdata.get(i).L_name);
+        myHolderView.mIconPlaying.setVisibility(mdata.get(i).L_id==mplayingLID?View.VISIBLE:View.INVISIBLE);
+
         myHolderView.mButton21.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -161,6 +172,12 @@ public class Adapter_List extends RecyclerView.Adapter<Adapter_List.MyHolderView
         this.notifyDataSetChanged();
     }
 
+    public void setMplayingLID(int lid)
+    {
+        mplayingLID=lid;
+        this.notifyDataSetChanged();
+    }
+
 
     @Override
     public int getItemCount()
@@ -173,13 +190,18 @@ public class Adapter_List extends RecyclerView.Adapter<Adapter_List.MyHolderView
 
     public static class MyHolderView extends RecyclerView.ViewHolder
     {
+        private ImageView mIconPlaying;
+        private ConstraintLayout mConstraintLayout;
         private TextView mTvItem;
         private Button mButton21;
         private View mView;
 
+
         public MyHolderView(@NonNull View itemView)
         {
             super(itemView);
+            mIconPlaying = (ImageView)itemView.findViewById(R.id.icon_playing);
+            mConstraintLayout = (ConstraintLayout) itemView.findViewById(R.id.constraintLayout);
             mTvItem = (TextView) itemView.findViewById(R.id.tv_item);
             mButton21 = (Button) itemView.findViewById(R.id.button21);
             mView=itemView;

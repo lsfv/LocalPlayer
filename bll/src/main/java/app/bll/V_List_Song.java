@@ -33,7 +33,7 @@ public abstract class V_List_Song
     //extend
     public static final int defaultListID=1;
 
-    public static String menu_editlist="编辑清单";
+    public static String menu_editlist="编辑列表";
 
     public  static java.util.List<String> getMenuTitle()
     {

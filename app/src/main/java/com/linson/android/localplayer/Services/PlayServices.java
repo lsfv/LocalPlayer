@@ -166,35 +166,42 @@ public class PlayServices extends Service
             int res = PlayerBaseInfo.status_error_other;
             String songPath = "";
             List<app.model.V_List_Song> songs= app.bll.V_List_Song.getModelByLid(mBaseInfo.lid);
-            try
-            {
-                songPath = songs.get(mBaseInfo.index).S_path;
-            } catch (Exception e)
-            {
-                LSLog.Log_Exception(e);
-            }
-            LSLog.Log_INFO(songPath);
-            if (songPath != null && songPath.trim().length() > 0)
+            if(songs.size()>mBaseInfo.index)
             {
                 try
                 {
-                    mMediaPlayer.reset();
-                    mMediaPlayer.setDataSource(songPath);
-                    mMediaPlayer.prepare();
-                    mMediaPlayer.start();
-                    res = PlayerBaseInfo.status_playing;
-                } catch (IOException e)
-                {
-                    res = PlayerBaseInfo.status_error_nofile;
-                    LSLog.Log_Exception(e);
+                    songPath = songs.get(mBaseInfo.index).S_path;
                 } catch (Exception e)
                 {
-                    res = PlayerBaseInfo.status_error_other;
                     LSLog.Log_Exception(e);
                 }
-            } else
+                LSLog.Log_INFO(songPath);
+                if (songPath != null && songPath.trim().length() > 0)
+                {
+                    try
+                    {
+                        mMediaPlayer.reset();
+                        mMediaPlayer.setDataSource(songPath);
+                        mMediaPlayer.prepare();
+                        mMediaPlayer.start();
+                        res = PlayerBaseInfo.status_playing;
+                    } catch (IOException e)
+                    {
+                        res = PlayerBaseInfo.status_error_nofile;
+                        LSLog.Log_Exception(e);
+                    } catch (Exception e)
+                    {
+                        res = PlayerBaseInfo.status_error_other;
+                        LSLog.Log_Exception(e);
+                    }
+                } else
+                {
+                    res = PlayerBaseInfo.status_error_nofile;
+                }
+            }
+            else
             {
-                res = PlayerBaseInfo.status_error_nofile;
+                res=PlayerBaseInfo.status_error_nofile;
             }
 
             return res;
@@ -276,13 +283,11 @@ public class PlayServices extends Service
             mMediaPlayer.seekTo(position);
         }
 
-
         @Override
         public void ondisconnected()
         {
             LSLog.Log_INFO("on disconnected.beacause it's a share connection.  a connecter will use it later.don't clear anything.");
         }
-
 
         public void ReasePlayer()
         {

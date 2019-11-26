@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Adapter.Adapter_Songs;
+import com.linson.android.localplayer.activities.Dialog.Dialog_addlist;
 import com.linson.android.localplayer.appHelperCommon;
 
 import java.util.ArrayList;
@@ -54,6 +55,13 @@ public class ListDetail extends BaseFragment
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        initParameter();//把类的自定义初始化禁止了，导致起不到初始化作用。糟糕的设计。所以把初始化变量的工作通过bundle来进行，并放置到oncreate中来作为初始
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         return inflater.inflate(R.layout.fragment_list_detail, container, false);
@@ -65,15 +73,16 @@ public class ListDetail extends BaseFragment
     {
         super.onActivityCreated(savedInstanceState);
         mMyControls=new MyControls();//cut it into 'onCreate'
-        initParameter();
         setupWidget();
         setupRecyleview();
-        getMaster().setupToolbarMenu(app.bll.V_List_Song.getMenuTitle(), new MenuHandler());
-
+        setupMasterMenu();
+        getMaster().SetupTitle("''"+mListName+"''");
         mObserverListener=new oob();
         MainActivity.baseInfoLSObserver.registerObserver(mObserverListener);
         LSLog.Log_INFO(String.format("id:%d,name:%s",mListID,mListName));
     }
+
+
 
     @Override
     public void onDestroyView()
@@ -83,14 +92,54 @@ public class ListDetail extends BaseFragment
     }
 
     //region private functions
+    private void setupMasterMenu()
+    {
+        getMaster().getBtnArray().get(0).setVisibility(View.GONE);
+        getMaster().getBtnArray().get(1).setVisibility(View.GONE);
+        getMaster().getBtnArray().get(2).setVisibility(View.VISIBLE);
+        getMaster().getBtnArray().get(2).setImageDrawable(getResources().getDrawable(R.drawable.icon_editlist));
+        getMaster().getBtnArray().get(2).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if(mListID>1 && getActivity()!=null)
+                {
+
+                    List<app.model.V_List_Song> allSongs = app.bll.V_List_Song.getModelByLid(V_List_Song.defaultListID);
+                    List<app.model.V_List_Song> mySongs = ((Adapter_Songs) mMyControls.mRvSonglist.getAdapter()).getCloneData();
+                    mySongs = mySongs == null ? new ArrayList<app.model.V_List_Song>() : mySongs;
+                    CharSequence[] nameList = app.bll.V_List_Song.getNameList(allSongs);
+                    boolean[] ischooseList = app.bll.V_List_Song.getIsChoose(allSongs, mySongs);
+
+                    //数据检测,正常就弹出系统api，多选对话窗口。
+                    //实时修改 是否选中的局部数据,确定按钮后才把局部数据更新到adapter和数据库。
+                    if (allSongs != null && mySongs != null && getActivity()!=null)
+                    {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ListDetail.this.getContext());
+                        builder.setMultiChoiceItems(nameList, ischooseList, new MultiChoiceHandler(ischooseList));
+
+                        builder.setPositiveButton("确定", new MultiChoiceClick(allSongs,ischooseList ));
+                        builder.setNegativeButton("取消", new MultiChoiceClickCancel());
+                        builder.show();
+                    }
+                }
+                else
+                {
+                    Toast.makeText(getContext(), "'所有歌曲'不需要编辑!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
     private void setupWidget()
     {
-        mMyControls.mTvListname.setText(mListName);
     }
+
 
     private void initParameter()
     {
-        mListID=getArguments().getInt(STRLID, mListID);//把类的自定义初始化禁止了，导致起不到初始化作用。糟糕的设计。
+        mListID=getArguments().getInt(STRLID, mListID);
         mListName=getArguments().getString(STRLNAME, "");
     }
 
@@ -160,45 +209,6 @@ public class ListDetail extends BaseFragment
     }
     //endregion
 
-    //region Menu's Handler
-    public class MenuHandler implements android.support.v7.widget.Toolbar.OnMenuItemClickListener
-    {
-        @Override
-        public boolean onMenuItemClick(MenuItem menuItem)
-        {
-            if(LSUI.getToolbarItemKeyID(menuItem).equals(V_List_Song.menu_editlist))
-            {
-                if(mListID>1 && getActivity()!=null)
-                {
-
-                    List<app.model.V_List_Song> allSongs = app.bll.V_List_Song.getModelByLid(V_List_Song.defaultListID);
-                    List<app.model.V_List_Song> mySongs = ((Adapter_Songs) mMyControls.mRvSonglist.getAdapter()).getCloneData();
-                    mySongs = mySongs == null ? new ArrayList<app.model.V_List_Song>() : mySongs;
-                    CharSequence[] nameList = app.bll.V_List_Song.getNameList(allSongs);
-                    boolean[] ischooseList = app.bll.V_List_Song.getIsChoose(allSongs, mySongs);
-
-                    //数据检测,正常就弹出系统api，多选对话窗口。
-                    //实时修改 是否选中的局部数据,确定按钮后才把局部数据更新到adapter和数据库。
-                    if (allSongs != null && mySongs != null && getActivity()!=null)
-                    {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(ListDetail.this.getContext());
-                        builder.setMultiChoiceItems(nameList, ischooseList, new MultiChoiceHandler(ischooseList));
-
-                        builder.setPositiveButton("确定", new MultiChoiceClick(allSongs,ischooseList ));
-                        builder.setNegativeButton("取消", new MultiChoiceClickCancel());
-                        builder.show();
-                    }
-                }
-                else
-                {
-                    Toast.makeText(getContext(), "'所有歌曲'不需要编辑!", Toast.LENGTH_SHORT).show();
-                }
-            }
-            return true;
-        }
-    }
-    //endregion
-
     //region MultiChoiceListener onchoose's handler
     public class MultiChoiceHandler implements DialogInterface.OnMultiChoiceClickListener
     {
@@ -264,12 +274,10 @@ public class ListDetail extends BaseFragment
     private MyControls mMyControls=null;
     public class MyControls
     {
-        private TextView mTvListname;
         private RecyclerView mRvSonglist;
 
         public MyControls()
         {
-            mTvListname = (TextView) ListDetail.this.getActivity().findViewById(R.id.tv_listname);
             mRvSonglist = (RecyclerView) ListDetail.this.getActivity().findViewById(R.id.rv_songlist);
         }
     }

@@ -5,17 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.ListDetail">
-
-    <TextView
-        android:id="@+id/tv_listname"
-        android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:gravity="center"
-        android:text="@string/holderTitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <android.support.v7.widget.RecyclerView
         android:contentDescription="rv_songlist"
         android:id="@+id/rv_songlist"
@@ -24,5 +13,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_listname"></android.support.v7.widget.RecyclerView>
+        app:layout_constraintTop_toTopOf="parent"></android.support.v7.widget.RecyclerView>
 </android.support.constraint.ConstraintLayout>

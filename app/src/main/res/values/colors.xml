@@ -2,5 +2,10 @@
 <resources>
     <color name="colorPrimary">#d2a06e</color>
     <color name="colorPrimaryDark">#00574b</color>
-    <color name="colorAccent">#d81b60</color>
+    <color name="colorAccent">#ff9900</color>
+    <color name="itemOrangetext">#ff9900</color>
+    <color name="itemOrangebg">#ffFFCC99</color>
+    <color name="fragmentTitlebg">#f3669900</color>
+    <color name="playerpanel">#ffcc99</color>
+    <color name="btnbgc">#8b8b8b</color>
 </resources>

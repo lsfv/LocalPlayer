@@ -19,31 +19,75 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <android.support.constraint.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <android.support.constraint.ConstraintLayout android:layout_width="match_parent" android:layout_height="match_parent">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:background="?attr/colorPrimary"
+                android:layout_height="90dp"
+                android:background="@drawable/banner"
                 android:minHeight="?attr/actionBarSize"
                 android:theme="?attr/actionBarTheme"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" >
-
-                <Button
+                app:layout_constraintTop_toTopOf="parent">
+                <app.lslibrary.customUI.LSCircleImage
+                    android:layout_marginRight="10dp"
+                    android:id="@+id/btn_menu"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    app:CircleImage_img="@drawable/icon_menulist"
+                    app:CircleImage_radius="20dp" />
+                <app.lslibrary.customUI.LSCircleImage
                     android:id="@+id/btn_back"
                     android:layout_width="40dp"
                     android:layout_height="match_parent"
-                    android:background="@color/colorPrimary"
-                    android:text="@string/back"
-                    tools:layout_editor_absoluteX="16dp"
-                    tools:layout_editor_absoluteY="4dp" />
+                    app:CircleImage_img="@drawable/icon_back"
+                    app:CircleImage_radius="20dp" />
+
+                <ImageView
+                    android:layout_marginEnd="10dp"
+                    android:id="@+id/btn_right1"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="end"
+                    app:srcCompat="@drawable/icon_newlist"
+                    tools:layout_editor_absoluteX="344dp"
+                    tools:layout_editor_absoluteY="25dp" />
+
+                <ImageView
+                    android:layout_marginRight="10dp"
+                    android:id="@+id/btn_right2"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="end"
+                    app:srcCompat="@drawable/icon_newlist"
+                    tools:layout_editor_absoluteX="304dp"
+                    tools:layout_editor_absoluteY="25dp" />
+
+                <ImageView
+                    android:layout_marginRight="10dp"
+                    android:id="@+id/btn_right3"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="end"
+                    app:srcCompat="@drawable/icon_newlist"
+                    tools:layout_editor_absoluteX="264dp"
+                    tools:layout_editor_absoluteY="25dp" />
             </android.support.v7.widget.Toolbar>
 
+            <TextView
+                android:id="@+id/fragmentTitle"
+                android:layout_width="0dp"
+                android:layout_height="35dp"
+                android:background="@color/playerpanel"
+                android:gravity="center"
+                android:text="栏目名字"
+                android:textAlignment="center"
+                android:textStyle="normal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar" />
             <android.support.constraint.ConstraintLayout
                 android:id="@+id/mainFragment"
                 android:layout_width="match_parent"
@@ -51,26 +95,14 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/toolbar"></android.support.constraint.ConstraintLayout>
+                app:layout_constraintTop_toBottomOf="@id/fragmentTitle"></android.support.constraint.ConstraintLayout>
         </android.support.constraint.ConstraintLayout>
-
-
-        <android.support.constraint.ConstraintLayout android:layout_width="200dp"
-            android:background="#ffff0000" android:layout_height="match_parent"
-            android:layout_gravity="start">
-            <Button
-                android:id="@+id/btn_page1"
-                android:text="@string/menu1"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </android.support.constraint.ConstraintLayout>
+<include layout="@layout/drawner_master"></include>
     </android.support.v4.widget.DrawerLayout>
     <com.linson.android.localplayer.CustomUI.PlayPanel
         android:id="@+id/playpanel"
         app:layout_constraintTop_toBottomOf="@id/drawerMainMenu"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_width="match_parent"
-        android:layout_height="0dp"></com.linson.android.localplayer.CustomUI.PlayPanel>
+        android:layout_height="60dp"></com.linson.android.localplayer.CustomUI.PlayPanel>
 </android.support.constraint.ConstraintLayout>

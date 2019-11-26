@@ -1,6 +1,7 @@
 package com.linson.android.localplayer.activities;
 
 import android.annotation.SuppressLint;
+import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
@@ -13,10 +14,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.appHelperCommon;
+
+import java.util.Date;
 
 import app.lslibrary.androidHelper.LSLog;
 import app.model.PlayerBaseInfo;
@@ -28,6 +32,7 @@ public class PlaySong extends BaseFragment
 {
     public static final String argumentLsid = "lid";
     public static final String argumentindex="index";
+
 
     private int mlsid=-1;
     private int mIndex=-1;
@@ -55,7 +60,8 @@ public class PlaySong extends BaseFragment
         super.onActivityCreated(savedInstanceState);
         mMyControls=new MyControls();//cut it into 'onCreate'
         initParameter();
-        getMaster().setupToolbarMenu(null, null);
+        setupMasterMenu();
+        getMaster().SetupTitle(null);
         setupSeekBar();
 
     }
@@ -64,11 +70,15 @@ public class PlaySong extends BaseFragment
     private void setupSeekBar()
     {
         V_List_Song thesong=app.bll.V_List_Song.getModelByLid(mlsid).get(mIndex);
+        java.text.SimpleDateFormat simpleDateFormat=new java.text.SimpleDateFormat("mm:ss");
+        String strdate=simpleDateFormat.format(new Date(0));
+        mMyControls.mTvDuration.setText(strdate);
         mMyControls.mSbPlaying.setMax(thesong.S_duration);
         mMyControls.mSbPlaying.setOnSeekBarChangeListener(new SeekBarListener());
         Thread thread_getDuration=new Thread(new GetDuration());
         mStopThread=false;
         thread_getDuration.start();
+
     }
 
     @Override
@@ -79,6 +89,13 @@ public class PlaySong extends BaseFragment
     }
 
     //region private funcions
+    private void setupMasterMenu()
+    {
+        getMaster().getBtnArray().get(0).setVisibility(View.GONE);
+        getMaster().getBtnArray().get(1).setVisibility(View.GONE);
+        getMaster().getBtnArray().get(2).setVisibility(View.GONE);
+    }
+
     @SuppressLint("DefaultLocale")
     private void initParameter()
     {
@@ -113,12 +130,15 @@ public class PlaySong extends BaseFragment
                         public void run()
                         {
                             mMyControls.mSbPlaying.setProgress(info.playingSeconds);
+                            java.text.SimpleDateFormat simpleDateFormat=new java.text.SimpleDateFormat("mm:ss");
+                            String strdate=simpleDateFormat.format(new Date(info.playingSeconds));
+                            mMyControls.mTvDuration.setText(strdate);
                         }
                     });
                 }
                 try
                 {
-                    Thread.sleep(1500);
+                    Thread.sleep(900);
                 }
                 catch (Exception e)
                 {
@@ -159,12 +179,14 @@ public class PlaySong extends BaseFragment
     {
         private ConstraintLayout mContent;
         private ConstraintLayout mBottom;
+        private TextView mTvDuration;
         private SeekBar mSbPlaying;
 
         public MyControls()
         {
-            mContent = (ConstraintLayout)getActivity().findViewById(R.id.content);
+            mContent = (ConstraintLayout) getActivity().findViewById(R.id.content);
             mBottom = (ConstraintLayout) getActivity().findViewById(R.id.bottom);
+            mTvDuration = (TextView) getActivity().findViewById(R.id.tv_duration);
             mSbPlaying = (SeekBar) getActivity().findViewById(R.id.sb_playing);
         }
     }

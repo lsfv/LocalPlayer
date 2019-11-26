@@ -2,6 +2,11 @@ package com.linson.android.localplayer.activities;
 
 import android.Manifest;
 import android.database.ContentObserver;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -15,16 +20,28 @@ import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+
 import com.linson.android.localplayer.CustomUI.PlayPanel;
 import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
+import com.linson.android.localplayer.activities.Dialog.Dialog_panelmenu;
 import com.linson.android.localplayer.appHelperCommon;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import app.bll.LocalSong;
 import app.lslibrary.androidHelper.LSContentResolver;
 import app.lslibrary.androidHelper.LSLog;
 import app.lslibrary.androidHelper.LSUI;
+import app.lslibrary.customUI.LSCircleImage;
 import app.model.PlayerBaseInfo;
 
+//!todo 图标和进度条提示
 //!todo ui的美化。歌词先不需要，用一个动态的cd代替就ok。
+//!todo 适配的总结。dp。
 //!todo mvvm？测试发现用观察者模式，非常简洁清晰有效。    可以开新分支测试mvvm.
 //!todo fullscreen dialog 的提起。
 //!todo 还是需要自带的常用所有控件都过一遍
@@ -39,39 +56,53 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_master_page);
+        try
+        {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_master_page);
 
-        mMyControls=new MyControls();//cut it into 'onCreate'//1.控件绑定
-        controlsEvent();
-        setupDrawerMenu();//2.配置左侧滑动菜单
-        CleanStackAndReplaceFragment(new ListIndex());//3.加载首页
-        LSContentResolver.checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new app.bll.LocalSong.UpdateDB_Songs(MainActivity.appContext));//4.自动跟新歌曲
-        this.getContentResolver().registerContentObserver(LSContentResolver.uri_audio_external, false, new MyAudioObserver(null));//5.监听歌曲变化
-        mMyControls.mPlaypanel.setLisener(new PanelListener());
+            mMyControls = new MyControls();//cut it into 'onCreate'//1.控件绑定
+            controlsEvent();
+            CleanStackAndReplaceFragment(new ListIndex());//3.加载首页
+            LSContentResolver.checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new LocalSong.UpdateDB_Songs(MainActivity.appContext));//4.自动跟新歌曲
+            this.getContentResolver().registerContentObserver(LSContentResolver.uri_audio_external, false, new MyAudioObserver(null));//5.监听歌曲变化
+            mMyControls.mPlaypanel.setLisener(new PanelListener());
+        } catch (Exception e)
+        {
+            LSLog.Log_Exception(e);
+        }
     }
-
 
     @Override
     public void onClick(View v)
     {
-        switch (v.getId())
+        if(v.getId()==R.id.btn_page1)
         {
-            case R.id.btn_page1:
-            {
-                CleanStackAndReplaceFragment(new ListIndex());
-                mMyControls.mDrawerMainMenu.closeDrawer(Gravity.START);
-                break;
-            }
-            case R.id.btn_back:
-            {
-                if(getSupportFragmentManager().getBackStackEntryCount()>0)
-                {
-                    getSupportFragmentManager().popBackStack();
-                }
-            }
-            default: { break; }
+            CleanStackAndReplaceFragment(new ListIndex());
+            mMyControls.mDrawerMainMenu.closeDrawer(Gravity.START);
         }
+        else if(v.getId()==R.id.btn_back)
+        {
+            if(getSupportFragmentManager().getBackStackEntryCount()>0)
+            {
+                getSupportFragmentManager().popBackStack();
+            }
+        }
+        else if(v.getId()==R.id.btn_menu)
+        {
+            mMyControls.mDrawerMainMenu.openDrawer(Gravity.START);
+        }
+        else if(v.getId()==R.id.btn_pagesetting)
+        {
+            Dialog_panelmenu dialog_panelmenu=new Dialog_panelmenu(this);
+            dialog_panelmenu.show();
+        }
+        else if(v.getId()==R.id.btn_pageabout)
+        {
+            CleanStackAndReplaceFragment(new About());
+            mMyControls.mDrawerMainMenu.closeDrawer(Gravity.START);
+        }
+
     }
 
     @Override
@@ -126,19 +157,9 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
     {
         mMyControls.mBtnBack.setOnClickListener(this);
         mMyControls.mBtnPage1.setOnClickListener(this);
-    }
-
-    private void setupDrawerMenu()
-    {
-        mMyControls.mToolbar.setNavigationIcon(R.drawable.list);
-        mMyControls.mToolbar.setNavigationOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                mMyControls.mDrawerMainMenu.openDrawer(Gravity.START);
-            }
-        });
+        mMyControls.mBtnMenu.setOnClickListener(this);
+        mMyControls.mBtnPagesetting.setOnClickListener(this);
+        mMyControls.mBtnPageabout.setOnClickListener(this);
     }
 
     private void CleanStackAndReplaceFragment(Fragment fragment)
@@ -149,14 +170,27 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
     //endregion
 
     //region 提供给fragment访问的功能
-    public void setupToolbarMenu(java.util.List<String> menus, android.support.v7.widget.Toolbar.OnMenuItemClickListener handler)
+    public List<ImageView> getBtnArray()
     {
-        LSUI.setupToolbarMenu(mMyControls.mToolbar, menus, handler);
+        List<ImageView> res=new ArrayList<>();
+        res.add(mMyControls.mBtnRight1);
+        res.add(mMyControls.mBtnRight2);
+        res.add(mMyControls.mBtnRight3);
+        return res;
     }
 
-    public void onBaseinfoChange()
+    public void SetupTitle(String title)
     {
-        mMyControls.mPlaypanel.setupUI();
+        if(title!=null)
+        {
+            mMyControls.mFragmentTitle.setText(title);
+            mMyControls.mFragmentTitle.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            mMyControls.mFragmentTitle.setText("");
+            mMyControls.mFragmentTitle.setVisibility(View.GONE);
+        }
     }
     //endregion
 
@@ -166,19 +200,48 @@ public class MasterPage extends AppCompatActivity implements View.OnClickListene
     {
         private DrawerLayout mDrawerMainMenu;
         private Toolbar mToolbar;
-        private Button mBtnBack;
+        private LSCircleImage mBtnMenu;
+        private LSCircleImage mBtnBack;
+        private ImageView mBtnRight1;
+        private ImageView mBtnRight2;
+        private ImageView mBtnRight3;
+        private TextView mFragmentTitle;
         private ConstraintLayout mMainFragment;
-        private Button mBtnPage1;
         private PlayPanel mPlaypanel;
+
+        private TextView mTextView7;
+        private Button mBtnPageabout;
+        private Button mBtnPagesetting;
+        private TextView mTextView6;
+        private Button mBtnPage1;
+        private TextView mTextView5;
+        private TextView mTextView8;
+
+
+
+
 
         public MyControls()
         {
             mDrawerMainMenu = (DrawerLayout) findViewById(R.id.drawerMainMenu);
             mToolbar = (Toolbar) findViewById(R.id.toolbar);
-            mBtnBack = (Button) findViewById(R.id.btn_back);
+            mBtnMenu = (LSCircleImage) findViewById(R.id.btn_menu);
+            mBtnBack = (LSCircleImage) findViewById(R.id.btn_back);
+            mBtnRight1 = (ImageView) findViewById(R.id.btn_right1);
+            mBtnRight2 = (ImageView) findViewById(R.id.btn_right2);
+            mBtnRight3 = (ImageView) findViewById(R.id.btn_right3);
+            mFragmentTitle = (TextView) findViewById(R.id.fragmentTitle);
             mMainFragment = (ConstraintLayout) findViewById(R.id.mainFragment);
             mBtnPage1 = (Button) findViewById(R.id.btn_page1);
             mPlaypanel = (PlayPanel) findViewById(R.id.playpanel);
+
+            mTextView7 = (TextView) findViewById(R.id.textView7);
+            mBtnPageabout = (Button) findViewById(R.id.btn_pageabout);
+            mBtnPagesetting = (Button) findViewById(R.id.btn_pagesetting);
+            mTextView6 = (TextView) findViewById(R.id.textView6);
+            mBtnPage1 = (Button) findViewById(R.id.btn_page1);
+            mTextView5 = (TextView) findViewById(R.id.textView5);
+            mTextView8 = (TextView) findViewById(R.id.textView8);
         }
     }
     //endregion

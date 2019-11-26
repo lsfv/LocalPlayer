@@ -2,9 +2,12 @@ package app.lslibrary.androidHelper;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+
+import app.lslibrary.R;
 
 public abstract class LSUI
 {
@@ -64,7 +67,7 @@ public abstract class LSUI
     //配置一个菜单，每个菜单有一个显示字符和一个内部参数字符。都是同一个值。目的就是显示字符修改后。还可以通过内部参数字符找到原菜单。
     @SuppressLint("AlwaysShowAction")
     private static String TOOLBARITEMVARIABLENAME="titlename";
-    public static void setupToolbarMenu(Toolbar toolbar, java.util.List<String> menus, android.support.v7.widget.Toolbar.OnMenuItemClickListener handler)
+    public static void setupToolbarMenu(Toolbar toolbar, java.util.List<String> menus, android.support.v7.widget.Toolbar.OnMenuItemClickListener handler,java.util.List<Drawable> imgs)
     {
         toolbar.setOnMenuItemClickListener(handler);
         toolbar.getMenu().clear();
@@ -77,6 +80,7 @@ public abstract class LSUI
                 tempIntent.putExtra(TOOLBARITEMVARIABLENAME, menus.get(i));
                 tempitem.setIntent(tempIntent);
                 tempitem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                tempitem.setIcon(imgs.get(i));
             }
         }
     }

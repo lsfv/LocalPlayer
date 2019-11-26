@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 
 import java.util.ArrayList;
@@ -59,9 +61,11 @@ public class Adapter_Songs extends RecyclerView.Adapter<Adapter_Songs.MyViewHold
         if(i==mPlayingIndex)
         {
             myViewHolder.mIvPlaying.setVisibility(View.VISIBLE);
+            //myViewHolder.mView.setBackgroundColor(MainActivity.appContext.getResources().getColor(R.color.itemOrangebg));
         }
         else
         {
+            //myViewHolder.mView.setBackgroundColor(0xffffffff);
             myViewHolder.mIvPlaying.setVisibility(View.INVISIBLE);
         }
         myViewHolder.mView.setOnClickListener(new View.OnClickListener()

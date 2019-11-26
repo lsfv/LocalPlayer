@@ -15,14 +15,16 @@ public class Adapter_RadioButton extends RecyclerView.Adapter<Adapter_RadioButto
     private List<String> mBtns;
     private int mCheckIndex=0;
     private int bgc=Color.GRAY;
-    private int bgcCheck=Color.YELLOW;
+    private int bgcCheck=0xffff9900;
     private IDialogRadioListener mIDialogEvent;
 
-    public Adapter_RadioButton(List<String> data,int checkedIndex,IDialogRadioListener dialogEvent)
+    public Adapter_RadioButton(List<String> data,int checkedIndex,IDialogRadioListener dialogEvent,int bgca,int bgcchecka)
     {
         mBtns=data;
         mCheckIndex=checkedIndex;
         mIDialogEvent=dialogEvent;
+//        bgc=bgca;
+//        bgcCheck=bgcchecka;
     }
 
     @NonNull

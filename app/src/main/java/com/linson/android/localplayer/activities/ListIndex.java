@@ -11,18 +11,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.linson.android.localplayer.MainActivity;
 import com.linson.android.localplayer.R;
 import com.linson.android.localplayer.activities.Adapter.Adapter_List;
 import com.linson.android.localplayer.activities.Dialog.Dialog_addlist;
+import com.linson.android.localplayer.appHelperCommon;
 
 import app.bll.V_List_Song;
+import app.lslibrary.androidHelper.LSLog;
 import app.lslibrary.androidHelper.LSUI;
+import app.lslibrary.pattern.LSObserver;
 import app.model.List;
+import app.model.PlayerBaseInfo;
 
 
 //功能：展示列表。实现母模板的菜单功能。
 public class ListIndex extends BaseFragment
 {
+    private LSObserver.IObserverListener<PlayerBaseInfo> mObserverListener;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
@@ -33,20 +40,71 @@ public class ListIndex extends BaseFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
-        super.onActivityCreated(savedInstanceState);
-        mMyControls=new MyControls();//cut it into 'onCreate'
-        setupRecycle();
-        getMaster().setupToolbarMenu(app.bll.List.getMenuTitle(), new MenuHandler());
+        try
+        {
+            super.onActivityCreated(savedInstanceState);
+            mMyControls = new MyControls();//cut it into 'onCreate'
+            setupRecycle();
+            setupMasterMenu();
+            getMaster().SetupTitle("我的播放列表");
+            mObserverListener = new ServiceListener();
+            MainActivity.baseInfoLSObserver.registerObserver(mObserverListener);
+        } catch (Exception e)
+        {
+            LSLog.Log_Exception(e);
+        }
+    }
+
+    private void setupMasterMenu()
+    {
+        getMaster().getBtnArray().get(0).setVisibility(View.GONE);
+        getMaster().getBtnArray().get(1).setVisibility(View.GONE);
+        getMaster().getBtnArray().get(2).setVisibility(View.VISIBLE);
+        getMaster().getBtnArray().get(2).setImageDrawable(getResources().getDrawable(R.drawable.icon_newlist));
+        getMaster().getBtnArray().get(2).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Dialog_addlist dialog_addlist=new Dialog_addlist(getContext(), new popupWindowHander());
+                dialog_addlist.show();
+            }
+        });
+        //getMaster().setupToolbarMenu(app.bll.List.getMenuTitle(), new MenuHandler());
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        MainActivity.baseInfoLSObserver.unRegisterObserver(mObserverListener);
     }
 
     //region private functions
     private void setupRecycle()
     {
         java.util.List<List> res=app.bll.List.getAlllList();
-        Adapter_List adapter_list=new Adapter_List(res, new Adapter_listHandler());
+        PlayerBaseInfo info= appHelperCommon.getServiceBaseInfo(MainActivity.appServiceConnection);
+        int lid=-1;
+        if(info!=null)
+        {
+            lid=info.lid;
+        }
+        Adapter_List adapter_list=new Adapter_List(res, new Adapter_listHandler(),lid);
         mMyControls.mRvList.setAdapter(adapter_list);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this.getContext());
         mMyControls.mRvList.setLayoutManager(linearLayoutManager);
+    }
+    //endregion
+
+    //region baseinfoListener
+    public class ServiceListener implements LSObserver.IObserverListener<PlayerBaseInfo>
+    {
+        @Override
+        public void onHappen(PlayerBaseInfo p)
+        {
+            ((Adapter_List)mMyControls.mRvList.getAdapter()).setMplayingLID(p.lid);
+        }
     }
     //endregion
 
@@ -99,23 +157,6 @@ public class ListIndex extends BaseFragment
                 temp = app.bll.List.getModel(id);
                 ((Adapter_List) mMyControls.mRvList.getAdapter()).addItem(temp);
             }
-        }
-    }
-    //endregion
-
-    //region menu's  click handler
-    public class MenuHandler implements android.support.v7.widget.Toolbar.OnMenuItemClickListener
-    {
-        @Override
-        public boolean onMenuItemClick(MenuItem menuItem)
-        {
-            if(LSUI.getToolbarItemKeyID(menuItem).equals(app.bll.List.menu_addlist))
-            {
-                //popup window for add list
-                Dialog_addlist dialog_addlist=new Dialog_addlist(getContext(), new popupWindowHander());
-                dialog_addlist.show();
-            }
-            return true;
         }
     }
     //endregion

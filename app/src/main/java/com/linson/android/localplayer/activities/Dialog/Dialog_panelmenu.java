@@ -2,6 +2,7 @@ package com.linson.android.localplayer.activities.Dialog;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.RemoteException;
@@ -127,7 +128,7 @@ public class Dialog_panelmenu extends Dialog
         {
             mode=info.playMode;
         }
-        Adapter_RadioButton adapter_radioButton=new Adapter_RadioButton(playmodes,mode,new DialogRadioListener());
+        Adapter_RadioButton adapter_radioButton=new Adapter_RadioButton(playmodes,mode,new DialogRadioListener(),R.color.btnbgc,R.color.itemOrangetext);
         mMyControls.mRvPlaymode.setAdapter(adapter_radioButton);
         RecyclerView.LayoutManager layoutManager=new GridLayoutManager(getContext(), 4);
         mMyControls.mRvPlaymode.setLayoutManager(layoutManager);
