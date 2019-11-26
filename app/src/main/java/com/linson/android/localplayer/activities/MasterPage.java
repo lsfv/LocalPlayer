@@ -39,8 +39,7 @@ import app.lslibrary.androidHelper.LSUI;
 import app.lslibrary.customUI.LSCircleImage;
 import app.model.PlayerBaseInfo;
 
-//!todo 图标和进度条提示
-//!todo ui的美化。歌词先不需要，用一个动态的cd代替就ok。
+//!todo 后期的歌词。
 //!todo 适配的总结。dp。
 //!todo mvvm？测试发现用观察者模式，非常简洁清晰有效。    可以开新分支测试mvvm.
 //!todo fullscreen dialog 的提起。
