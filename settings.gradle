@@ -1,1 +1,1 @@
-include ':app', ':lslibrary', ':model', ':dal', ':bll'
+include ':sunplayer'
